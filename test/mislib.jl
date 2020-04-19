@@ -1,9 +1,14 @@
 using EliminateGraphs
 using TropicalTensors
 using TropicalTensors: inferier_table
+using OMEinsum
 using Test
 
 @testset "tropical contract" begin
+    t1 = Tropical.(randn(20, 20, 4))
+    t2 = Tropical.(randn(4, 20, 30))
+    t3 = ein"abc,cbd->abd"(t1,t2)
+    @test t3 isa Array{Tropical{Float64},3}
 end
 
 @testset "mislib" begin
