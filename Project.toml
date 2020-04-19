@@ -3,6 +3,9 @@ uuid = "d36a0d72-1b97-4328-8dbd-2ebdfd409140"
 authors = ["GiggleLiu"]
 version = "0.1.0"
 
+[deps]
+OMEinsum = "ebe7aa44-baf0-506c-a96f-8464559b3922"
+
 [compat]
 julia = "1"
 

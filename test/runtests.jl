@@ -1,6 +1,7 @@
 using TropicalTensors
 using Test
+using OMEinsum
 
-@testset "TropicalTensors.jl" begin
-    # Write your own tests here.
+@testset "contract" begin
+    include("mislib.jl")
 end
