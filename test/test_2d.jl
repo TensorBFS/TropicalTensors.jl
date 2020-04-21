@@ -73,9 +73,11 @@ end
 
 L = 16
 e = gen_mine_2d(L, Val(:ferro), Array)
-e = gen_mine_2d(L, Val(:ferro), CuArray)
 println("mine=",e)
 
 using BenchmarkTools
 @benchmark gen_mine_2d($L, $(Val(:ferro)), $Array)
+
+using CuArrays
+e = gen_mine_2d(L, Val(:ferro), CuArray)
 @benchmark (CuArrays.@sync gen_mine_2d($L, $(Val(:ferro)), $CuArray))
