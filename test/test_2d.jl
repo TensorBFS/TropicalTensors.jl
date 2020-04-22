@@ -4,6 +4,10 @@ using OMEinsum
 using CuArrays
 CuArrays.allowscalar(false)
 
+struct NoSplit end
+# split first dimension
+struct Split{N} end
+
 function get_TroI(::Type{Array})
     I2 = zeros(2,2)
     I2 .= -Inf
@@ -37,12 +41,12 @@ end
 get_TroB(::Type{CuArray}, v::Val) = CuArray(get_TroB(Array, v))
 get_TroI(::Type{CuArray}) = CuArray.(get_TroI(Array))
 
-function gen_mine_2d(L::Int, Jtype::Val, array_type::Type)
+function gen_mine_2d(L::Int, Jtype::Val, array_type::Type, contract_method)
     I2,I3,I4 = get_TroI(array_type)
     """The first row"""
     ball = I2
     for j in 2:L-1
-        ball = ein"ab,bc,cde->ade"(ball,get_TroB(array_type, Jtype),I3)
+        ball = ein"(ab,bc),cde->ade"(ball,get_TroB(array_type, Jtype),I3)
         ball = reshape( ball,:,size(ball,3) )
     end
     ball = ein"ab,bc,cd->ad"(ball,get_TroB(array_type, Jtype),I2)
@@ -50,13 +54,13 @@ function gen_mine_2d(L::Int, Jtype::Val, array_type::Type)
     """ From the second row to the second row from bottom """
     for i in 2:L-1
         ball = reshape(ball,2,:)
-        ball = ein"ab,ae,cde->cdb"(ball,get_TroB(array_type, Jtype),I3)
+        ball = ein"(ab,ae),cde->cdb"(ball,get_TroB(array_type, Jtype),I3)
         ball = reshape(ball,2,2,2,:)
         for j in 2:L-1
-            ball = ein"abcd,be,hc,efgh->afgd"(ball,get_TroB(array_type, Jtype),get_TroB(array_type, Jtype),I4)
+            ball = contract4224!(contract_method, ball,get_TroB(array_type, Jtype),get_TroB(array_type, Jtype),I4)
             ball = reshape(ball, size(ball,1)*size(ball,2),2,2,:)
         end
-        ball = ein"abcd,be,hc,efh->afd"(ball,get_TroB(array_type, Jtype),get_TroB(array_type, Jtype),I3)
+        ball = ein"abcd,(be,(hc,efh))->afd"(ball,get_TroB(array_type, Jtype),get_TroB(array_type, Jtype),I3)
         ball = reshape(ball,2,:)
     end
 
@@ -64,16 +68,51 @@ function gen_mine_2d(L::Int, Jtype::Val, array_type::Type)
     ball = ein"ab,da,cd->cb"(ball,get_TroB(array_type, Jtype),I2)
     ball = reshape(ball,2,2,:)
     for j in 2:L-1
-        ball = ein"abc,ad,fb,def->ec"(ball,get_TroB(array_type, Jtype),get_TroB(array_type, Jtype),I3)
+        ball = ein"abc,(ad,(fb,def))->ec"(ball,get_TroB(array_type, Jtype),get_TroB(array_type, Jtype),I3)
         ball = reshape(ball,2,2,:)
     end
-    ball = ein"abc,ad,fb,df->c"(ball,get_TroB(array_type, Jtype),get_TroB(array_type, Jtype),I2)
+    ball = ein"abc,(ad,(fb,df))->c"(ball,get_TroB(array_type, Jtype),get_TroB(array_type, Jtype),I2)
     return ball
 end
 
+function contract4224!(::NoSplit, A::AT, B, C, D) where AT
+    ein"abcd,(be,(hc,efgh))->afgd"(A, B, C, D)
+end
+
+array_upload(::Type{<:CuArray}, A) = CuArray(A)
+array_upload(::Type{<:Array}, A) = Array(A)
+
+function contract4224!(::Split{N}, A::AT, B, C, D::DT) where {N,AT,DT}
+    L = size(A, 1)
+    M = size(A, 4)
+    chunk_size = ceil(Int, (L >= M ? L : M) ÷ N)
+    for i = 1:N
+        if L >= M
+            if chunk_size*(i-1) < min(L,chunk_size*i)
+                Ai = array_upload(DT, view(A, chunk_size*(i-1)+1:min(L,chunk_size*i),:,:,:))
+                # using ein"abcd,be,hc,efgh->afgd" is very slow, seems like a bug.
+                resi = ein"abcd,(be, (hc,efgh))->afgd"(Ai, B, C, D)
+                A[chunk_size*(i-1)+1:min(L,chunk_size*i),:,:,:] = resi
+            end
+        else
+            if chunk_size*(i-1) < min(M,chunk_size*i)
+                # TODO: fix zero dimension error!
+                Ai = array_upload(DT, view(A, :,:,:,chunk_size*(i-1)+1:min(M,chunk_size*i)))
+                resi = ein"abcd,(be, (hc,efgh))->afgd"(Ai, B, C, D)
+                A[:,:,:,chunk_size*(i-1)+1:min(M,chunk_size*i)] = resi
+            end
+        end
+    end
+    A
+end
+
 L = 16
-e = gen_mine_2d(L, Val(:ferro), Array)
-println("mine=",e)
+e1 = gen_mine_2d(L, Val(:ferro), CuArray, Split{4}())
+e2 = gen_mine_2d(L, Val(:ferro), Array, Split{4}())
+e3 = gen_mine_2d(L, Val(:ferro), CuArray, NoSplit())
+e4 = gen_mine_2d(L, Val(:ferro), Array, NoSplit())
+using Test
+@test Array(e1) == e2 == Array(e3) == e4
 
 using BenchmarkTools
 @benchmark gen_mine_2d($L, $(Val(:ferro)), $Array)
