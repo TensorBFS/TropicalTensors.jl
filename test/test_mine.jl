@@ -6,25 +6,25 @@ using OMEinsum
 
 function get_TroI(::Type{Array})
     I2 = zeros(2,2)
-    I2 .= -Inf
-    I2[1,1] = 0.0
-    I2[2,2] = 0.0
+    I2 .= TROPICAL_ZERO
+    I2[1,1] = TROPICAL_ONE
+    I2[2,2] = TROPICAL_ONE
 
     I3 = zeros(2,2,2)
-    I3 .= -Inf
-    I3[1,1,1] = 0.0
-    I3[2,2,2] = 0.0
+    I3 .= TROPICAL_ZERO
+    I3[1,1,1] = TROPICAL_ONE
+    I3[2,2,2] = TROPICAL_ONE
 
     I4 = zeros(2,2,2,2)
-    I4 .= -Inf
-    I4[1,1,1,1] = 0.0
-    I4[2,2,2,2] = 0.0
+    I4 .= TROPICAL_ZERO
+    I4[1,1,1,1] = TROPICAL_ONE
+    I4[2,2,2,2] = TROPICAL_ONE
 
     return Tropical.(I2),Tropical.(I3),Tropical.(I4)
 end
 
-_get_J(::Val{:ferro}) = 1.0
-_get_J(::Val{:anti}) = -1.0
+_get_J(::Val{:ferro}) = -1.0
+_get_J(::Val{:anti}) = 1.0
 _get_J(::Val{:randn}) = randn()
 _get_J(::Val{:rand}) = rand()
 
@@ -43,7 +43,7 @@ function gen_2d(L::Int,array_type::Type, Jtype::Val)
     return [[[get_TroB(array_type,Jtype) for j in 1:L-1] for i in 1:L ] for k in 1:2]
 end
 
-function get_T(i::Int,j::Int, L::Int, array_type::Type, config::Array{Array{Int64,1},1})
+function get_T(i::Int,j::Int, L::Int, array_type::Type, config::Array{Int64,2})
     I2,I3,I4 = get_TroI(array_type)
     if i == 1 || i == L
         if j == 1 || j == L
@@ -72,16 +72,16 @@ function get_T(i::Int,j::Int, L::Int, array_type::Type, config::Array{Array{Int6
         end
     end
 
-    if config[i][j] == 1
-        T[end] = Tropical(-Inf)
-    elseif config[i][j] == 2
-        T[1] = Tropical(-Inf)
+    if config[i,j] == 1
+        T[end] = TROPICAL_ZERO
+    elseif config[i,j] == 2
+        T[1] = TROPICAL_ZERO
     end
 
     return T
 end
 
-function mine_2d(L::Int, Jtype::Val, array_type::Type, Js, config::Array{Array{Int64,1},1} )
+function mine_2d(LA::Int, Jtype::Val, array_type::Type, Js, config::Array{Int, 2} )
     """
     return minimum energy of the 2D model.
     """
@@ -136,19 +136,19 @@ function mine_2d(L::Int, Jtype::Val, array_type::Type, Js, config::Array{Array{I
 end
 
 function ground_state(L::Int, Jtype::Val, array_type::Type,Js)
-    config = [ [0 for j in 1:L] for i in 1:L ]
+    config = zeros(Int, L, L)
     println("energy of the found state is ",mine_2d(L, Jtype, Array, Js, config))
     for i in 1:L
         for j in 1:L
-            config[i][j] = 1
+            config[i,j] = 1
             ep = mine_2d(L, Jtype, Array,Js, config)
-            config[i][j] = 2
+            config[i,j] = 2
             em = mine_2d(L, Jtype, Array, Js,config)
             #println("i= ",i," j=",j," ep=",ep," em=",em)
-            if ep > em
-                config[i][j] = 1
+            if ep < em
+                config[i,j] = 1
             else
-                config[i][j] = 2
+                config[i,j] = 2
             end
         end
     end
@@ -159,8 +159,8 @@ end
 
 L = 10
 #Jtype = Val(:ferro)
-Jtype = Val(:anti)
-#Jtype = Val(:randn)
+#Jtype = Val(:anti)
+Jtype = Val(:randn)
 Js = gen_2d(L,Array,Jtype)
 ground_state(L, Jtype, Array,Js)
 

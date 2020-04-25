@@ -10,24 +10,24 @@ struct Split{N} end
 
 function get_TroI(::Type{Array})
     I2 = zeros(2,2)
-    I2 .= -Inf
-    I2[1,1] = 0.0
-    I2[2,2] = 0.0
+    I2 .= TROPICAL_ZERO
+    I2[1,1] = TROPICAL_ONE
+    I2[2,2] = TROPICAL_ONE
 
     I3 = zeros(2,2,2)
-    I3 .= -Inf
-    I3[1,1,1] = 0.0
-    I3[2,2,2] = 0.0
+    I3 .= TROPICAL_ZERO
+    I3[1,1,1] = TROPICAL_ONE
+    I3[2,2,2] = TROPICAL_ONE
 
     I4 = zeros(2,2,2,2)
-    I4 .= -Inf
-    I4[1,1,1,1] = 0.0
-    I4[2,2,2,2] = 0.0
+    I4 .= TROPICAL_ZERO
+    I4[1,1,1,1] = TROPICAL_ONE
+    I4[2,2,2,2] = TROPICAL_ONE
 
     return Tropical.(I2),Tropical.(I3),Tropical.(I4)
 end
 
-_get_J(::Val{:ferro}) = 1.0
+_get_J(::Val{:ferro}) = -1.0
 _get_J(::Val{:randn}) = randn()
 _get_J(::Val{:rand}) = rand()
 

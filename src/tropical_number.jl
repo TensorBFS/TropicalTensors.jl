@@ -1,6 +1,7 @@
-export Tropical
+export Tropical, TROPICAL_ZERO, TROPICAL_ONE
 
-const TROPICAL_ZERO = -999999
+const TROPICAL_ZERO = Inf
+const TROPICAL_ONE = 0.0 # needs better type
 
 struct Tropical{T} <: Number
     n::T
@@ -15,7 +16,7 @@ function Base.show(io::IO, ::MIME"text/plain", inf::Tropical)
 end
 
 Base.:*(a::Tropical, b::Tropical) = Tropical(a.n + b.n)
-Base.:+(a::Tropical, b::Tropical) = Tropical(max(a.n, b.n))
+Base.:+(a::Tropical, b::Tropical) = Tropical(min(a.n, b.n))
 Base.zero(::Type{Tropical{T}}) where T = Tropical(T(TROPICAL_ZERO))
 Base.zero(::Tropical{T}) where T = zero(Tropical{T})
 #for OP in [:(Base.:>), :(Base.:<), :(Base.:==), :(Base.isapprox), :(Base.:>=), :(Base.:<=)]
