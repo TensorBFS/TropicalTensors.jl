@@ -1,7 +1,7 @@
 array_upload(::CC{:GPU}, A, inds) = CuArray(A[inds...])
 array_upload(::CC{:CPU}, A, inds) = Array(A[inds...])
 function array_download!(A, resi, inds)
-    A[inds...] = resi
+    copyto!(view(A,inds...), Array(resi))
 end
 
 function contract4224!(cc::CC{DEVICE,N}, A, B, C, D) where {N,DEVICE}
