@@ -1,7 +1,7 @@
 array_upload(::CC{:GPU}, A, inds) = CuArray(A[inds...])
 array_upload(::CC{:CPU}, A, inds) = Array(A[inds...])
 function array_download!(A, resi, inds)
-    copyto!(view(A,inds...), Array(resi))
+    A[inds...] = Array(resi)
 end
 
 function contract4224!(cc::CC{DEVICE,N}, A, B, C, D) where {N,DEVICE}
@@ -21,17 +21,22 @@ function _con!(cc::CC{DEVICE,N}, code, out, A, Ts...; dim::Int) where {DEVICE,N}
     ix = get_leftmost_ixs(code)
     odim = indexin(ix[dim], [OMEinsum.getiy(code.eins)...])[]
     chunk_size = ceil(Int, L/N)
+    queue = []
+    oqueue = []
     for i = 1:N
         if chunk_size*(i-1) < min(L,chunk_size*i)
             range = chunk_size*(i-1)+1:min(L,chunk_size*i)
             slice = Any[Colon() for i=1:ndims(A)]
             slice[dim] = range
-            Ai = array_upload(cc, A, slice)
-            # using ein"abcd,be,hc,efgh->afgd" is very slow, seems like a bug.
-            resi = code(Ai, Ts...)
+            push!(queue, view(A,slice))
             slice = Any[Colon() for i=1:ndims(out)]
             slice[odim] = range
-            array_download!(out, resi, slice)
+            push!(oqueue, slice)
+        end
+        for (i,Ai) in CuIterator(queue)
+            # using ein"abcd,be,hc,efgh->afgd" is very slow, seems like a bug.
+            resi = code(Ai, Ts...)
+            array_download!(out, resi, oqueue[i])
         end
     end
     out
