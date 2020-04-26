@@ -45,33 +45,7 @@ end
 
 function get_T(i::Int,j::Int, L::Int, array_type::Type, config::Array{Array{Int64,1},1})
     I2,I3,I4 = get_TroI(array_type)
-    if i == 1 || i == L
-        if j == 1 || j == L
-            T = I2
-        else
-            T = I3
-        end
-    else
-        if j == 1 || j == L
-            T = I3
-        else
-            T = I4
-        end
-    end
-    if j == 1 || j == L
-        if i == 1 || i == L
-            T = I2
-        else
-            T = I3
-        end
-    else
-        if i == 1 || i == L
-            T = I3
-        else
-            T = I4
-        end
-    end
-
+    T = i == 1 || i == L ? (T = j==1 || j==L ? I2 : I3) : (T = j==1 || j==L ? I3 : I4)
     if config[i][j] == 1
         T[end] = Tropical(-Inf)
     elseif config[i][j] == 2
