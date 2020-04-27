@@ -27,6 +27,7 @@ _get_J(::Val{:ferro}) = 1.0
 _get_J(::Val{:anti}) = -1.0
 _get_J(::Val{:randn}) = randn()
 _get_J(::Val{:rand}) = rand()
+_get_J(::Val{:pm}) = rand() > 0.5 ? 1.0 : -1.0
 
 function get_TroB(::Type{Array}, v::Val)
     Jij = _get_J(v)
@@ -55,6 +56,12 @@ function get_T(i::Int,j::Int, L::Int, array_type::Type, config::Array{Array{Int6
     return T
 end
 
+function noninf_ratio(ball)
+    #println("# ",1.0-sum(ball .== Tropical(-Inf)) / length(ball))
+    println("# ",sum(ball .== Tropical(-Inf))," -Inf, totally ", length(ball))
+    #println(ball)
+end
+
 function mine_2d(L::Int, Jtype::Val, array_type::Type, Js, config::Array{Array{Int64,1},1} )
     """
     return minimum energy of the 2D model.
@@ -65,12 +72,16 @@ function mine_2d(L::Int, Jtype::Val, array_type::Type, Js, config::Array{Array{I
     i=1
     j=1
     ball = get_T(i,j,L,array_type,config)
+    #println("# ",1.0-sum(ball .== Tropical(-Inf)) / length(ball))
+    noninf_ratio(ball)
     for j in 2:L-1
         #ball = ein"ab,bc,cde->ade"(ball,rows[i][j-1],I3)
         ball = ein"ab,bc,cde->ade"(ball,rows[i][j-1],get_T(i,j,L,array_type,config))
         ball = reshape( ball,:,size(ball,3) )
     end
     j=L
+    #println("# ",1.0-sum(ball .== Tropical(-Inf)) / length(ball))
+    noninf_ratio(ball)
     #ball = ein"ab,bc,cd->ad"(ball,rows[i][j-1],I2)
     ball = ein"ab,bc,cd->ad"(ball,rows[i][j-1],get_T(i,j,L,array_type,config))
 
@@ -90,6 +101,8 @@ function mine_2d(L::Int, Jtype::Val, array_type::Type, Js, config::Array{Array{I
         #ball = ein"abcd,be,hc,efh->afd"(ball,rows[i][j-1],cols[j][i-1],I3)
         ball = ein"abcd,be,hc,efh->afd"(ball,rows[i][j-1],cols[j][i-1],get_T(i,j,L,array_type,config))
         ball = reshape(ball,2,:)
+        #println("# ",1.0-sum(ball .== Tropical(-Inf)) / length(ball))
+        noninf_ratio(ball)
     end
 
     """ the last row """
@@ -98,6 +111,8 @@ function mine_2d(L::Int, Jtype::Val, array_type::Type, Js, config::Array{Array{I
     #ball = ein"ab,da,cd->cb"(ball,cols[j][i-1],I2)
     ball = ein"ab,da,cd->cb"(ball,cols[j][i-1],get_T(i,j,L,array_type,config))
     ball = reshape(ball,2,2,:)
+    #println("# ",1.0-sum(ball .== Tropical(-Inf)) / length(ball))
+    noninf_ratio(ball)
     for j in 2:L-1
         #ball = ein"abc,ad,fb,def->ec"(ball,rows[i][j-1],cols[j][i-1],I3)
         ball = ein"abc,ad,fb,def->ec"(ball,rows[i][j-1],cols[j][i-1],get_T(i,j,L,array_type,config))
@@ -133,13 +148,13 @@ end
 
 L = 10
 #Jtype = Val(:ferro)
-Jtype = Val(:anti)
-#Jtype = Val(:randn)
+#Jtype = Val(:pm)
+Jtype = Val(:randn)
 Js = gen_2d(L,Array,Jtype)
-ground_state(L, Jtype, Array,Js)
+#ground_state(L, Jtype, Array,Js)
 
-#config = [ [0 for j in 1:L] for i in 1:L ]
-#@time e = mine_2d(L, Val(:ferro), Array, config)
+config = [ [0 for j in 1:L] for i in 1:L ]
+e = mine_2d(L, Jtype, Array,Js, config)
 #@time e = mine_2d(L, Val(:anti), Array, config)
 #@time e = mine_2d(L, Val(:randn), Array, config)
 #println("mine=",e)
