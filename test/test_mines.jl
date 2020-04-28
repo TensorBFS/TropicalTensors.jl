@@ -120,3 +120,4 @@ Js = gen_2d(L,Array,Jtype)
 config = [ [0 for j in 1:L] for i in 1:L ]
 E,S = mines_2d(L, Jtype, Array, Js, config )
 println("E= ",-E[1]," \t Entropy= ",S[1])
+E,S = mines_2d(L, Jtype, CuArrays, Js, config )
