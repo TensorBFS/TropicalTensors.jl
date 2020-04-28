@@ -41,11 +41,19 @@ function gen_mine_2d(L::Int, Jtype::Val, array_type::Type)
     I2,I3,I4 = get_TroI(array_type)
     """The first row"""
     ball = I2
+    i=1
     for j in 2:L-1
+        println("i= ",i," j= ",j)
         ball = ein"ab,bc,cde->ade"(ball,get_TroB(array_type, Jtype),I3)
         ball = reshape( ball,:,size(ball,3) )
     end
+    j=L
+    println("i= ",i," j= ",j)
     ball = ein"ab,bc,cd->ad"(ball,get_TroB(array_type, Jtype),I2)
+    println("first line Done")
+    println("size(ball) ",size(ball))
+    println("typeof(ball) ",typeof(ball))
+    sleep(10)
 
     """ From the second row to the second row from bottom """
     for i in 2:L-1
@@ -53,6 +61,7 @@ function gen_mine_2d(L::Int, Jtype::Val, array_type::Type)
         ball = ein"ab,ae,cde->cdb"(ball,get_TroB(array_type, Jtype),I3)
         ball = reshape(ball,2,2,2,:)
         for j in 2:L-1
+            println("i= ",i," j= ",j)
             ball = ein"abcd,be,hc,efgh->afgd"(ball,get_TroB(array_type, Jtype),get_TroB(array_type, Jtype),I4)
             ball = reshape(ball, size(ball,1)*size(ball,2),2,2,:)
         end
@@ -71,13 +80,16 @@ function gen_mine_2d(L::Int, Jtype::Val, array_type::Type)
     return ball
 end
 
-L = 16
-e = gen_mine_2d(L, Val(:ferro), Array)
-println("mine=",e)
+L = 30
+println("L=",L)
+#e = gen_mine_2d(L, Val(:ferro), Array)
+#println("mine=",e)
 
 using BenchmarkTools
-@benchmark gen_mine_2d($L, $(Val(:ferro)), $Array)
+#@benchmark gen_mine_2d($L, $(Val(:ferro)), $Array)
+#@time e0=gen_mine_2d(L, Val(:ferro), Array)
+#println("cpu,e=",e0)
 
 using CuArrays
-e = gen_mine_2d(L, Val(:ferro), CuArray)
-@benchmark (CuArrays.@sync gen_mine_2d($L, $(Val(:ferro)), $CuArray))
+@time e1=gen_mine_2d(L, Val(:ferro), CuArray)
+println("gpu,e=",e1)
