@@ -1,6 +1,7 @@
 using TropicalTensors
 using OMEinsum
 using CuArrays
+using Printf
 CuArrays.allowscalar(false)
 
 function get_TroI(dtype)
@@ -115,33 +116,29 @@ function mine_2d(L::Int, Jtype::Val, atype::Type, Js, dtype )
     for i in 1:L
         ball = reshape(ball,1,:)
         for j in 1:L
-            print("i= ",i," j=",j," ")
+            t0 = time()
+            print("\r(",i,",",j,") / (",L,",",L,") \t")
             T = get_T(i,j,L,atype,Js,dtype)
-            print("T ",size(T)," ")
-#            ball = ein"abcd,bfgc->afgd"( reshape(ball, size(ball,1),size(T,1),size(T,4),:) , T)
+            n_chunks = 4
             if i==1 || j==1 || j==L || i==L
                 ball = ein"abcd,bfgc->afgd"( reshape(ball, size(ball,1),size(T,1),size(T,4),:) , T)
-            elseif j<=10
-                ball = reshape(ball, size(ball,1),size(T,1),size(T,4),:,2,2)
-                ball[:,:,:,:,1,1] = ein"abcd,bfgc->afgd"( ball[:,:,:,:,1,1] , T)
-                ball[:,:,:,:,1,2] = ein"abcd,bfgc->afgd"( ball[:,:,:,:,1,2] , T)
-                ball[:,:,:,:,2,1] = ein"abcd,bfgc->afgd"( ball[:,:,:,:,2,1] , T)
-                ball[:,:,:,:,2,2] = ein"abcd,bfgc->afgd"( ball[:,:,:,:,2,2] , T)
+            elseif j <= L/2
+                ball = reshape(ball, size(ball,1),size(T,1),size(T,n_chunks),:,n_chunks)
+                for chunk in 1:n_chunks
+                    ball[:,:,:,:,chunk] = ein"abcd,bfgc->afgd"( ball[:,:,:,:,chunk] , T)
+                end
             else
-                ball = reshape(ball,2,2,Int(size(ball,1)/4),size(T,1),size(T,4),:)
-                ball[1,1,:,:,:,:] = ein"abcd,bfgc->afgd"( ball[1,1,:,:,:,:] , T)
-                ball[1,2,:,:,:,:] = ein"abcd,bfgc->afgd"( ball[1,2,:,:,:,:] , T)
-                ball[2,1,:,:,:,:] = ein"abcd,bfgc->afgd"( ball[2,1,:,:,:,:] , T)
-                ball[2,2,:,:,:,:] = ein"abcd,bfgc->afgd"( ball[2,2,:,:,:,:] , T)
-                ball = reshape(ball,size(ball,1)*size(ball,2)*size(ball,3),size(T,2),:)
-#            else
-#                ball = ein"abcd,bfgc->afgd"( reshape(ball, size(ball,1),size(T,1),size(T,4),:) , T)
+                ball = reshape(ball,n_chunks,Int(size(ball,1)/n_chunks),size(T,1),size(T,4),:)
+                for chunk in 1:n_chunks
+                    ball[chunk,:,:,:,:] = ein"abcd,bfgc->afgd"( ball[chunk,:,:,:,:] , T)
+                end
+                ball = reshape(ball,size(ball,1)*size(ball,2),size(T,2),:)
             end
-            print(" einsum ")
             ball = reshape(ball, size(ball,1)*size(ball,2),:)
-            println(" reshape ")
+            @printf("%.2g Sec.                  ",time()-t0)
         end
     end
+    println(" Done")
     return ball
 end
 
@@ -149,12 +146,12 @@ end
 
 
 L=32
-Jtype = Val(:pm)
-dtype = Float32
+Jtype = Val(:ferro)
+#dtype = Float32
 dtype = Float16
+#atype = Array
 atype = CuArray
 Js = gen_2d(L,atype, dtype, Jtype)
-#atype = Array
 @time mine=mine_2d(L, Jtype, atype, Js, dtype )
 println("mine = ",mine)
 
