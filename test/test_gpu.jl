@@ -119,7 +119,7 @@ function mine_2d(L::Int, Jtype::Val, atype::Type, Js, dtype )
             T = get_T(i,j,L,atype,Js,dtype)
             print("T ",size(T)," ")
 #            ball = ein"abcd,bfgc->afgd"( reshape(ball, size(ball,1),size(T,1),size(T,4),:) , T)
-            if i==1 || j==1 || j==L
+            if i==1 || j==1 || j==L || i==L
                 ball = ein"abcd,bfgc->afgd"( reshape(ball, size(ball,1),size(T,1),size(T,4),:) , T)
             elseif j<=10
                 ball = reshape(ball, size(ball,1),size(T,1),size(T,4),:,2,2)
