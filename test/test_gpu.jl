@@ -115,10 +115,13 @@ function mine_2d(L::Int, Jtype::Val, atype::Type, Js, dtype )
     for i in 1:L
         ball = reshape(ball,1,:)
         for j in 1:L
-            println("i= ",i," j=",j)
+            print("i= ",i," j=",j," ")
             T = get_T(i,j,L,atype,Js,dtype)
+            print("T ",size(T)," ")
             ball = ein"abcd,bfgc->afgd"( reshape(ball, size(ball,1),size(T,1),size(T,4),:) , T)
+            print(" einsum ")
             ball = reshape(ball, size(ball,1)*size(ball,2),:)
+            println(" reshape ")
         end
     end
     println(typeof(ball))
@@ -128,7 +131,7 @@ end
 
 
 
-L=28
+L=32
 Jtype = Val(:pm)
 dtype = Float32
 dtype = Float16
