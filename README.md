@@ -11,7 +11,7 @@ Type `]` in Julia REPL to enter pkg mode and
 ```julia pkg
 pkg> dev git@github.com:TensorBFS/TropicalTensors.jl.git
 pkg> dev git@github.com:GiggleLiu/EliminateGraphs.jl.git
-pkg> add OMEinsum
+pkg> dev OMEinsum
 pkg> add CuArrays
 ```
 The last line is required only when you use GPU for computing.

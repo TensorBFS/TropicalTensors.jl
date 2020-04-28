@@ -61,8 +61,6 @@ function get_TroB64(::Type{Array}, v::Val)
     return [tij _tij; _tij tij]
 end
 
-#get_TroB(::Type{CuArray}, v::Val) = CuArray(get_TroB(Array, v))
-#get_TroI(::Type{CuArray}) = CuArray.(get_TroI(Array))
 
 function gen_2d(L::Int,array_type::Type, Jtype::Val)
     # [L rows, L columns] each of which contains L-1 edges
@@ -254,20 +252,25 @@ function ground_state(L::Int, Jtype::Val, array_type::Type,Js)
     println("Its energy is ",mine_2d(L, Jtype, Array, Js, config))
 end
 
+get_TroB(::Type{CuArray}, v::Val) = CuArray(get_TroB(Array, v))
+get_TroI(::Type{CuArray}) = CuArray.(get_TroI(Array))
 
 L = 16
 #Jtype = Val(:ferro)
-#Jtype = Val(:pm)
+Jtype = Val(:pm)
 #Jtype = Val(:randn)
 #Js = gen_2d(L,Array,Jtype)
-#config = [ [0 for j in 1:L] for i in 1:L ]
+config = [ [0 for j in 1:L] for i in 1:L ]
 #ground_state(L, Jtype, Array,Js)
 println("L= ",L," Jtype",Jtype)
 #@time e = mine_2d(L, Jtype, Array,Js, config)
 
 #Js2 = Js_(Js)
 Js2 = gen_2d_2(L,Array,Jtype)
-@time e = mine_2d_2(L, Jtype, Array,Js2, config)
-#@time e = mine_2d(L, Val(:anti), Array, config)
-#@time e = mine_2d(L, Val(:randn), Array, config)
-#println("mine=",e)
+#@time e = mine_2d_2(L, Jtype, Array,Js2, config)
+
+Js2 = gen_2d_2(L,CuArray,Jtype)
+#config = CuArray(config)
+@time e = mine_2d_2(L, Jtype, CuArray,Js2, config)
+
+
