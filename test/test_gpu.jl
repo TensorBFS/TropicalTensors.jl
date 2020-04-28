@@ -118,13 +118,30 @@ function mine_2d(L::Int, Jtype::Val, atype::Type, Js, dtype )
             print("i= ",i," j=",j," ")
             T = get_T(i,j,L,atype,Js,dtype)
             print("T ",size(T)," ")
-            ball = ein"abcd,bfgc->afgd"( reshape(ball, size(ball,1),size(T,1),size(T,4),:) , T)
+#            ball = ein"abcd,bfgc->afgd"( reshape(ball, size(ball,1),size(T,1),size(T,4),:) , T)
+            if i==1 || j==1 || j==L
+                ball = ein"abcd,bfgc->afgd"( reshape(ball, size(ball,1),size(T,1),size(T,4),:) , T)
+            elseif j<=10
+                ball = reshape(ball, size(ball,1),size(T,1),size(T,4),:,2,2)
+                ball[:,:,:,:,1,1] = ein"abcd,bfgc->afgd"( ball[:,:,:,:,1,1] , T)
+                ball[:,:,:,:,1,2] = ein"abcd,bfgc->afgd"( ball[:,:,:,:,1,2] , T)
+                ball[:,:,:,:,2,1] = ein"abcd,bfgc->afgd"( ball[:,:,:,:,2,1] , T)
+                ball[:,:,:,:,2,2] = ein"abcd,bfgc->afgd"( ball[:,:,:,:,2,2] , T)
+            else
+                ball = reshape(ball,2,2,Int(size(ball,1)/4),size(T,1),size(T,4),:)
+                ball[1,1,:,:,:,:] = ein"abcd,bfgc->afgd"( ball[1,1,:,:,:,:] , T)
+                ball[1,2,:,:,:,:] = ein"abcd,bfgc->afgd"( ball[1,2,:,:,:,:] , T)
+                ball[2,1,:,:,:,:] = ein"abcd,bfgc->afgd"( ball[2,1,:,:,:,:] , T)
+                ball[2,2,:,:,:,:] = ein"abcd,bfgc->afgd"( ball[2,2,:,:,:,:] , T)
+                ball = reshape(ball,size(ball,1)*size(ball,2)*size(ball,3),size(T,2),:)
+#            else
+#                ball = ein"abcd,bfgc->afgd"( reshape(ball, size(ball,1),size(T,1),size(T,4),:) , T)
+            end
             print(" einsum ")
             ball = reshape(ball, size(ball,1)*size(ball,2),:)
             println(" reshape ")
         end
     end
-    println(typeof(ball))
     return ball
 end
 
