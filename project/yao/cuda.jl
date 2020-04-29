@@ -1,3 +1,5 @@
+using CUDAnative
+device!(7)
 using Yao, CuYao
 include("spinglass.jl")
 

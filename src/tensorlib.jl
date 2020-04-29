@@ -21,12 +21,12 @@ end
 
 spinglass_vertex_tensor(ndim::Int) = spinglass_vertex_tensor(Float64, ndim)
 
-function spinglass_bond_tensor(Jij::Real)
+function spinglass_bond_tensor(Jij)
     tij = Tropical(Jij)
     _tij = Tropical(-Jij)
     return [tij _tij; _tij tij]
 end
 
-function spinglass_g4_tensor(Jij::Real)
+function spinglass_g4_tensor(Jij)
     reshape(ein"ab->abab"(spinglass_bond_tensor(Jij)), 4, 4)
 end

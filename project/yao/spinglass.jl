@@ -9,9 +9,10 @@ _get_J(::Val{:ferro}) = 1.0
 _get_J(::Val{:randn}) = randn()
 _get_J(::Val{:rand}) = rand()
 
-function _spinglass_yao(reg, L::Int, jtype::Val)
-    G2 = matblock(spinglass_bond_tensor(1.0))
-    G4 = matblock(spinglass_g4_tensor(1.0))
+function _spinglass_yao(reg::ArrayReg{B,Tropical{T}}, L::Int, jtype::Val) where {B,T}
+    G2 = matblock(spinglass_bond_tensor(T(1.0)))
+    G4 = matblock(spinglass_g4_tensor(T(1.0)))
+    @show mat(G2), mat(G4)
     println("Layer 1/$L")
     for i=1:L-1
         reg |> put(L, (i,i+1)=>G4)
@@ -28,7 +29,7 @@ function _spinglass_yao(reg, L::Int, jtype::Val)
     sum(statevec(reg))
 end
 
-spinglass_yao(L::Int, jtype::Val; usecuda=false) = spinglass_yao(L, jtype; usecuda=usecuda)
+spinglass_yao(L::Int, jtype::Val; usecuda=false) = spinglass_yao(Float64, L, jtype; usecuda=usecuda)
 function spinglass_yao(::Type{T}, L::Int, jtype::Val; usecuda=false) where T
     # Yao gates
     reg = ArrayReg(ones(Tropical{T}, 1<<L))

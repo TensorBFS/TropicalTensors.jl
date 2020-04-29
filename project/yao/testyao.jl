@@ -1,3 +1,4 @@
+using OMEinsum
 include("spinglass.jl")
 
 function first_row(L::Int, jtype::Val)
