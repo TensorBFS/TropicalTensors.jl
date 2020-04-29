@@ -1,5 +1,6 @@
 using Test
 using Yao, OMEinsum
+using CuYao
 using TropicalTensors
 
 _get_J(::Val{:ferro}) = 1.0
@@ -48,7 +49,35 @@ function last_row(L, ball, jtype)
     return ball
 end
 
-@testset "first row" begin
+function _spinglass_yao(reg, L::Int, jtype::Val)
+    G2 = matblock(spinglass_bond_tensor(1.0))
+    G4 = matblock(spinglass_g4_tensor(1.0))
+    println("Layer 1/$L")
+    for i=1:L-1
+        reg |> put(L, (i,i+1)=>G4)
+    end
+    for j=2:L
+        println("Layer $j/$L")
+        for i=1:L
+            reg |> put(L, i=>G2)
+        end
+        for i=1:L-1
+            reg |> put(L, (i,i+1)=>G4)
+        end
+    end
+    sum(statevec(reg))
+end
+
+function spinglass_yao(L::Int, jtype::Val; usecuda=false)
+    # Yao gates
+    reg = ArrayReg(ones(Tropical{Float64}, 1<<L))
+    if usecuda
+        reg = reg |> cu
+    end
+    _spinglass_yao(reg, L::Int, jtype::Val)
+end
+
+@testset "yao" begin
     L = 10
     jtype = Val(:ferro)
     # Yao gates
@@ -84,32 +113,6 @@ end
         reg |> put(L, (i,i+1)=>G4)
     end
     @test row3[] ≈ sum(statevec(reg))
-end
-
-function _spinglass_yao(reg, L::Int, jtype::Val)
-    G2 = matblock(spinglass_bond_tensor(1.0))
-    G4 = matblock(spinglass_g4_tensor(1.0))
-    println("Layer 1/$L")
-    for i=1:L-1
-        reg |> put(L, (i,i+1)=>G4)
-    end
-    for j=2:L
-        println("Layer $j/$L")
-        for i=1:L
-            reg |> put(L, i=>G2)
-        end
-        for i=1:L-1
-            reg |> put(L, (i,i+1)=>G4)
-        end
-    end
-    sum(statevec(reg))
-end
-
-function spinglass_yao(L::Int, jtype::Val; usecuda=false)
-    # Yao gates
-    reg = ArrayReg(ones(Tropical{Float64}, 1<<L))
-    if usecuda
-        reg = reg |> cu
-    end
-    _spinglass_yao(reg, L::Int, jtype::Val)
+    @test spinglass_yao(10, Val(:ferro)) ≈ Tropical(180.0)
+    @test spinglass_yao(10, Val(:ferro); usecuda=true) ≈ Tropical(180.0)
 end
