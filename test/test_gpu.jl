@@ -36,7 +36,7 @@ function get_TroI(array_type,dtype)
 end
 
 
-_get_J(::Val{:ferro}) = 1.0
+_get_J(::Val{:ferro}) = 0.1
 _get_J(::Val{:anti}) = -1.0
 _get_J(::Val{:randn}) = randn()
 _get_J(::Val{:rand}) = rand()
