@@ -50,7 +50,7 @@ end
     # Yao gates
     reg = ArrayReg(ones(Tropical{Float64}, 1<<L))
     G2 = matblock(spinglass_bond_tensor(1.0))
-    G4 = matblock(spinglass_g4_tensor(1.0))
+    G4 = matblock(Diagonal(spinglass_g4_tensor(1.0)))
 
     # first row
     row1 = first_row(L, jtype)
