@@ -1,10 +1,10 @@
 export Tropical
 
-const TROPICAL_ZERO = -999999
-
 struct Tropical{T} <: Number
     n::T
 end
+
+Tropical{T}(x::Tropical{T}) where T = x
 
 function Base.show(io::IO, inf::Tropical)
     print(io,"Tropical($(inf.n))")
@@ -15,13 +15,30 @@ function Base.show(io::IO, ::MIME"text/plain", inf::Tropical)
 end
 
 Base.:*(a::Tropical, b::Tropical) = Tropical(a.n + b.n)
+function Base.:*(a::Tropical{<:Rational}, b::Tropical{<:Rational})
+    if a == zero(a)
+        a
+    elseif b == zero(b)
+        b
+    else
+        Tropical(a.n + b.n)
+    end
+end
 Base.:+(a::Tropical, b::Tropical) = Tropical(max(a.n, b.n))
-Base.zero(::Type{Tropical{T}}) where T = Tropical(T(TROPICAL_ZERO))
+Base.zero(::Type{Tropical{T}}) where T = Tropical(T(-Inf))
+Base.zero(::Type{Tropical{T}}) where T<:Integer = Tropical(T(-999999))
 Base.zero(::Tropical{T}) where T = zero(Tropical{T})
+
+Base.one(::Type{Tropical{T}}) where T = Tropical(zero(T))
+Base.one(::Tropical{T}) where T = one(Tropical{T})
+
 #for OP in [:(Base.:>), :(Base.:<), :(Base.:==), :(Base.isapprox), :(Base.:>=), :(Base.:<=)]
-for OP in [:>, :<, :(==), :(isapprox), :>=, :<=]
+for OP in [:>, :<, :(==), :>=, :<=]
     @eval Base.$OP(a::Tropical, b::Tropical) = $OP(a.n, b.n)
 end
+
+Base.isapprox(x::Tropical, y::Tropical; kwargs...) = isapprox(x.n, y.n; kwargs...)
+Base.isapprox(x::AbstractArray{<:Tropical}, y::AbstractArray{<:Tropical}; kwargs...) = all(isapprox.(x, y; kwargs...))
 
 # neighbor analysis
 # degree == 2, from 1.2.2.2 and 1.2.1, we know the maximum branching is 2, <= 2^(1/3).

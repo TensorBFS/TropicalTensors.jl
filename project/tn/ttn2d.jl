@@ -4,45 +4,21 @@ using OMEinsum
 using CuArrays
 CuArrays.allowscalar(false)
 
-Base.isapprox(x::Tropical, y::Tropical; kwargs...) = Base.isapprox(x.n, y.n; kwargs...)
-Base.isapprox(x::Array{<:Tropical}, y::Array{<:Tropical}; kwargs...) = all(Base.isapprox.(x, y; kwargs...))
-Base.rtoldefault(x::Type{Tropical{Float64}}, ::Type{Tropical{Float64}}, ::Int64)  where T = 1e-7
 # Computing Configuration
 # N is the number of chunks
 struct CC{DEVICE,N} end
-
-function get_TroI(::CC{:CPU})
-    I2 = zeros(2,2)
-    I2 .= -Inf
-    I2[1,1] = 0.0
-    I2[2,2] = 0.0
-
-    I3 = zeros(2,2,2)
-    I3 .= -Inf
-    I3[1,1,1] = 0.0
-    I3[2,2,2] = 0.0
-
-    I4 = zeros(2,2,2,2)
-    I4 .= -Inf
-    I4[1,1,1,1] = 0.0
-    I4[2,2,2,2] = 0.0
-
-    return Tropical.(I2),Tropical.(I3),Tropical.(I4)
-end
 
 _get_J(::Val{:ferro}) = 1.0
 _get_J(::Val{:randn}) = randn()
 _get_J(::Val{:rand}) = rand()
 
 function get_TroB(::CC{:CPU}, v::Val)
-    Jij = _get_J(v)
-    tij = Tropical(Jij)
-    _tij = Tropical(-Jij)
-    return [tij _tij; _tij tij]
+    spinglass_bond_tensor(_get_J(v))
 end
 
 get_TroB(::CC{:GPU}, v::Val) = CuArray(get_TroB(CC{:CPU,1}(), v))
-get_TroI(::CC{:GPU}) = CuArray.(get_TroI(CC{:CPU,1}()))
+get_TroI(::CC{:GPU}) = CuArray.(spinglass_vertex_tensor())
+get_TroI(::CC{:GPU}) = spinglass_vertex_tensor()
 
 initball(::CC{:CPU}, x) = Array(x)
 initball(::CC{:GPU,N}, x) where N = Array(x)
