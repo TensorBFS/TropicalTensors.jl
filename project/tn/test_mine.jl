@@ -205,6 +205,7 @@ function mine_2d_2(L::Int, Jtype::Val, array_type::Type, Js, config::Array{Array
     for i in 1:L
         ball = reshape(ball,1,:)
         for j in 1:L
+            println("i= ",i," j= ",j)
             T = get_T_2(i,j,L,array_type,config,Js)
             ball = ein"abcd,bfgc->afgd"( reshape(ball, size(ball,1),size(T,1),size(T,4),:) , T)
             ball = reshape(ball, size(ball,1)*size(ball,2),:)
@@ -255,9 +256,9 @@ end
 get_TroB(::Type{CuArray}, v::Val) = CuArray(get_TroB(Array, v))
 get_TroI(::Type{CuArray}) = CuArray.(get_TroI(Array))
 
-L = 16
-#Jtype = Val(:ferro)
-Jtype = Val(:pm)
+L = 23
+Jtype = Val(:ferro)
+#Jtype = Val(:pm)
 #Jtype = Val(:randn)
 #Js = gen_2d(L,Array,Jtype)
 config = [ [0 for j in 1:L] for i in 1:L ]
@@ -269,8 +270,9 @@ println("L= ",L," Jtype",Jtype)
 Js2 = gen_2d_2(L,Array,Jtype)
 #@time e = mine_2d_2(L, Jtype, Array,Js2, config)
 
-Js2 = gen_2d_2(L,CuArray,Jtype)
+#Js2 = gen_2d_2(L,CuArray,Jtype)
 #config = CuArray(config)
-@time e = mine_2d_2(L, Jtype, CuArray,Js2, config)
+#@time e = mine_2d_2(L, Jtype, CuArray,Js2, config)
+@time e = mine_2d_2(L, Jtype, Array,Js2, config)
 
 
