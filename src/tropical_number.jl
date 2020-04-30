@@ -1,3 +1,5 @@
+using CuArrays
+
 export Tropical
 
 struct Tropical{T} <: Number
@@ -31,6 +33,9 @@ Base.zero(::Tropical{T}) where T = zero(Tropical{T})
 
 Base.one(::Type{Tropical{T}}) where T = Tropical(zero(T))
 Base.one(::Tropical{T}) where T = one(Tropical{T})
+
+CuArrays.ones(::Type{Tropical{T}}, dims...) where T = fill!(CuArray{Tropical{T}}(undef, dims...), one(Tropical{T}))
+CuArrays.zeros(::Type{Tropical{T}}, dims...) where T = fill!(CuArray{Tropical{T}}(undef, dims...), zero(Tropical{T}))
 
 #for OP in [:(Base.:>), :(Base.:<), :(Base.:==), :(Base.isapprox), :(Base.:>=), :(Base.:<=)]
 for OP in [:>, :<, :(==), :>=, :<=]

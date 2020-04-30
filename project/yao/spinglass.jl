@@ -35,7 +35,7 @@ spinglass_yao(L::Int, jtype::Val; usecuda=false) = spinglass_yao(Float64, L, jty
 function spinglass_yao(::Type{T}, L::Int, jtype::Val; usecuda=false) where T
     # Yao gates
     if usecuda
-    	reg = ArrayReg(Tropical.(CuArrays.zeros(T, 1<<L)))
+        reg = ArrayReg(CuArrays.ones(Tropical{T}, 1<<L))
     else
     	reg = ArrayReg(ones(Tropical{T}, 1<<L))
     end
