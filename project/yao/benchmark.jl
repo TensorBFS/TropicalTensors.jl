@@ -24,17 +24,19 @@ end
 using BenchmarkTools
 suite = BenchmarkGroup()
 suite["GPU"] = BenchmarkGroup()
-for L = 4:2:10
-    suite["GPU"][L] = @benchmarkable spinglass_yao($L, $(load_J(L, Val(:randn))); usecuda=true)
-    #suite["CPU"][L] = @benchmarkable spinglass_yao(L, $(load_J(L, Val(:randn))); usecuda=false)
+for L = 4:2:32
+    suite["GPU"][L] = @benchmarkable (CuArrays.@sync spinglass_yao(Float32, $L, $(load_J(L, Val(:randn))); usecuda=true))
+    #suite["CPU"][L] = @benchmarkable (CuArrays.@sync spinglass_yao(Float32, $L, $(load_J(L, Val(:randn))); usecuda=false))
 end
+
+println("loaded")
 
 tune!(suite)
 res = run(suite)
 
 function analyze_res(res)
     times = zeros(length(res["GPU"]))
-    for (k,L) = enumerate(4:2:10)
+    for (k,L) = enumerate(4:2:32)
         times[k] = minimum(res["GPU"][L].times)
     end
     return times
