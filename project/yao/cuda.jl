@@ -3,4 +3,5 @@ device!(7)
 using Yao, CuYao
 include("spinglass.jl")
 
-@time spinglass_yao(Float32, 32, Val(:ferro); usecuda=true)
+@show spinglass_yao(Float32, 10, Val(:ferro); usecuda=true)
+@show spinglass_yao(Float32, 10, Val(:ferro); usecuda=false)
