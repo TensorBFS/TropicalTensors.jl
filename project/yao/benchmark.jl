@@ -43,6 +43,6 @@ function analyze_res(res)
 end
 
 times = analyze_res(res)
-fname = joinpath(@__DIR__, "data", "bench_spingglass_gpu.dat")
+fname = joinpath(@__DIR__, "data", "bench_spinglass_gpu.dat")
 println("Writing benchmark results to file: $fname.")
 writedlm(fname, times)
