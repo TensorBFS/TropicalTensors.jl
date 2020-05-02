@@ -16,6 +16,8 @@ function Base.show(io::IO, ::MIME"text/plain", inf::Tropical)
     Base.show(io, inf)
 end
 
+value(x::Tropical) = x.n
+
 Base.:*(a::Tropical, b::Tropical) = Tropical(a.n + b.n)
 function Base.:*(a::Tropical{<:Rational}, b::Tropical{<:Rational})
     if a == zero(a)
