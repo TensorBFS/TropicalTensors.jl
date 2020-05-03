@@ -1,8 +1,8 @@
 using CUDAnative
 using DelimitedFiles
-device!(6)
+device!(2)
 
-include("spinglass.jl")
+include("chimera.jl")
 include("datadump.jl")
 
 # dump_Js(Val(:randn))
@@ -14,9 +14,9 @@ include("datadump.jl")
 using BenchmarkTools
 suite = BenchmarkGroup()
 suite["GPU"] = BenchmarkGroup()
-for L = 4:2:32
-    suite["GPU"][L] = @benchmarkable (CuArrays.@sync spinglass_yao(Float32, $L, $(load_J(L, Val(:randn))); usecuda=true))
-    #suite["CPU"][L] = @benchmarkable (CuArrays.@sync spinglass_yao(Float32, $L, $(load_J(L, Val(:randn))); usecuda=false))
+for L = 3:8
+    suite["GPU"][L] = @benchmarkable (CuArrays.@sync chimera_yao(Float16, $L, $L, $(load_JC(L, L, Val(:randn))); usecuda=true))
+    #suite["CPU"][L] = @benchmarkable (CuArrays.@sync chimera_yao(Float16, $L, $(load_J(L, Val(:randn))); usecuda=false))
 end
 
 println("loaded")
@@ -26,13 +26,13 @@ res = run(suite)
 
 function analyze_res(res)
     times = zeros(length(res["GPU"]))
-    for (k,L) = enumerate(4:2:32)
+    for (k,L) = enumerate(3:8)
         times[k] = minimum(res["GPU"][L].times)
     end
     return times
 end
 
 times = analyze_res(res)
-fname = joinpath(@__DIR__, "data", "bench_spinglass_gpu.dat")
+fname = joinpath(@__DIR__, "data", "bench_chimera_gpu.dat")
 println("Writing benchmark results to file: $fname.")
 writedlm(fname, times)

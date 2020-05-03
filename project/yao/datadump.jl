@@ -36,6 +36,10 @@ function load_J(L::Int, jtype::Val{JT}) where JT
     vec(readdlm(joinpath(@__DIR__, "data", "J_$(JT)_L$L.dat")))
 end
 
+function load_JC(Lx::Int, Ly::Int, jtype::Val{:ferro})
+    return ones(Lx*(Ly-1)*4 + Ly*(Lx-1)*4 + Lx*Ly*16)
+end
+
 if abspath(PROGRAM_FILE) == @__FILE__
     dump_JCs(Val(:randn))
     dump_Js(Val(:randn))
