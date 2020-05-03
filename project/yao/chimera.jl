@@ -78,15 +78,17 @@ function _init_reg(::Type{T}, L::Int, usecuda::Bool) where T
     end
 end
 
-using Test
-@testset "test red reg" begin
-    reg = red_reg(Float32, 3, randn(8+16*3); usecuda=false)
-    @test reg isa ArrayReg{1,Tropical{Float32},Matrix{Tropical{Float32}}}
-end
+if abspath(PROGRAM_FILE) == @__FILE__
+    using Test
+    @testset "test red reg" begin
+        reg = red_reg(Float32, 3, randn(8+16*3); usecuda=false)
+        @test reg isa ArrayReg{1,Tropical{Float32},Matrix{Tropical{Float32}}}
+    end
 
-@testset "test Chimera" begin
-    res = chimera_yao(Float32, 3, 3, ones(12*4 + 9*16); usecuda=false)
-    @test res.n == 12*4 + 9*16
-    res = chimera_yao(Float32, 3, 3, ones(12*4 + 9*16); usecuda=true)
-    @test res.n == 12*4 + 9*16
+    @testset "test Chimera" begin
+        res = chimera_yao(Float32, 3, 3, ones(12*4 + 9*16); usecuda=false)
+        @test res.n == 12*4 + 9*16
+        res = chimera_yao(Float32, 3, 3, ones(12*4 + 9*16); usecuda=true)
+        @test res.n == 12*4 + 9*16
+    end
 end
