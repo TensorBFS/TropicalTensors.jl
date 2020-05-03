@@ -30,7 +30,9 @@ function Base.:*(a::Tropical{<:Rational}, b::Tropical{<:Rational})
 end
 Base.:+(a::Tropical, b::Tropical) = Tropical(max(a.n, b.n))
 Base.zero(::Type{Tropical{T}}) where T = Tropical(T(-Inf))
-Base.zero(::Type{Tropical{T}}) where T<:Integer = Tropical(T(-999999))
+Base.zero(::Type{Tropical{Int16}}) = Tropical(-32768)
+Base.zero(::Type{Tropical{Int32}}) = Tropical(-2147483648)
+Base.zero(::Type{Tropical{Int64}}) = Tropical(-9223372036854775808)
 Base.zero(::Tropical{T}) where T = zero(Tropical{T})
 
 Base.one(::Type{Tropical{T}}) where T = Tropical(zero(T))
