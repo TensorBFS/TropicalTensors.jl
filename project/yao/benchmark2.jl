@@ -1,6 +1,6 @@
 using CUDAnative
 using DelimitedFiles
-device!(2)
+device!(4)
 
 include("chimera.jl")
 include("datadump.jl")
