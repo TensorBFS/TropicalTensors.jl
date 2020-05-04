@@ -15,7 +15,7 @@ end
 
 # chimera
 function dump_JCs(jtype::Val{JT}) where JT
-    for i=3:8
+    for i=4
         J = generate_J(jtype, i*(i-1)*8 + i^2*16)
         writedlm(joinpath(@__DIR__, "data", "JC_$(JT)_Lx$(i)_Ly$(i).dat"), J)
     end
@@ -112,6 +112,17 @@ function i2cind(i::Int, Lx::Int, Ly::Int)
     iy = blockid ÷ Lx + 1
     ix = blockid - (iy-1)*Lx + 1
     ix, iy, cellid, color
+end
+
+function dump_JC_labeled(::Type{T}, Lx, Ly, jtype::Val{JT}) where {T, JT}
+    Js = load_JC(Lx, Ly, jtype)
+    labels = chimera_bond!([], Lx, Ly, Js)
+    open(joinpath(@__DIR__, "data", "JCL_$(JT)_Lx$(Lx)_Ly$(Ly).dat"), "w") do f
+        write(f, "# $JT\n")
+        for ((i,j), J) in zip(labels, Js)
+            write(f, "$i $j $(-T(J))\n")
+        end
+    end
 end
 
 using Test
