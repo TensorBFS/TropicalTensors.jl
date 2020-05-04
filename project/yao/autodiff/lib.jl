@@ -9,7 +9,7 @@
 				muleq(x[i,k], y[k,j])
 				if (el.n < x[i,k].n, branch_keeper[k])
 					FLIP(branch_keeper[k])
-					SWAP(el, x[i,k])
+					NiLang.SWAP(el, x[i,k])
 				end
 			end
 			@inbounds muleq(out![i,j], el)
@@ -27,7 +27,7 @@ end
 			muleq(x[i,k], y[k])
 			if (el.n < x[i,k].n, branch_keeper[k])
 				FLIP(branch_keeper[k])
-				SWAP(el, x[i,k])
+				NiLang.SWAP(el, x[i,k])
 			end
 		end
 		@inbounds muleq(out![i], el)
@@ -36,12 +36,13 @@ end
 end
 
 NiLang.SWAP(a::Tropical{T}, b::Tropical{T}) where T = b, a
+NiLang.SWAP(a::Array, b::Array) where T = b, a
 # branch should be initialized to false.
 @i @inline function imuladd(out!, x, y, branch)
 	muleq(x, y)
 	@invcheckoff if (out!.n < x.n, branch)
 		FLIP(branch)
-		SWAP(out!, x)
+		NiLang.SWAP(out!, x)
 	end
 end
 
@@ -80,4 +81,14 @@ using Test, Random
 	igemv!(out4, x, v, bk)
 	@test out1 ≈ out2
 	@test out3 ≈ out4
+end
+
+NiLang.AD.GVar(x::Tropical) = Tropical(GVar(x.n))
+(_::Type{Inv{GVar}})(x::Tropical{<:GVar}) = Tropical((~GVar)(x.n))
+NiLang.AD.GVar(x::ArrayReg{B}) where B = ArrayReg{B}(GVar(ArrayReg.state))
+
+@testset "GVar" begin
+    x = Tropical(0.4)
+    @test GVar(x) isa Tropical{<:GVar}
+    @test (~GVar)(GVar(Tropical(0.4))) == x
 end
