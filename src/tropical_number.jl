@@ -40,7 +40,7 @@ CuArrays.ones(::Type{Tropical{T}}, dims...) where T = fill!(CuArray{Tropical{T}}
 CuArrays.zeros(::Type{Tropical{T}}, dims...) where T = fill!(CuArray{Tropical{T}}(undef, dims...), zero(Tropical{T}))
 
 #for OP in [:(Base.:>), :(Base.:<), :(Base.:==), :(Base.isapprox), :(Base.:>=), :(Base.:<=)]
-for OP in [:>, :<, :(==), :>=, :<=]
+for OP in [:>, :<, :(==), :>=, :<=, :isless]
     @eval Base.$OP(a::Tropical, b::Tropical) = $OP(a.n, b.n)
 end
 
