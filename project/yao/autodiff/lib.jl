@@ -83,12 +83,15 @@ using Test, Random
 	@test out3 ≈ out4
 end
 
+(_::Type{Inv{Tropical}})(x::Tropical) = x.n
 NiLang.AD.GVar(x::Tropical) = Tropical(GVar(x.n))
+NiLang.AD.grad(x::Tropical{<:GVar}) = Tropical(grad(x.n))
 (_::Type{Inv{GVar}})(x::Tropical{<:GVar}) = Tropical((~GVar)(x.n))
-NiLang.AD.GVar(x::ArrayReg{B}) where B = ArrayReg{B}(GVar(ArrayReg.state))
 
 @testset "GVar" begin
     x = Tropical(0.4)
+	@test (~Tropical)(x) == 0.4
     @test GVar(x) isa Tropical{<:GVar}
+    @test grad(x) isa Tropical{Float64}
     @test (~GVar)(GVar(Tropical(0.4))) == x
 end
