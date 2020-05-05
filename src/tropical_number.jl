@@ -1,10 +1,14 @@
-export Tropical
+export Tropical, TropicalF64, TropicalF32, TropicalF16
 
 struct Tropical{T} <: Number
     n::T
 end
 
 Tropical{T}(x::Tropical{T}) where T = x
+
+const TropicalF64 = Tropical{Float64}
+const TropicalF32 = Tropical{Float32}
+const TropicalF16 = Tropical{Float16}
 
 function Base.show(io::IO, inf::Tropical)
     print(io,"Tropical($(inf.n))")
