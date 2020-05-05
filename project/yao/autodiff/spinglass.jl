@@ -37,5 +37,17 @@ end
 @testset "yao" begin
     L = 10
     reg = ArrayReg(ones(Tropical{Float32}, 1<<L))
-    @test spinglass_yao(0.0, reg, L, ones(180))[1] ≈ 180.0
+    @test check_inv(spinglass_yao, (Float32(0.0), reg, L, ones(Float32, 180)))
+    @test spinglass_yao(Float32(0.0), reg, L, ones(Float32,180))[1] ≈ 180.0
+    empty!(NiLang.GLOBAL_STACK)
+end
+
+function benchmarker(L)
+    reg = ArrayReg(ones(Tropical{Float32}, 1<<L))
+    spinglass_yao(Float32(0.0), reg, L, ones(L*(L-1)*2))
+end
+
+function benchmarker2(L)
+    reg = ArrayReg(ones(Tropical{Float32}, 1<<L))
+    _spinglass_yao(reg, L, ones(L*(L-1)*2))
 end

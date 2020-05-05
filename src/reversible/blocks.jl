@@ -41,3 +41,7 @@ end
     end
     ~@routine
 end
+
+function NiLang.loaddata(::Type{Array{Tropical{GVar{T,T}},N}}, data::Array{Tropical{T},N}) where {T,N}
+    GVar.(data)
+end

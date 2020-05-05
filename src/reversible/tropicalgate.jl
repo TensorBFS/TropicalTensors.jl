@@ -1,4 +1,5 @@
 using YaoBlocks
+using StaticArrays
 
 export tropicalblock, TropicalMatrixBlock
 export apply_G4!, apply_G2!, apply_G16!
@@ -54,7 +55,7 @@ YaoBlocks.apply!(reg::ArrayReg{B}, b::TropicalMatrixBlock) where B = throw(NotIm
 @i function apply_G2!(reg::ArrayReg{1,T}, i::Int, J::Real) where T<:Tropical
     @routine begin
         nbit ← nqubits(reg)
-        blk ← put(nbit, i=>tropicalblock(ones(T, 2, 2)))
+        blk ← put(nbit, i=>tropicalblock(MMatrix{2,2}(ones(T, 2, 2))))
         spinglass_bond_tensor!(blk.content.mat, J)
     end
     apply!(reg, blk)
@@ -64,7 +65,7 @@ end
 @i function apply_G4!(reg::ArrayReg{1,T}, i::NTuple{2,Int}, J::Real) where T<:Tropical
     @routine begin
         nbit ← nqubits(reg)
-        blk ← put(nbit, i=>tropicalblock(Diagonal(ones(T, 4))))
+        blk ← put(nbit, i=>tropicalblock(Diagonal(MVector{4}(ones(T, 4)))))
         spinglass_g4_tensor!(blk.content.mat, J)
     end
     apply!(reg, blk)

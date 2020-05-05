@@ -3,9 +3,10 @@ export Tropical, TropicalF64, TropicalF32, TropicalF16
 struct Tropical{T} <: Number
     n::T
     Tropical{T}(x) where T = new{T}(T(x))
+    function Tropical(x::T) where T
+        new{T}(x)
+    end
 end
-
-Tropical{T}(x::Tropical{T}) where T = x
 
 const TropicalF64 = Tropical{Float64}
 const TropicalF32 = Tropical{Float32}
@@ -32,8 +33,8 @@ function Base.:*(a::Tropical{<:Rational}, b::Tropical{<:Rational})
     end
 end
 Base.:+(a::Tropical, b::Tropical) = Tropical(max(a.n, b.n))
-Base.zero(::Type{Tropical{T}}) where T = Tropical(T(-Inf))
-Base.zero(::Type{Tropical{T}}) where T<:Integer = Tropical(T(-999999))
+Base.zero(::Type{Tropical{T}}) where T = Tropical(convert(T,-Inf))
+Base.zero(::Type{Tropical{T}}) where T<:Integer = Tropical(convert(T,-999999))
 Base.zero(::Tropical{T}) where T = zero(Tropical{T})
 
 Base.one(::Type{Tropical{T}}) where T = Tropical(zero(T))

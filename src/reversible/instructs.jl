@@ -4,7 +4,7 @@ using TupleTools
 
 export i_instruct!
 
-NiLang.AD.GVar(x::ArrayReg{B}) where B = ArrayReg{B}(GVar(ArrayReg.state))
+NiLang.AD.GVar(x::ArrayReg{B}) where B = ArrayReg{B}(GVar(x.state))
 
 @i function i_instruct!(state::StridedVector{<:Tropical},
         U0::AbstractMatrix{<:Tropical},
