@@ -53,7 +53,7 @@ end
 YaoBlocks.apply!(reg::ArrayReg{B}, b::TropicalMatrixBlock) where B = throw(NotImplementedError(:apply!, typeof((reg, b))))
 
 @i function apply_G2!(reg::ArrayReg{1,T}, i::Int, J::Real) where T<:Tropical
-    @routine begin
+    @routine @invcheckoff begin
         nbit ← nqubits(reg)
         blk ← put(nbit, i=>tropicalblock(MMatrix{2,2}(ones(T, 2, 2))))
         spinglass_bond_tensor!(blk.content.mat, J)
@@ -63,7 +63,7 @@ YaoBlocks.apply!(reg::ArrayReg{B}, b::TropicalMatrixBlock) where B = throw(NotIm
 end
 
 @i function apply_G4!(reg::ArrayReg{1,T}, i::NTuple{2,Int}, J::Real) where T<:Tropical
-    @routine begin
+    @routine @invcheckoff begin
         nbit ← nqubits(reg)
         blk ← put(nbit, i=>tropicalblock(Diagonal(MVector{4}(ones(T, 4)))))
         spinglass_g4_tensor!(blk.content.mat, J)
@@ -73,7 +73,7 @@ end
 end
 
 @i function apply_G16!(reg::ArrayReg{1,T}, i::NTuple{4,Int}, Js::AbstractVector{<:Real}) where T<:Tropical
-    @routine begin
+    @routine @invcheckoff begin
         nbit ← nqubits(reg)
         blk ← put(nbit, i=>tropicalblock(ones(T, 16, 16)))
         spinglass_g16_tensor!(blk.content.mat, Js)
