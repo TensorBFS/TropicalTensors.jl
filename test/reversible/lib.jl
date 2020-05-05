@@ -26,3 +26,7 @@ end
 	@test out1 ≈ out2
 	@test out3 ≈ out4
 end
+
+@testset "isum" begin
+	isum(TropicalF32(0), TropicalF32.([3.0,10.0,2.0]))[1].n == 10
+end

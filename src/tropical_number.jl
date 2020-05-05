@@ -2,6 +2,7 @@ export Tropical, TropicalF64, TropicalF32, TropicalF16
 
 struct Tropical{T} <: Number
     n::T
+    Tropical{T}(x) where T = new{T}(T(x))
 end
 
 Tropical{T}(x::Tropical{T}) where T = x

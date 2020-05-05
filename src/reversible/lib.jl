@@ -1,4 +1,4 @@
-export igemm!, igemv!
+export igemm!, igemv!, isum
 export muleq, muleq_mul, muleq_add, tropical_muladd
 
 export maxloc
@@ -49,6 +49,21 @@ NiLang.SWAP(a::Array, b::Array) where T = b, a
 		FLIP(branch)
 		NiLang.SWAP(out!, x)
 	end
+end
+
+@i function isum(out!::T, v::AbstractArray{T}) where T<:Tropical
+	@routine @invcheckoff begin
+		branch_keeper ← zeros(Bool, length(v))
+		anc ← zero(T)
+		for i = 1:length(v)
+			if (anc.n < v[i].n, branch_keeper[i])
+				FLIP(branch_keeper[i])
+				NiLang.SWAP(anc, v[i])
+			end
+		end
+	end
+	out!.n += identity(anc.n)
+	~@routine
 end
 
 @i @inline function muleq_add(z::Tropical, x::Tropical, y::Tropical)
