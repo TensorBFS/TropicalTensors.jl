@@ -35,5 +35,3 @@ using TropicalTensors
     end
     @test spinglass_bond_tensor(1.0) ≈ get_TroB(Val{:ferro}())
 end
-
-end

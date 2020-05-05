@@ -1,7 +1,8 @@
 using BitBasis
+using YaoArrayRegister: SDDiagonal, ArrayReg, staticize
 using TupleTools
-using YaoArrayRegister: SDDiagonal
-using NiLang, NiLang.AD
+
+export i_instruct!
 
 NiLang.AD.GVar(x::ArrayReg{B}) where B = ArrayReg{B}(GVar(ArrayReg.state))
 
@@ -16,7 +17,7 @@ NiLang.AD.GVar(x::ArrayReg{B}) where B = ArrayReg{B}(GVar(ArrayReg.state))
         MM ← size(U0, 1)
         locked_bits ← [clocs..., locs...]
         locked_vals ← [cvals..., zeros(Int, M)...]
-        locs_raw ← [i+1 for i in itercontrol(nbit, setdiff(1:nbit, locs), zeros(Int, nbit-M))] |> YaoArrayRegister.staticize
+        locs_raw ← [i+1 for i in itercontrol(nbit, setdiff(1:nbit, locs), zeros(Int, nbit-M))] |> staticize
         configs ← itercontrol(nbit, locked_bits, locked_vals)
     end
     loop_kernel(state, configs, U, locs_raw)
@@ -58,18 +59,4 @@ end
         new_state → zeros(T, length(state))
         branch_keeper → zeros(Bool, size(U, 2))
     end
-end
-
-@testset "new instr" begin
-    g4 = Diagonal(spinglass_g4_tensor(1.5))
-    reg = ArrayReg(randn(1<<12) .|> Tropical)
-    s1 = i_instruct!(copy(vec(reg.state)), g4, (7, 3), (), ())[1]
-    nreg = copy(reg) |> put(12, (7, 3)=>matblock(g4))
-    @test statevec(nreg) ≈ s1
-
-    g4 = randn(4, 4) .|> Tropical
-    reg = ArrayReg(randn(1<<12) .|> Tropical)
-    s1 = i_instruct!(copy(vec(reg.state)), g4, (7, 3), (), ())[1]
-    nreg = copy(reg) |> put(12, (7, 3)=>matblock(g4))
-    @test statevec(nreg) ≈ s1
 end

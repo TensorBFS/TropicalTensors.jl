@@ -13,3 +13,7 @@ end
 @testset "tensorlib" begin
     include("tensorlib.jl")
 end
+
+@testset "reversible" begin
+    include("reversible/reversible.jl")
+end

@@ -1,13 +1,19 @@
-# NOTE: this is slow!
+using OMEinsum: EinCode, @ein_str
+
+export ieinsum!
 
 """
-A naive implementation of `einsum!`
+	ieinsum!(code::EinCode{ixs, iy}, xs, y::AbstractArray{T}) where {ixs, iy, NO,T<:Tropical}
+
+A naive reversible implementation of `einsum!`
     * `ixs`: input tensor indices,
     * `xs`: input tensors,
     * `iy`: output tensor indices,
     * `y`: accumulated tensor, notice it is initialized to 0 as output!
+
+# NOTE: this function is general purposed and slow!
 """
-@i function naive_einsum!(code::EinCode{ixs, iy}, xs, y::AbstractArray{T}) where {ixs, iy, NO,T<:Tropical}
+@i function ieinsum!(code::EinCode{ixs, iy}, xs, y::AbstractArray{T}) where {ixs, iy, NO,T<:Tropical}
 	@routine @invcheckoff begin
 	    # outer legs and inner legs
 	    outer_indices ← unique(iy)
@@ -60,11 +66,3 @@ loop and accumulate products to y, the GPU version, the CPU version.
 		~@routine
     end
 end
-
-using Test
-N = 3
-a = Tropical.(randn(N, N))
-b = Tropical.(randn(N, N))
-c = Tropical.(zeros(N, N))
-naive_einsum!(ein"ij,jk->ik", (a, b), c)
-@test c ≈ a*b

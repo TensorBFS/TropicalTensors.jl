@@ -1,3 +1,5 @@
+export spinglass_g4_tensor!, spinglass_bond_tensor!, spinglass_g16_tensor!
+
 """
     spinglass_bond_tensor!(mat, Jij)
 
@@ -20,6 +22,7 @@ end
     (~muleq)(mat[2,2], Jij)
     (~muleq)(mat[3,3], Jij)
     muleq(mat[4,4], Jij)
+    (~Tropical)(Jij)
 end
 
 @i function spinglass_g16_tensor!(out!::AbstractMatrix{T}, Js) where T<:Tropical
@@ -31,26 +34,10 @@ end
         for i = 1:length(Js)
             spinglass_bond_tensor!(tget(xs,i), Js[i])
         end
-        naive_einsum!(ein"aα,aβ,aγ,aδ,bα,bβ,bγ,bδ,cα,cβ,cγ,cδ,dα,dβ,dγ,dδ->abcdαβγδ", xs, y)
+        ieinsum!(ein"aα,aβ,aγ,aδ,bα,bβ,bγ,bδ,cα,cβ,cγ,cδ,dα,dβ,dγ,dδ->abcdαβγδ", xs, y)
     end
     for i=1:length(out!)
         muleq(out![i], y[i])
     end
     ~@routine
-end
-
-using NiLang, NiLang.AD, TropicalTensors, OMEinsum
-using TupleTools
-include("lib.jl")
-include("nieinsum.jl")
-using LinearAlgebra, Test
-@testset "i-bond tensor" begin
-    mat = ones(Tropical{Float64}, 2, 2)
-    J = 0.3
-    @test spinglass_bond_tensor!(mat, J)[1] ≈ spinglass_bond_tensor(J)
-    mat = Diagonal(ones(Tropical{Float64}, 4))
-    @test spinglass_g4_tensor!(mat, J)[1] ≈ spinglass_g4_tensor(J)
-    mat = ones(Tropical{Float64}, 16, 16)
-    Js = randn(16)
-    @test spinglass_g16_tensor!(mat, Js)[1] ≈ spinglass_g16_tensor(Js)
 end
