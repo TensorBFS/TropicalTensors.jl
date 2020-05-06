@@ -57,6 +57,7 @@ end
 	@routine @invcheckoff begin
 		branch_keeper ← zeros(Bool, length(v))
 		anc ← zero(T)
+		@safe @show anc |> typeof
 		for i = 1:length(v)
 			if (anc.n < v[i].n, branch_keeper[i])
 				FLIP(branch_keeper[i])
@@ -107,10 +108,8 @@ function deanc(x::T, val::T) where T<:Tropical
     x === val || deanc(x.n, val.n)
 end
 
-Base.isapprox(x::GVar, y::GVar; kwargs...) = isapprox(x.x, y.x; kwargs...) && isapprox(x.g, y.g; kwargs...)
-
 Base.one(x::XT) where XT<:TropicalG{T,GT} where {T,GT} = one(TropicalG{T,GT})
 Base.one(::Type{TropicalG{T,GT}}) where {T,GT} = Tropical(GVar(zero(T), zero(GT)))
 Base.zero(x::XT) where XT<:TropicalG{T,GT} where {T,GT} =zero(TropicalG{T,GT})
-Base.zero(::Type{TropicalG{T,GT}}) where {T<:AbstractFloat,GT} = Tropical(GVar(typemin(T)/2, zero(GT)))
-Base.zero(::Type{TropicalG{T,GT}}) where {T<:Integer,GT} = Tropical(GVar(typemin(T)÷2, zero(GT)))
+Base.zero(::Type{TropicalG{T,GT}}) where {T<:AbstractFloat,GT} = Tropical(GVar(typemin(T)/T(2), zero(GT)))
+Base.zero(::Type{TropicalG{T,GT}}) where {T<:Integer,GT} = Tropical(GVar(typemin(T)÷T(2), zero(GT)))

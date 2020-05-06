@@ -19,7 +19,7 @@ end
 
 @i function incstack!(vs::VecStack)
 	@safe @assert size(vs.data, 2) > vs.top
-	vs.top += identity(1)
+	INC(vs.top)
 end
 
 @i function i_instruct!(state::StridedVector{T},
