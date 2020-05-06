@@ -47,28 +47,28 @@ function NiLang.chfield(a::AbstractArray, ::typeof(vec), val)
     reshape(val, size(a)...)
 end
 
-@i function YaoBlocks.apply!(reg::ArrayReg{1}, pb::PutBlock{N,C,<:TropicalMatrixBlock}) where {N, C}
-    i_instruct!(vec(reg.state), pb.content.mat, pb.locs, (), ())
+@i function YaoBlocks.apply!(reg::ArrayReg{1}, pb::PutBlock{N,C,<:TropicalMatrixBlock}, REG_STACK) where {N, C}
+    i_instruct!(vec(reg.state), pb.content.mat, pb.locs, (), (), REG_STACK)
 end
-YaoBlocks.apply!(reg::ArrayReg{B}, b::TropicalMatrixBlock) where B = throw(NotImplementedError(:apply!, typeof((reg, b))))
+YaoBlocks.apply!(reg::ArrayReg{B}, b::TropicalMatrixBlock, REG_STACK) where B = throw(NotImplementedError(:apply!, typeof((reg, b))))
 
-@i function apply_G2!(reg::ArrayReg{1,T}, i::Int, J::Real) where T<:Tropical
+@i function apply_G2!(reg::ArrayReg{1,T}, i::Int, J::Real, REG_STACK) where T<:Tropical
     @routine @invcheckoff begin
         nbit ← nqubits(reg)
         blk ← put(nbit, i=>tropicalblock(MMatrix{2,2}(ones(T, 2, 2))))
         spinglass_bond_tensor!(blk.content.mat, J)
     end
-    apply!(reg, blk)
+    apply!(reg, blk, REG_STACK)
     ~@routine
 end
 
-@i function apply_G4!(reg::ArrayReg{1,T}, i::NTuple{2,Int}, J::Real) where T<:Tropical
+@i function apply_G4!(reg::ArrayReg{1,T}, i::NTuple{2,Int}, J::Real, REG_STACK) where T<:Tropical
     @routine @invcheckoff begin
         nbit ← nqubits(reg)
         blk ← put(nbit, i=>tropicalblock(Diagonal(MVector{4}(ones(T, 4)))))
         spinglass_g4_tensor!(blk.content.mat, J)
     end
-    apply!(reg, blk)
+    apply!(reg, blk, REG_STACK)
     ~@routine
 end
 
