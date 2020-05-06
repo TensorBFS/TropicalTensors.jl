@@ -42,7 +42,8 @@ end
 	end
 end
 
-NiLang.SWAP(a, b) where T = b, a
+NiLang.SWAP(a::T, b::T) where T<:Array = b, a
+NiLang.SWAP(a::T, b::T) where T<:Tropical = b, a
 # branch should be initialized to false.
 @i @inline function tropical_muladd(out!::Tropical, x::Tropical, y::Tropical, branch)
 	muleq(x, y)
@@ -98,18 +99,12 @@ function NiLang.loaddata(::Type{Array{TropicalG{T,GT},N}}, data::Array{Tropical{
     GVar.(data)
 end
 import NiLang.NiLangCore: deanc
-#function deanc(x::Array{Tropical{GVar{T,T}},N}, val::Array{Tropical{T},N}) where {T,N}
-#    deanc.(x, val)
-#end
-#function deanc(x::Tropical{GVar{T,T}}, val::Tropical{T}) where {T,N}
-#    deanc(x.n, val.n)
-#end
 
 function deanc(x::T, val::T) where {T<:Array}
-    deanc.(x, val)
+   x === val || deanc.(x, val)
 end
 function deanc(x::T, val::T) where T<:Tropical
-    deanc(x.n, val.n)
+    x === val || deanc(x.n, val.n)
 end
 
 Base.isapprox(x::GVar, y::GVar; kwargs...) = isapprox(x.x, y.x; kwargs...) && isapprox(x.g, y.g; kwargs...)
