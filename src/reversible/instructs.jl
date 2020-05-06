@@ -79,11 +79,11 @@ end
 
 @i function loop_kernel(state::StridedVector{T}, configs, U::MMatrix{2,2}, locs_raw, REG_STACK) where T<:Tropical
     @invcheckoff begin
-		a ← one(T)
-		b ← one(T)
-		c ← one(T)
-		d ← one(T)
 		@routine @inbounds begin
+			a ← one(T)
+			b ← one(T)
+			c ← one(T)
+			d ← one(T)
 			muleq(a, U[1])
 			muleq(b, U[2])
 			muleq(c, U[3])
