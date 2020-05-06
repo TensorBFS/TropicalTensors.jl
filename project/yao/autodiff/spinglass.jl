@@ -8,37 +8,15 @@ using NiLang, NiLang.AD
 
 @i function spinglass_yao(out!, reg::ArrayReg{B,T}, L::Int, J::AbstractVector) where {B,T<:Tropical}
     @invcheckoff begin
-    @safe println("Layer 1/$L")
+    @safe println("Layer 1/$L, stack size: $(length(NiLang.GLOBAL_STACK))")
     k ← 0
     for i=1:L-1
         k += identity(1)
         apply_G4!(reg, (i, i+1), J[k])
     end
     for j=2:L
-        @safe println("Layer $j/$L")
-        @routine begin
-            for i=1:L
-                k += identity(1)
-                apply_G2!(reg, i, J[k])
-            end
-        end
-        # bookup current state and loss
-        new_state ← one.(reg.state)
-        for i = 1:length(reg.state)
-            muleq(new_state[i], reg.state[i])
-        end
-
-        # clean up `NiLang.GLOBAL_STACK`
-        ~@routine
-        # but wait, `k` should not be uncomputed
-        k += identity(L)
-
-        NiLang.SWAP(reg.state, new_state)
-        # cache `new_reg` to `GLOBAL_STACK`, because we don't know its content
-        ipush!(new_state)
-        # deallocate `new_reg` that restored to zero state.
-        new_state → zero(reg.state)
-
+        @safe println("Layer $j/$L, stack size: $(length(NiLang.GLOBAL_STACK))")
+        G2_layer(L, k, reg, J)
         for i=1:L-1
             k += identity(1)
             apply_G4!(reg, (i, i+1), J[k])
@@ -50,6 +28,33 @@ using NiLang, NiLang.AD
     k → length(J)
     summed → one(T)
     end
+end
+
+@i function G2_layer(L::Int, k::Int, reg, J)
+    @routine begin
+        for i=1:L
+            k += identity(1)
+            apply_G2!(reg, i, J[k])
+        end
+    end
+    # bookup current state and loss
+    new_state ← one.(reg.state)
+    for i = 1:length(reg.state)
+        muleq(new_state[i], reg.state[i])
+    end
+
+    # clean up `NiLang.GLOBAL_STACK`
+    ~@routine
+    # but wait, `k` should not be uncomputed
+    k += identity(L)
+
+    @safe GC.gc()
+
+    NiLang.SWAP(reg.state, new_state)
+    # cache `new_reg` to `GLOBAL_STACK`, because we don't know its content
+    ipush!(new_state)
+    # deallocate `new_reg` that restored to zero state.
+    new_state → zero(reg.state)
 end
 
 @i function spinglass_yao_v0(out!, reg::ArrayReg{B,T}, L::Int, J::AbstractVector) where {B,T<:Tropical}
