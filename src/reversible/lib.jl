@@ -3,6 +3,8 @@ export muleq, muleq_mul, muleq_add, tropical_muladd
 
 export maxloc
 
+const TropicalG{T,TG} = Tropical{GVar{T,TG}}
+
 # out initialized to one(Tropical)
 @i function igemm!(out!::AbstractMatrix{T}, x::AbstractMatrix{T}, y::AbstractMatrix{T}) where T<:Tropical
 	@safe size(x, 2) == size(y, 1) || throw(DimensionMismatch())
@@ -40,8 +42,7 @@ end
 	end
 end
 
-NiLang.SWAP(a::Tropical{T}, b::Tropical{T}) where T = b, a
-NiLang.SWAP(a::Array, b::Array) where T = b, a
+NiLang.SWAP(a, b) where T = b, a
 # branch should be initialized to false.
 @i @inline function tropical_muladd(out!::Tropical, x::Tropical, y::Tropical, branch)
 	muleq(x, y)
@@ -86,9 +87,35 @@ maxloc(v::AbstractVector) = findmax(v)[2]
 
 # AD wrappers
 (_::Type{Inv{Tropical}})(x::Tropical) = x.n
-NiLang.AD.GVar(x::Tropical) = Tropical(GVar(x.n))
+NiLang.AD.GVar(x::Tropical) = Tropical(GVar(x.n, zero(x.n)))
 Base.convert(::Type{GVar{T,T}}, x::TX) where {T<:Number, TX<:Number} = GVar(T(x))
 Base.convert(::Type{GVar{T,T}}, x::GVar{T,T}) where {T<:Number} = x
 #(::Type{GVar{T,T}})(x::TX) where {T<:Number, TX<:Number} = GVar(T(x))
-NiLang.AD.grad(x::Tropical{<:GVar}) = Tropical(grad(x.n))
-(_::Type{Inv{GVar}})(x::Tropical{<:GVar}) = Tropical((~GVar)(x.n))
+NiLang.AD.grad(x::TropicalG) = Tropical(grad(x.n))
+(_::Type{Inv{GVar}})(x::TropicalG) = Tropical((~GVar)(x.n))
+Base.isfinite(x::GVar) = isfinite(x.x) && isfinite(x.g)
+function NiLang.loaddata(::Type{Array{TropicalG{T,GT},N}}, data::Array{Tropical{T},N}) where {T,GT,N}
+    GVar.(data)
+end
+import NiLang.NiLangCore: deanc
+#function deanc(x::Array{Tropical{GVar{T,T}},N}, val::Array{Tropical{T},N}) where {T,N}
+#    deanc.(x, val)
+#end
+#function deanc(x::Tropical{GVar{T,T}}, val::Tropical{T}) where {T,N}
+#    deanc(x.n, val.n)
+#end
+
+function deanc(x::T, val::T) where {T<:Array}
+    deanc.(x, val)
+end
+function deanc(x::T, val::T) where T<:Tropical
+    deanc(x.n, val.n)
+end
+
+Base.isapprox(x::GVar, y::GVar; kwargs...) = isapprox(x.x, y.x; kwargs...) && isapprox(x.g, y.g; kwargs...)
+
+Base.one(x::XT) where XT<:TropicalG{T,GT} where {T,GT} = one(TropicalG{T,GT})
+Base.one(::Type{TropicalG{T,GT}}) where {T,GT} = Tropical(GVar(zero(T), zero(GT)))
+Base.zero(x::XT) where XT<:TropicalG{T,GT} where {T,GT} =zero(TropicalG{T,GT})
+Base.zero(::Type{TropicalG{T,GT}}) where {T<:AbstractFloat,GT} = Tropical(GVar(typemin(T)/2, zero(GT)))
+Base.zero(::Type{TropicalG{T,GT}}) where {T<:Integer,GT} = Tropical(GVar(typemin(T)÷2, zero(GT)))

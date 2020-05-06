@@ -33,8 +33,8 @@ function Base.:*(a::Tropical{<:Rational}, b::Tropical{<:Rational})
     end
 end
 Base.:+(a::Tropical, b::Tropical) = Tropical(max(a.n, b.n))
-Base.zero(::Type{Tropical{T}}) where T = Tropical(convert(T,-Inf))
-Base.zero(::Type{Tropical{T}}) where T<:Integer = Tropical(convert(T,-999999))
+Base.zero(::Type{Tropical{T}}) where T<:Integer = Tropical(typemin(T)÷2)
+Base.zero(::Type{Tropical{T}}) where T<:AbstractFloat = Tropical(typemin(T)/2)
 Base.zero(::Tropical{T}) where T = zero(Tropical{T})
 
 Base.one(::Type{Tropical{T}}) where T = Tropical(zero(T))

@@ -15,7 +15,7 @@ end
 
 # chimera
 function dump_JCs(jtype::Val{JT}) where JT
-    for i=4
+    for i=3:8
         J = generate_J(jtype, i*(i-1)*8 + i^2*16)
         writedlm(joinpath(@__DIR__, "data", "JC_$(JT)_Lx$(i)_Ly$(i).dat"), J)
     end
