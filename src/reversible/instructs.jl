@@ -1,6 +1,7 @@
 using BitBasis
 using YaoArrayRegister: SDDiagonal, ArrayReg, staticize
 using TupleTools
+using StaticArrays
 
 export i_instruct!, VecStack, incstack!, stack4reg
 
