@@ -99,22 +99,26 @@ end
 			NiLang.SWAP(s1, state[is1])
 			NiLang.SWAP(s2, state[is2])
 			@routine begin
-				muleq(a, s1)
-				muleq(c, s2)
+				s3 ← one(T)
+				s4 ← one(T)
+				muleq_mul(s3, s1, b)
+				muleq_mul(s4, s2, d)
+				muleq(s1, a)
+				muleq(s2, c)
 				muleq(b, s1)
 				muleq(d, s2)
-				bk1 ← a.n > c.n
-				bk2 ← b.n > d.n
+				bk1 ← s1 > s2
+				bk2 ← s3 > s4
 			end
 			if (bk1, ~)
-				muleq(state[is1], a)
+				muleq(state[is1], s1)
 			else
-				muleq(state[is1], c)
+				muleq(state[is1], s2)
 			end
 			if (bk2, ~)
-				muleq(state[is2], b)
+				muleq(state[is2], s3)
 			else
-				muleq(state[is2], d)
+				muleq(state[is2], s4)
 			end
 			~@routine
         	NiLang.SWAP(s1, REG_STACK[is1])
