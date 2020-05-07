@@ -166,7 +166,7 @@ function _spinglass_yao(reg::ArrayReg{B,Tropical{T}}, L::Int, J::AbstractVector)
     sum(state(reg))
 end
 
-function assign_grid(L, g::AbstractVector) where {B,T<:Tropical}
+function assign_grid(L, g::AbstractVector)
     grid = zeros(Int, L, L)
     grid[1,1] = 1
     println("Layer 1/$L")

@@ -90,8 +90,8 @@ maxloc(v::AbstractVector) = findmax(v)[2]
 # AD wrappers
 (_::Type{Inv{Tropical}})(x::Tropical) = x.n
 NiLang.AD.GVar(x::Tropical) = Tropical(GVar(x.n, zero(x.n)))
-Base.convert(::Type{GVar{T,T}}, x::TX) where {T<:Number, TX<:Number} = GVar(T(x))
-Base.convert(::Type{GVar{T,T}}, x::GVar{T,T}) where {T<:Number} = x
+#Base.convert(::Type{GVar{T,T}}, x::TX) where {T<:Number, TX<:Number} = GVar(T(x))
+#Base.convert(::Type{GVar{T,T}}, x::GVar{T,T}) where {T<:Number} = x
 #(::Type{GVar{T,T}})(x::TX) where {T<:Number, TX<:Number} = GVar(T(x))
 NiLang.AD.grad(x::TropicalG) = Tropical(grad(x.n))
 (_::Type{Inv{GVar}})(x::TropicalG) = Tropical((~GVar)(x.n))
