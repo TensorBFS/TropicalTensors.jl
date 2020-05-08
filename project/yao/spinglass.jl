@@ -20,8 +20,8 @@ function generate_J(type::Val, size...)
     return J
 end
 
-G2(::Type{T}, J) where T = matblock(spinglass_bond_tensor(T(1.0)) |> LuxurySparse.staticize)
-G4(::Type{T}, J) where T = matblock(Diagonal(spinglass_g4_tensor(T(1.0))) |> LuxurySparse.staticize)
+G2(::Type{T}, J) where T = matblock(spinglass_bond_tensor(T(J)) |> LuxurySparse.staticize)
+G4(::Type{T}, J) where T = matblock(Diagonal(spinglass_g4_tensor(T(J))) |> LuxurySparse.staticize)
 
 function _spinglass_yao(reg::ArrayReg{B,Tropical{T}}, L::Int, J::AbstractVector) where {B,T}
     println("Layer 1/$L")
