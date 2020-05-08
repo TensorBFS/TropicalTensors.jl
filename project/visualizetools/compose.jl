@@ -58,7 +58,7 @@ function showbonds(Nx::Int, Ny::Int, color_sites::AbstractMatrix, color_bonds::A
                 filename="_lattice.svg")
     lt = SquareLattice(Nx, Ny, 0.3)
     scolors = LCHab.(vec(color_sites).*200, 230, 57)
-    composition = compose(context(),
+    composition = compose(context(0.1,0.1,0.8,0.8,rotation=Rotation(π/4,0.5,0.5)),
         (context(), lattice(lt), fill(scolors), stroke("silver"), linewidth(0.05mm)),
         #(context(), circle(lt[1,1]..., 0.04)),
         #(context(), circle(lt[2,1]..., 0.04)),

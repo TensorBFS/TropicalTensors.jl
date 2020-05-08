@@ -57,7 +57,6 @@ end
 	@routine @invcheckoff begin
 		branch_keeper ← zeros(Bool, length(v))
 		anc ← zero(T)
-		@safe @show anc |> typeof
 		for i = 1:length(v)
 			if (anc.n < v[i].n, branch_keeper[i])
 				FLIP(branch_keeper[i])
