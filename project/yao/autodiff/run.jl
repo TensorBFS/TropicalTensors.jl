@@ -1,5 +1,7 @@
 include("spinglass.jl")
 
+L = 28
+
 function solve_and_dump(::Type{T}, L; jtype) where T
     eng, g = opt_config(T, L; jtype=jtype)
     filename = joinpath(@__DIR__, "../data", "spinglassgrad_$(jtype)_L$(L)_$(T).dat")
@@ -13,8 +15,8 @@ end
 #    print_grid(grid)
 #end
 
-solve_and_dump(Int32, 10; jtype=:randpm)
-#analyze_grad(Int32, 10; jtype=:randpm)
+@time solve_and_dump(Int32, L; jtype=:randpm)
+#analyze_grad(Int32, L; jtype=:randpm)
 
 include("../../visualizetools/compose.jl")
 
@@ -26,7 +28,7 @@ function show_coupling(::Type{T}, L; jtype, filename="_lattice.svg") where T
     grid = Int.((assign_grid(L, vec(g)) .+ 1) ./ 2)
     pbonds = bonds[Js .> 0]
     nbonds = bonds[Js .< 0]
-    showbonds(10, 10, grid, [("red"=>pbonds), "green"=>nbonds])
+    showbonds(L, L, grid, [("red"=>pbonds), "green"=>nbonds])
 end
 
 function get_bonds(Lx, Ly)
@@ -45,4 +47,4 @@ function get_bonds(Lx, Ly)
     return bonds
 end
 
-show_coupling(Int32, 10; jtype=:randpm)
+show_coupling(Int16, L; jtype=:randpm)

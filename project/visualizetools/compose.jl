@@ -23,6 +23,8 @@ function bond(lt::SquareLattice, loc1, loc2)
     lt[loc1...], lt[loc2...]
 end
 
+unit(lt::SquareLattice) = 1/(max(lt.Nx, lt.Ny)+2*lt.r)
+
 using Test
 @testset "sq lattice" begin
     lt = SquareLattice(10, 20, 0.2)
@@ -33,8 +35,6 @@ using Test
     lt = SquareLattice(10, 10, 0.2)
     @test all(lt[end,end] .≈ (1-unit(lt) * (lt.r+0.5), 1-unit(lt) * (lt.r+0.5)))
 end
-
-unit(lt::SquareLattice) = 1/(max(lt.Nx, lt.Ny)+2*lt.r)
 
 function locs(sq::SquareLattice)
     xs = Float64[]
