@@ -7,7 +7,7 @@ struct Tropical{T} <: Number
         new{T}(x)
     end
     function Tropical{T}(x::Tropical{T}) where T
-        new{T}(x)
+        x
     end
 end
 
