@@ -6,6 +6,9 @@ struct Tropical{T} <: Number
     function Tropical(x::T) where T
         new{T}(x)
     end
+    function Tropical{T}(x::Tropical{T}) where T
+        new{T}(x)
+    end
 end
 
 const TropicalF64 = Tropical{Float64}
