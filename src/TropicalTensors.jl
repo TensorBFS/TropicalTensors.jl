@@ -5,6 +5,7 @@ using Requires
 
 include("tropical_number.jl")
 include("tensorlib.jl")
+#include("tropical_mm.jl")
 include("mislib.jl")
 
 export Reversible

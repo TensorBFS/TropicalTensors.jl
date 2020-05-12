@@ -18,18 +18,7 @@ end
 @time solve_and_dump(Int32, L; jtype=:randpm)
 #analyze_grad(Int32, L; jtype=:randpm)
 
-include("../../visualizetools/compose.jl")
-
-function show_coupling(::Type{T}, L; jtype, filename="_lattice.svg") where T
-    Js = load_J(L, Val(jtype))
-    lt = SquareLattice(L, L, 0.2)
-    bonds = get_bonds(lt.Nx, lt.Ny)
-    g = readdlm(joinpath(@__DIR__, "../data", "spinglassgrad_$(jtype)_L$(L)_$(T).dat"))
-    grid = Int.((assign_grid(L, vec(g)) .+ 1) ./ 2)
-    pbonds = bonds[Js .> 0]
-    nbonds = bonds[Js .< 0]
-    showbonds(L, L, grid, [("red"=>pbonds), "green"=>nbonds])
-end
+using Viznet
 
 function get_bonds(Lx, Ly)
     bonds = Tuple{Tuple{Int,Int},Tuple{Int,Int}}[]
