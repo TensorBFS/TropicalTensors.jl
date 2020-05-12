@@ -3,7 +3,9 @@ module TropicalTensors
 using OMEinsum
 using Requires
 
-include("tropical_number.jl")
+using TropicalNumbers
+
+export Tropical, TropicalF16, TropicalF32, TropicalF64
 include("tensorlib.jl")
 #include("tropical_mm.jl")
 include("mislib.jl")

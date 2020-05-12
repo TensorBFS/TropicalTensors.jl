@@ -3,5 +3,5 @@
 *.jl.mem
 .DS_Store
 _*.svg
-/Manifest.toml
+*.swp
 /dev/

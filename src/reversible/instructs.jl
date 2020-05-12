@@ -105,8 +105,6 @@ end
 				muleq_mul(s4, s2, d)
 				muleq(s1, a)
 				muleq(s2, c)
-				muleq(b, s1)
-				muleq(d, s2)
 				bk1 ← s1 > s2
 				bk2 ← s3 > s4
 			end

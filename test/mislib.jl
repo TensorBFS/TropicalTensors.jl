@@ -32,6 +32,7 @@ end
     inferier_table(tbl, (1,1,1,1,1))
     inferier_table(tbl)
 
+    @show tbl
     @test sum(tbl .> Tropical(-555555)) == 12
     @test sum(inferier_table(tbl)) == 32 - 12
 
@@ -39,6 +40,7 @@ end
     tbl = ein"ab,bc,cd,bd,de->ab"(T(1//1,1//3),T(1//3,1//2),T(1//2,1//3),T(1//3,1//3),T(1//3,1//1))
 
     @test sum(tbl .> Tropical(-555555)) == 3
+    @show tbl
     @test isinferier(tbl, (1,2), (1,1))
     @test sum(inferier_table(tbl)) == 2
 end

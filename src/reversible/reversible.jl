@@ -2,6 +2,7 @@ module Reversible
 using NiLang, NiLang.AD
 using ..TropicalTensors
 using LinearAlgebra
+using TropicalNumbers
 
 include("lib.jl")
 include("ieinsum.jl")

@@ -1,6 +1,5 @@
 export igemm!, igemv!, isum
 export muleq, muleq_mul, muleq_add, tropical_muladd
-
 export maxloc
 
 const TropicalG{T,TG} = Tropical{GVar{T,TG}}
@@ -42,8 +41,6 @@ end
 	end
 end
 
-NiLang.SWAP(a::T, b::T) where T<:Array = b, a
-NiLang.SWAP(a::T, b::T) where T<:Tropical = b, a
 # branch should be initialized to false.
 @i @inline function tropical_muladd(out!::Tropical, x::Tropical, y::Tropical, branch)
 	muleq(x, y)
@@ -81,7 +78,7 @@ end
 end
 
 @i @inline function muleq_mul(out!::Tropical, x::Tropical, y::Tropical)
-    x.n += x.n + y.n
+    out!.n += x.n + y.n
 end
 
 maxloc(v::AbstractVector) = findmax(v)[2]
@@ -91,7 +88,6 @@ maxloc(v::AbstractVector) = findmax(v)[2]
 NiLang.AD.GVar(x::Tropical) = Tropical(GVar(x.n, zero(x.n)))
 NiLang.AD.grad(x::TropicalG) = Tropical(grad(x.n))
 (_::Type{Inv{GVar}})(x::TropicalG) = Tropical((~GVar)(x.n))
-#Base.isfinite(x::GVar) = isfinite(x.x) && isfinite(x.g)
 function NiLang.loaddata(::Type{Array{TropicalG{T,GT},N}}, data::Array{Tropical{T},N}) where {T,GT,N}
     GVar.(data)
 end
