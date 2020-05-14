@@ -8,18 +8,6 @@ using TropicalTensors
 using LuxurySparse
 using DelimitedFiles
 
-_get_J(::Val{:ferro}) = 1.0
-_get_J(::Val{:randn}) = randn()
-_get_J(::Val{:rand}) = rand()
-
-function generate_J(type::Val, size...)
-    J = zeros(size...)
-    for i=1:length(J)
-        J[i] = _get_J(type)
-    end
-    return J
-end
-
 G2(::Type{T}, J) where T = matblock(spinglass_bond_tensor(T(J)) |> LuxurySparse.staticize)
 G4(::Type{T}, J) where T = matblock(Diagonal(spinglass_g4_tensor(T(J))) |> LuxurySparse.staticize)
 
