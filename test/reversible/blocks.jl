@@ -1,4 +1,4 @@
-using TropicalTensors
+using TropicalTensors, TropicalTensors.Reversible
 using LinearAlgebra, Test
 
 @testset "i-bond tensor" begin

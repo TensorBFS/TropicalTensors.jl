@@ -3,7 +3,7 @@ module TropicalTensors
 using OMEinsum
 using Requires
 
-using TropicalNumbers
+using TropicalNumbers, NiLog
 
 export Tropical, TropicalF16, TropicalF32, TropicalF64
 include("tensorlib.jl")

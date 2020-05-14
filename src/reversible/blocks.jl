@@ -8,20 +8,20 @@ export spinglass_g4_tensor!, spinglass_bond_tensor!, spinglass_g16_tensor!
 @i function spinglass_bond_tensor!(mat::AbstractMatrix, Jij::Real)
     @safe @assert size(mat) == (2,2)
     Tropical(Jij)
-    muleq(mat[1,1], Jij)
-    muleq(mat[2,2], Jij)
-    (~muleq)(mat[1,2], Jij)
-    (~muleq)(mat[2,1], Jij)
+    mat[1,1] *= identity(Jij)
+    mat[2,2] *= identity(Jij)
+    mat[1,2] /= identity(Jij)
+    mat[2,1] /= identity(Jij)
     (~Tropical)(Jij)
 end
 
 @i function spinglass_g4_tensor!(mat::Diagonal, Jij::Real)
     @safe @assert size(mat) == (4,4)
     Tropical(Jij)
-    muleq(mat[1,1], Jij)
-    (~muleq)(mat[2,2], Jij)
-    (~muleq)(mat[3,3], Jij)
-    muleq(mat[4,4], Jij)
+    mat[1,1] *= identity(Jij)
+    mat[2,2] /= identity(Jij)
+    mat[3,3] /= identity(Jij)
+    mat[4,4] *= identity(Jij)
     (~Tropical)(Jij)
 end
 
@@ -34,10 +34,12 @@ end
         for i = 1:length(Js)
             spinglass_bond_tensor!(tget(xs,i), Js[i])
         end
-        ieinsum!(ein"aα,aβ,aγ,aδ,bα,bβ,bγ,bδ,cα,cβ,cγ,cδ,dα,dβ,dγ,dδ->abcdαβγδ", xs, y)
+        ixs ← ([(ix...,) for ix in split("aα,aβ,aγ,aδ,bα,bβ,bγ,bδ,cα,cβ,cγ,cδ,dα,dβ,dγ,dδ", ',')]...,)
+        iy ← ("abcdαβγδ"...,)
+        NiLog.einsum!(ixs, xs, iy, y)
     end
     for i=1:length(out!)
-        muleq(out![i], y[i])
+        out![i] *= identity(y[i])
     end
     ~@routine
 end

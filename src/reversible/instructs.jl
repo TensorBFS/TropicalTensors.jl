@@ -45,7 +45,7 @@ end
     @invcheckoff @inbounds for i=1:length(configs)
         x ← configs[i]
         for i=1:length(U.diag)
-            muleq(state[x+locs_raw[i]], U.diag[i])
+            state[x+locs_raw[i]] *= identity(U.diag[i])
         end
     end
 end
@@ -60,13 +60,13 @@ end
 			for l=1:size(U,1)
 				el ← zero(T)
 				@routine for k=1:size(U,2)
-					muleq(U[l,k], state[x+locs_raw[k]])
+					U[l,k] *= identity(state[x+locs_raw[k]])
 					if (el.n < U[l,k].n, branch_keeper[k])
 						FLIP(branch_keeper[k])
 						NiLang.SWAP(el, U[l,k])
 					end
 				end
-				muleq(REG_STACK[x+locs_raw[l]], el)
+				REG_STACK[x+locs_raw[l]] *= identity(el)
 				~@routine
 			end
         end
@@ -84,10 +84,10 @@ end
 			b ← one(T)
 			c ← one(T)
 			d ← one(T)
-			muleq(a, U[1])
-			muleq(b, U[2])
-			muleq(c, U[3])
-			muleq(d, U[4])
+			a *= identity(U[1])
+			b *= identity(U[2])
+			c *= identity(U[3])
+			d *= identity(U[4])
 		end
 		incstack!(REG_STACK)
         @inbounds for i=1:length(configs)
@@ -101,22 +101,22 @@ end
 			@routine begin
 				s3 ← one(T)
 				s4 ← one(T)
-				muleq_mul(s3, s1, b)
-				muleq_mul(s4, s2, d)
-				muleq(s1, a)
-				muleq(s2, c)
+				s3 *= s1 * b
+				s4 *= s2 * d
+				s1 *= identity(a)
+				s2 *= identity(c)
 				bk1 ← s1 > s2
 				bk2 ← s3 > s4
 			end
 			if (bk1, ~)
-				muleq(state[is1], s1)
+				state[is1] *= identity(s1)
 			else
-				muleq(state[is1], s2)
+				state[is1] *= identity(s2)
 			end
 			if (bk2, ~)
-				muleq(state[is2], s3)
+				state[is2] *= identity(s3)
 			else
-				muleq(state[is2], s4)
+				state[is2] *= identity(s4)
 			end
 			~@routine
         	NiLang.SWAP(s1, REG_STACK[is1])

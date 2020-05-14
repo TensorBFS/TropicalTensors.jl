@@ -172,6 +172,12 @@ uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 deps = ["Libdl"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
+[[LogarithmicNumbers]]
+deps = ["Random", "Requires"]
+git-tree-sha1 = "fa14eb7801e95b3c996612d9d62899ebe5c8f877"
+uuid = "aa2f6b4e-9042-5d33-9679-40d3a6b85899"
+version = "0.4.0"
+
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
@@ -222,6 +228,14 @@ deps = ["DataStructures", "MLStyle", "TupleTools"]
 git-tree-sha1 = "e46f0d7c1dad570b1b1b009e5878f8bc223dfac6"
 uuid = "575d3204-02a4-11ea-3f62-238caa8bf11e"
 version = "0.5.1"
+
+[[NiLog]]
+deps = ["LogarithmicNumbers", "NiLang", "TropicalNumbers", "TupleTools"]
+git-tree-sha1 = "cfff7af9d4d31c7a6565d97165b0987d52f605d7"
+repo-rev = "master"
+repo-url = "https://github.com/JuliaReverse/NiLog.jl"
+uuid = "07b9913f-4636-4bc8-9841-9af50769c5b0"
+version = "0.1.0"
 
 [[OMEinsum]]
 deps = ["BatchedRoutines", "Combinatorics", "LinearAlgebra", "MacroTools", "PkgBenchmark", "Requires", "TensorOperations", "Test", "TupleTools", "ZygoteRules"]
