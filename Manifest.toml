@@ -216,9 +216,9 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[LuxurySparse]]
 deps = ["FillArrays", "LinearAlgebra", "Random", "SparseArrays", "StaticArrays"]
-git-tree-sha1 = "0302284020dc5cabcd5095dd4a7b65322fa612c0"
+git-tree-sha1 = "f5beb9d83b3e2a3463d3176dcbfc2e156c7a4949"
 uuid = "d05aeea4-b7d4-55ac-b691-9e7fabb07ba2"
-version = "0.6.1"
+version = "0.6.2"
 
 [[MLStyle]]
 git-tree-sha1 = "67f9a88611bc79f992aa705d9bbc833a2547dec7"
@@ -418,6 +418,14 @@ git-tree-sha1 = "379550bf85d714c486fef21f1267050bac6bb380"
 repo-rev = "master"
 repo-url = "https://github.com/GiggleLiu/TropicalNumbers.jl"
 uuid = "b3a74e9c-7526-4576-a4eb-79c0d4c32334"
+version = "0.1.0"
+
+[[TropicalYao]]
+deps = ["BitBasis", "LinearAlgebra", "NiLang", "NiLogLikeNumbers", "StaticArrays", "TropicalNumbers", "TupleTools", "Yao", "YaoArrayRegister"]
+git-tree-sha1 = "fb7a4dc69ff57f0aab6e6c9930f1b358714beeed"
+repo-rev = "master"
+repo-url = "https://github.com/JuliaReverse/TropicalYao.jl"
+uuid = "8a7e9035-3e12-4286-9ab6-425b4286d857"
 version = "0.1.0"
 
 [[TupleTools]]
