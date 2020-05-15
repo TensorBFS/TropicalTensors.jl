@@ -1,12 +1,14 @@
 using TropicalTensors
 using Test
-using OMEinsum
-using TropicalYao
-
-@testset "contract" begin
-    include("mislib.jl")
-end
 
 @testset "dumpload" begin
     include("dumpload.jl")
+end
+
+@testset "yao" begin
+    include("yao/yao.jl")
+end
+
+@testset "cuda" begin
+    include("cuda.jl")
 end

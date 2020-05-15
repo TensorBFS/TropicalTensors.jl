@@ -1,17 +1,5 @@
-using Test
-using Yao
-using CuYao
-using LinearAlgebra
-using CuArrays
-CuArrays.allowscalar(false)
-using TropicalTensors
-using LuxurySparse
-G2(::Type{T}, J) where T = matblock(spinglass_bond_tensor(T(J)) |> LuxurySparse.staticize)
-G4(::Type{T}, J) where T = matblock(Diagonal(spinglass_g4_tensor(T(J))) |> LuxurySparse.staticize)
-G16(::Type{T}, Js) where T = matblock(spinglass_g16_tensor(T.(Js)) |> LuxurySparse.staticize)
-
 function red_reg(::Type{T}, Ly::Int, Js; usecuda=false) where T
-    reg = _init_reg(T, Ly*4, usecuda)
+    reg = _init_reg(T, Ly*4, Val(usecuda))
     k = 0
     for i=1:Ly-1
         for j = 1:4
@@ -27,7 +15,9 @@ function red_reg(::Type{T}, Ly::Int, Js; usecuda=false) where T
     return reg
 end
 
-function chimera_yao(::Type{T}, Lx::Int, Ly::Int, J::AbstractVector; usecuda::Bool) where {T}
+function solve(sg::Spinglass{LT,T}; usecuda::Bool) where {LT<:ChimeraLattice,T}
+    _, Lx, Ly = size(sg.lattice)
+    J = sg.Js
     println("Running Chimera, Lx = $Lx, Ly = $Ly, eltype = $T, usecuda = $usecuda.")
     nj_red = (Ly-1)*4 + 16 * Ly
     println("Layer 1/$Lx")
@@ -51,30 +41,7 @@ function chimera_yao(::Type{T}, Lx::Int, Ly::Int, J::AbstractVector; usecuda::Bo
     if length(J) !== k
         @warn "length of parameters is $(length(J)), used $k"
     end
-    sum(state(reg))
+    sum(statevec(reg))
 end
 
-chimera_yao(Lx::Int, Ly::Int, J::AbstractVector; usecuda=false) = chimera_yao(Float64, Lx, Ly, J; usecuda=usecuda)
-
-function _init_reg(::Type{T}, L::Int, usecuda::Bool) where T
-    if usecuda
-        reg = ArrayReg(CuArrays.ones(Tropical{T}, 1<<L))
-    else
-    	reg = ArrayReg(ones(Tropical{T}, 1<<L))
-    end
-end
-
-if abspath(PROGRAM_FILE) == @__FILE__
-    using Test
-    @testset "test red reg" begin
-        reg = red_reg(Float32, 3, randn(8+16*3); usecuda=false)
-        @test reg isa ArrayReg{1,Tropical{Float32},Matrix{Tropical{Float32}}}
-    end
-
-    @testset "test Chimera" begin
-        res = chimera_yao(Float32, 3, 3, ones(12*4 + 9*16); usecuda=false)
-        @test res.n == 12*4 + 9*16
-        res = chimera_yao(Float32, 3, 3, ones(12*4 + 9*16); usecuda=true)
-        @test res.n == 12*4 + 9*16
-    end
-end
+sgbonds(lt::ChimeraLattice) = bonds(lt)

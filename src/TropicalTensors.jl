@@ -1,20 +1,20 @@
 module TropicalTensors
 
-using OMEinsum
+using Viznet
 using Requires
 
 using TropicalNumbers
 
-include("dumpload.jl")
-#include("tropical_mm.jl")
-#include("mislib.jl")
+export Tropical
 
+include("Core.jl")
+include("dumpload.jl")
+include("yao/yao.jl")
 #export Reversible
-#include("reversible/reversible.jl")
+#include("yao/reversible/reversible.jl")
 
 function __init__()
-    @require CuArrays="3a865a2d-5b23-5a0f-bc46-62713ec82fae" include("cuda.jl")
+    @require CuYao = "b48ca7a8-dd42-11e8-2b8e-1b7706800275" include("cuda.jl")
 end
-
 
 end # module

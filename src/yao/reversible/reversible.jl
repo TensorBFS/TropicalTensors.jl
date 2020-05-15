@@ -3,6 +3,6 @@ module Reversible
 using TropicalYao
 using NiLogLikeNumbers
 
-include("spinglass.jl")
+include("square.jl")
 
 end
