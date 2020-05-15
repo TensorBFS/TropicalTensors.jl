@@ -24,8 +24,8 @@ function rand_spinglass(::Type{T}, lt::Viznet.AbstractLattice;
                     jt::Jtype=Randn(), ht::Jtype=Zero(), seed::Int=2,
                     dumpto=nothing) where T
     Random.seed!(seed)
-    hs = [_get_J(ht) for i=1:length(lt)]
-    Js = [_get_J(jt) for i=1:length(bonds(lt))]
+    hs = T[_get_J(ht) for i=1:length(lt)]
+    Js = T[_get_J(jt) for i=1:length(bonds(lt))]
     sg = Spinglass(lt, Js, hs)
     if !(dumpto isa Nothing)
         dump_params(dumpto, sg, jt, ht, seed)

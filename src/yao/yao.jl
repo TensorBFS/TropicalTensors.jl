@@ -1,9 +1,10 @@
 using Yao
 using LuxurySparse
 using LinearAlgebra
+using TropicalYao
+using Viznet
 
 export solve, SquareLattice, ChimeraLattice
-using TropicalYao
 
 G2(::Type{T}, J) where T = matblock(spinglass_bond_tensor(T(J)) |> LuxurySparse.staticize)
 G4(::Type{T}, J) where T = matblock(Diagonal(spinglass_g4_tensor(T(J))) |> LuxurySparse.staticize)
@@ -15,3 +16,4 @@ end
 
 include("square.jl")
 include("chimera.jl")
+include("reversible/reversible.jl")
