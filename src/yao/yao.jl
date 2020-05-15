@@ -16,4 +16,3 @@ end
 
 include("square.jl")
 include("chimera.jl")
-include("reversible/reversible.jl")

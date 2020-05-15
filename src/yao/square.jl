@@ -25,28 +25,19 @@ function solve(sg::Spinglass{LT,T}; usecuda=false) where {LT<:SquareLattice,T}
     square_solve(reg, lt.Nx, lt.Ny, sg.Js)
 end
 
-function assign_grid(lt, g::AbstractVector)
-    g = copy(g)
-    grid = zeros(Int, size(lt))
+function assign_grid(lt::SquareLattice, g::AbstractVector{T}) where T
+    grid = zeros(length(lt))
     grid[1,1] = 1
-    for (a, b) in v_bonds(lt, 1)
-        assign_one!(grid, a, b, g |> popfirst!)
+    configs = length(lt)
+    for ((i,j), g) in zip(sgbonds(lt), g)
+        assign_one!(grid, i, j, g)
     end
-    for i=2:lt.Lx
-        for (a, b) in h_bonds(lt, i-1)
-            assign_one!(grid, a, b, g |> popfirst!)
-        end
-        for (a, b) in v_bonds(lt, i)
-            assign_one!(grid, a, b, g |> popfirst!)
-        end
-    end
-    @assert length(g) == 0
     return grid
 end
 
 function assign_one!(grid, x, y, g)
     if grid[x] == 0 && grid[y] == 0
-        error("")
+        error("both $x and $y are not set!")
     elseif grid[x] == 0
         grid[x] = sign(g)*grid[y]
     elseif grid[y] == 0
