@@ -22,3 +22,10 @@ end
     res = solve(sg; usecuda=true)
     @test res.n == 12*4 + 9*16
 end
+
+@testset "forwarddiff-gpu" begin
+    L = 5
+    Js = ones(Float32, 2L*(L-1))
+    gs = ForwardDiff.gradient(x->solve(SquareLattice(L, L), x, zeros(eltype(x), L^2); usecuda=true).n, Js)
+    @test gs ≈ ones(Float32, 2L*(L-1))
+end

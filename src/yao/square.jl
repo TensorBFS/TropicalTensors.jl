@@ -25,6 +25,11 @@ function solve(sg::Spinglass{LT,T}; usecuda=false) where {LT<:SquareLattice,T}
     square_solve(reg, lt.Nx, lt.Ny, sg.Js)
 end
 
+function solve(lattice::Viznet.AbstractLattice, Js::Vector{T}, hs::Vector{T}; usecuda=false) where {T}
+    sg = Spinglass(lattice, Js, hs)
+    solve(sg; usecuda=usecuda)
+end
+
 function assign_grid(lt::SquareLattice, g::AbstractVector{T}) where T
     grid = zeros(length(lt))
     grid[1,1] = 1
