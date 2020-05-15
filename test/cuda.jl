@@ -1,6 +1,7 @@
 using Test
 using TropicalTensors
 using CuArrays, CuYao
+using ForwardDiff
 CuArrays.allowscalar(false)
 
 @testset "cuda" begin
