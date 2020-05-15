@@ -78,6 +78,13 @@ end
     end
 end
 
+struct SpinglassOptConfig{LT,T}
+    sg::Spinglass{LT,T}
+    eng::T
+    grad_J::Vector{T}
+    grad_h::Vector{T}
+end
+
 function opt_config(sg::Spinglass{LT,T}) where {LT,T}
     reg = ArrayReg(ones(Tropical{T}, 1<<sg.lattice.Ny))
     A = stack4reg(reg, sg.lattice.Ny)
@@ -86,7 +93,11 @@ function opt_config(sg::Spinglass{LT,T}) where {LT,T}
     sgg = Spinglass(sg.lattice, GVar.(sg.Js, zero(sg.Js)), GVar.(sg.hs, zero(sg.hs)))
     gres = (~isolve)(GVar(eng, T(1)), sgg, GVar(reg), GVar(A), GVar(B))
     empty!(NiLang.GLOBAL_STACK)
-    return eng, grad.(gres[2].Js)
+    return SpinglassOptConfig(sg, eng, grad.(gres[2].Js), grad.(gres[2].hs))
+end
+
+function Base.display(sgres::SpinglassOptConfig)
+    Base.display(vizgrad_J(sgres.sg, sgres.grad_J))
 end
 
 export vizgrad_J

@@ -25,10 +25,11 @@ end
         sgg = Spinglass(sg.lattice, GVar.(sg.Js, zero(sg.Js)), GVar.(sg.hs, zero(sg.hs)))
         gres = (~isolve_largemem)(GVar(eng, T(1)), sgg, GVar(reg), GVar(A))
         empty!(NiLang.GLOBAL_STACK)
-        return eng, grad.(gres[2].Js)
+        return TropicalTensors.SpinglassOptConfig(sg, eng, grad.(gres[2].Js), grad.(gres[2].hs))
     end
     sg = rand_spinglass(Int32, SquareLattice(9, 7); jt=Randpm(), ht=Zero(), seed=2)
     optc = opt_config(sg)
     optc2 = opt_config_largemem(sg)
-    @test optc == optc2
+    @test optc.grad_J == optc2.grad_J
+    @test optc.eng == optc2.eng
 end
