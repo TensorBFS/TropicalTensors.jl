@@ -94,6 +94,10 @@ end
         k += 4*Ly
         swap_state!(B_STACK, reg.state)
 
+        for j=1:Ly*4 # `hs` interated in red->black order
+            apply_Gh!(reg, j, hs[j+hk+4Ly], A_STACK)
+        end
+
         # RED
         @routine begin
             rr ← _init_reg(T, Ly*4, Val(false))

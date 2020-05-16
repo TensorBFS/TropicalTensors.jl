@@ -107,21 +107,24 @@ function Base.getindex(lt::ChimeraLattice, k::Int, i::Int, j::Int)
     kj = mod1(k, 4)-1
     x = ((i-1)*(Viznet.gap_x(lt) + 2)+ki+0.5)*unit(lt)
     y = ((j-1)*(Viznet.gap_y(lt) + 4)+kj+0.5)*unit(lt)
-    return (x+0.03*ki, y+0.03*kj)
+    return (x+0.01*kj, y+0.02*ki)
 end
 
 # to index `h`.
 function sgvertexorder(lt::ChimeraLattice)
     v = Int[]
+    LI = LinearIndices(lt)
     for i=1:lt.Nx
         for ki = 1:2
             for j=1:lt.Ny
                 for kj = 1:4
                     k = (ki-1)*4 + kj
-                    push!(v, lt[k,i,j])
+                    push!(v, LI[k,i,j])
                 end
             end
         end
     end
     return v
 end
+
+regsize(lt::ChimeraLattice) = lt.Ny*4

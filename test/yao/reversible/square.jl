@@ -29,6 +29,7 @@ end
     sg = rand_spinglass(Int32, SquareLattice(9, 7); jt=Randpm(), ht=Zero(), seed=2)
     optc = opt_config(sg)
     optc2 = opt_config_largemem(sg)
-    @test optc.grad_J == optc2.grad_J
+    @test optc.grad_Js == optc2.grad_Js
+    @test optc.grad_hs == optc2.grad_hs
     @test optc.eng == optc2.eng
 end

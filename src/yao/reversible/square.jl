@@ -2,19 +2,23 @@
     @invcheckoff begin
     Lx ← sg.lattice.Nx
     Ly ← sg.lattice.Ny
-    J ← sg.Js
+    Js ← sg.Js
+    hs ← sg.hs
     @safe println("Layer 1/$Lx, stack size: $(A_STACK.top) & $(B_STACK.top)")
     k ← 0
+    for j=1:Ly
+        apply_Gh!(reg, j, hs[j], A_STACK)
+    end
     for j=1:Ly-1
         k += identity(1)
-        apply_G4!(reg, (j, j+1), J[k], A_STACK)
+        apply_G4!(reg, (j, j+1), Js[k], A_STACK)
     end
     for i=2:Lx
         @safe println("Layer $i/$Lx, stack size: $(A_STACK.top) & $(B_STACK.top)")
         @routine begin
             for j=1:Ly
                 k += identity(1)
-                apply_G2!(reg, j, J[k], A_STACK)
+                apply_G2!(reg, j, Js[k], A_STACK)
             end
         end
         # bookup current state and loss
@@ -29,15 +33,18 @@
         # store the stored state
         swap_state!(B_STACK, reg.state)
 
+        for j=1:Ly
+            apply_Gh!(reg, j, hs[(i-1)*Ly+j], A_STACK)
+        end
         for j=1:Ly-1
             k += identity(1)
-            apply_G4!(reg, (j, j+1), J[k], A_STACK)
+            apply_G4!(reg, (j, j+1), Js[k], A_STACK)
         end
     end
     summed ← one(TT)
     isum(summed, reg.state)
     NiLang.SWAP(summed.n, out!)
-    k → length(J)
+    k → length(Js)
     summed → one(TT)
     end
 end
@@ -58,28 +65,35 @@ end
     @invcheckoff begin
     Lx ← sg.lattice.Nx
     Ly ← sg.lattice.Ny
-    J ← sg.Js
+    Js ← sg.Js
+    hs ← sg.hs
     @safe println("Layer 1/$Lx")
     k ← 0
+    for j=1:Ly
+        apply_Gh!(reg, j, hs[j], REG_STACK)
+    end
     for j=1:Ly-1
         k += identity(1)
-        apply_G4!(reg, (j, j+1), J[k], REG_STACK)
+        apply_G4!(reg, (j, j+1), Js[k], REG_STACK)
     end
     for i=2:Lx
         @safe println("Layer $i/$Lx")
         for j=1:Ly
             k += identity(1)
-            apply_G2!(reg, j, J[k], REG_STACK)
+            apply_G2!(reg, j, Js[k], REG_STACK)
+        end
+        for j=1:Ly
+            apply_Gh!(reg, j, hs[(i-1)*Ly+j], REG_STACK)
         end
         for j=1:Ly-1
             k += identity(1)
-            apply_G4!(reg, (j, j+1), J[k], REG_STACK)
+            apply_G4!(reg, (j, j+1), Js[k], REG_STACK)
         end
     end
     summed ← one(TT)
     isum(summed, reg.state)
     NiLang.SWAP(summed.n, out!)
-    k → length(J)
+    k → length(Js)
     summed → one(TT)
     end
 end

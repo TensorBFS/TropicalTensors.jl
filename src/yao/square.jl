@@ -37,42 +37,19 @@ function solve(lattice::Viznet.AbstractLattice, Js::Vector{T}, hs::Vector{T}; us
     solve(sg; usecuda=usecuda)
 end
 
-function assign_grid(lt::Viznet.AbstractLattice, g::AbstractVector{T}) where T
-    grid = zeros(length(lt))
-    grid[1] = 1
-    configs = length(lt)
-    bonds = sgbonds(lt)
-    remain_bonds = collect(1:length(bonds))
-    for i=1:10
-        nrem = length(remain_bonds)
-        for (i_, k) in enumerate(Base.Iterators.reverse(copy(remain_bonds)))
-            i, j = bonds[k]
-            res = assign_one!(grid, i, j, g[k])
-            if res
-                deleteat!(remain_bonds, nrem-i_+1)
-            end
+# to index `h`.
+function sgvertexorder(lt::SquareLattice)
+    v = Int[]
+    LI = LinearIndices(lt)
+    for i=1:lt.Nx
+        for j=1:lt.Ny
+            push!(v, LI[i,j])
         end
-        isempty(remain_bonds) && break
     end
-    if !isempty(remain_bonds)
-        error("bonds $remain_bonds can not be set!")
-    end
-    return grid
+    return v
 end
 
-function assign_one!(grid, x, y, g)
-    if grid[x] == 0 && grid[y] == 0
-        return false
-    elseif grid[x] == 0
-        grid[x] = sign(g)*grid[y]
-    elseif grid[y] == 0
-        grid[y] = sign(g)*grid[x]
-    else
-        @assert grid[y] == sign(g)*grid[x]
-    end
-    return true
-end
-
+# to index `J`.
 function sgbonds(lt::SquareLattice)
     edges  =Tuple{Int,Int}[]
     append!(edges, v_bonds(lt, 1))
@@ -93,13 +70,4 @@ function h_bonds(lt::SquareLattice, i::Int)
     map(j -> (LI[i,j], LI[i+1,j]), 1:lt.Ny)
 end
 
-# to index `h`.
-function sgvertexorder(lt::SquareLattice)
-    v = Int[]
-    for i=1:lt.Nx
-        for j=1:lt.Ny
-            push!(v, lt[i,j])
-        end
-    end
-    return v
-end
+regsize(lt::SquareLattice) = lt.Ny
