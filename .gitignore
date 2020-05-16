@@ -6,3 +6,5 @@ _*.svg
 *.swp
 /dev/
 _local/
+SquareLattice_hRandn_Lx3_Ly3_seed2.dat
+SquareLattice_JRandn_Lx3_Ly3_seed2.dat

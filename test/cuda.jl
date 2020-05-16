@@ -19,7 +19,7 @@ end
 
 @testset "test Chimera" begin
     lt = ChimeraLattice(3, 3)
-    sg = Spinglass(lt, ones(Float32, 12*4 + 9*16), zeros(Float32, 3*8))
+    sg = Spinglass(lt, ones(Float32, 12*4 + 9*16), zeros(Float32, 9*8))
     res = solve(sg; usecuda=true)
     @test res.n == 12*4 + 9*16
 end

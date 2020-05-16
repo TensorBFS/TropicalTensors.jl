@@ -6,6 +6,7 @@ using Viznet
 
 export solve, SquareLattice, ChimeraLattice
 
+Gh(::Type{T}, h) where T = matblock(Diagonal(spinglass_mag_tensor(T(h))) |> LuxurySparse.staticize)
 G2(::Type{T}, J) where T = matblock(spinglass_bond_tensor(T(J)) |> LuxurySparse.staticize)
 G4(::Type{T}, J) where T = matblock(Diagonal(spinglass_g4_tensor(T(J))) |> LuxurySparse.staticize)
 G16(::Type{T}, Js) where T = matblock(spinglass_g16_tensor(T.(Js)) |> LuxurySparse.staticize)

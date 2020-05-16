@@ -1,18 +1,25 @@
 export sgbonds
 
-function square_solve(reg::ArrayReg{B,Tropical{T}}, Lx::Int, Ly::Int, J::AbstractVector) where {B,T}
+function square_solve(reg::ArrayReg{B,Tropical{T}}, Lx::Int, Ly::Int, Js::AbstractVector, hs::AbstractVector) where {B,T}
     println("Layer 1/$Lx")
-    J = copy(J)
+    Js = copy(Js)
+    hs = copy(hs)
+    for j=1:Ly
+        reg |> put(Ly, j=>Gh(T, hs |> popfirst!))
+    end
     for j=1:Ly-1
-        reg |> put(Ly, (j,j+1)=>G4(T, J |> popfirst!))
+        reg |> put(Ly, (j,j+1)=>G4(T, Js |> popfirst!))
     end
     for i=2:Lx
         println("Layer $i/$Lx")
         for j=1:Ly
-            reg |> put(Ly, j=>G2(T, J |> popfirst!))
+            reg |> put(Ly, j=>G2(T, Js |> popfirst!))
+        end
+        for j=1:Ly
+            reg |> put(Ly, j=>Gh(T, hs |> popfirst!))
         end
         for j=1:Ly-1
-            reg |> put(Ly, (j,j+1)=>G4(T, J |> popfirst!))
+            reg |> put(Ly, (j,j+1)=>G4(T, Js |> popfirst!))
         end
     end
     sum(state(reg))
@@ -22,7 +29,7 @@ function solve(sg::Spinglass{LT,T}; usecuda=false) where {LT<:SquareLattice,T}
     # Yao gates
     lt = sg.lattice
     reg = _init_reg(T, lt.Ny, Val(usecuda))
-    square_solve(reg, lt.Nx, lt.Ny, sg.Js)
+    square_solve(reg, lt.Nx, lt.Ny, sg.Js, sg.hs)
 end
 
 function solve(lattice::Viznet.AbstractLattice, Js::Vector{T}, hs::Vector{T}; usecuda=false) where {T}
@@ -84,4 +91,15 @@ end
 function h_bonds(lt::SquareLattice, i::Int)
     LI = LinearIndices(size(lt))
     map(j -> (LI[i,j], LI[i+1,j]), 1:lt.Ny)
+end
+
+# to index `h`.
+function sgvertexorder(lt::SquareLattice)
+    v = Int[]
+    for i=1:lt.Nx
+        for j=1:lt.Ny
+            push!(v, lt[i,j])
+        end
+    end
+    return v
 end
