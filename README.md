@@ -9,6 +9,7 @@ Tensors of Tropical numbers.
 
 Type `]` in Julia REPL to enter pkg mode and
 ```julia pkg
+pkg> add https://github.com/GiggleLiu/NiLangCore.jl#log-numbers add https://github.com/GiggleLiu/NiLang.jl#matchcore https://github.com/GiggleLiu/Viznet.jl#master https://github.com/JuliaReverse/TropicalYao.jl#master https://github.com/JuliaReverse/NiLogLikeNumbers.jl#master https://github.com/GiggleLiu/TropicalNumbers.jl#master
 pkg> dev git@github.com:TensorBFS/TropicalTensors.jl.git
 ```
 The last line is required only when you use GPU for computing.
