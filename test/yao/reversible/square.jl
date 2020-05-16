@@ -24,7 +24,6 @@ end
         eng, sg, reg, A = isolve_largemem(T(0.0), sg, reg, A)
         sgg = Spinglass(sg.lattice, GVar.(sg.Js, zero(sg.Js)), GVar.(sg.hs, zero(sg.hs)))
         gres = (~isolve_largemem)(GVar(eng, T(1)), sgg, GVar(reg), GVar(A))
-        empty!(NiLang.GLOBAL_STACK)
         return TropicalTensors.SpinglassOptConfig(sg, eng, grad.(gres[2].Js), grad.(gres[2].hs))
     end
     sg = rand_spinglass(Int32, SquareLattice(9, 7); jt=Randpm(), ht=Zero(), seed=2)

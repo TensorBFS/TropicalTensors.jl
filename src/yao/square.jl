@@ -30,19 +30,32 @@ function solve(lattice::Viznet.AbstractLattice, Js::Vector{T}, hs::Vector{T}; us
     solve(sg; usecuda=usecuda)
 end
 
-function assign_grid(lt::SquareLattice, g::AbstractVector{T}) where T
+function assign_grid(lt::Viznet.AbstractLattice, g::AbstractVector{T}) where T
     grid = zeros(length(lt))
-    grid[1,1] = 1
+    grid[1] = 1
     configs = length(lt)
-    for ((i,j), g) in zip(sgbonds(lt), g)
-        assign_one!(grid, i, j, g)
+    bonds = sgbonds(lt)
+    remain_bonds = collect(1:length(bonds))
+    for i=1:10
+        nrem = length(remain_bonds)
+        for (i_, k) in enumerate(Base.Iterators.reverse(copy(remain_bonds)))
+            i, j = bonds[k]
+            res = assign_one!(grid, i, j, g[k])
+            if res
+                deleteat!(remain_bonds, nrem-i_+1)
+            end
+        end
+        isempty(remain_bonds) && break
+    end
+    if !isempty(remain_bonds)
+        error("bonds $remain_bonds can not be set!")
     end
     return grid
 end
 
 function assign_one!(grid, x, y, g)
     if grid[x] == 0 && grid[y] == 0
-        error("both $x and $y are not set!")
+        return false
     elseif grid[x] == 0
         grid[x] = sign(g)*grid[y]
     elseif grid[y] == 0
@@ -50,6 +63,7 @@ function assign_one!(grid, x, y, g)
     else
         @assert grid[y] == sign(g)*grid[x]
     end
+    return true
 end
 
 function sgbonds(lt::SquareLattice)
