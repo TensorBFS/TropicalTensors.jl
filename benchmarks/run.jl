@@ -4,7 +4,7 @@
 const DEVICE = ARGS[2]
 
 using CUDAnative, CuArrays
-device!(0)
+device!(parse(Int, get(ARGS, 3, "0")))
 using CuYao
 using DelimitedFiles, TropicalTensors
 using BenchmarkTools
