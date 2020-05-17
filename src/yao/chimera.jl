@@ -2,7 +2,7 @@ function red_reg(::Type{T}, Ly::Int, Js, hs; usecuda=false) where T
     reg = _init_reg(T, Ly*4, Val(usecuda))
     k = 0
     for i=1:Ly*4
-        reg |> put(4*Ly, i=>Gh(T, hs[i]))
+        hs[i] != 0 && (reg |> put(4*Ly, i=>Gh(T, hs[i])))
     end
     for i=1:Ly-1
         for j = 1:4
@@ -29,7 +29,7 @@ function solve(sg::Spinglass{LT,T}; usecuda::Bool) where {LT<:ChimeraLattice,T}
     reg = red_reg(T, Ly, Js[k+1:k+nj_red], hs[1:4Ly]; usecuda=usecuda)
     k += nj_red
     for j=1:Ly*4
-        reg |> put(4*Ly, j=>Gh(T, hs[j]))
+        hs[j]!= 0 && (reg |> put(4*Ly, j=>Gh(T, hs[j])))
     end
     for i=2:Lx
         hk = (i-1)*Ly*8
@@ -40,7 +40,7 @@ function solve(sg::Spinglass{LT,T}; usecuda::Bool) where {LT<:ChimeraLattice,T}
             k += 1
         end
         for j=1:Ly*4 # `hs` interated in red->black order
-            reg |> put(4*Ly, j=>Gh(T, hs[j+hk+4Ly]))
+            hs[j+hk+4Ly] != 0 && (reg |> put(4*Ly, j=>Gh(T, hs[j+hk+4Ly])))
         end
 
         # Contract with RED
