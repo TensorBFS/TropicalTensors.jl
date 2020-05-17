@@ -75,6 +75,9 @@ end
     end
     reg.state .*= identity.(rr.state)
     ~@routine
+    for j=1:Ly*4 # `hs` interated in red->black order
+        apply_Gh!(reg, j, hs[j+4Ly], A_STACK)
+    end
 
     k += identity(nj_red)
 

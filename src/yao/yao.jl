@@ -23,15 +23,40 @@ struct SpinglassOptConfig{LT,T}
     grad_hs::Vector{T}
 end
 
-export tofile
+export tofile, fromfile
+function fromfile(::Type{T}, filename::String, lattice) where T
+    nv = length(lattice)
+    ne = length(sgbonds(lattice))
+    Js = zeros(T, ne)
+    Js_grad = zeros(T, ne)
+    hs_grad = zeros(T, nv)
+    open(filename, "r") do f
+        for i=1:length(Js)
+            l = strip(readline(f))
+            j, g = split(l, ' ')
+            Js[i] = parse(T, j)
+            Js_grad[i] = parse(T, g)
+        end
+        for i=1:length(hs)
+            l = strip(readline(f))
+            h, g = split(l, ' ')
+            hs[i] = parse(T, h)
+            hs_grad[i] = parse(T, g)
+        end
+    end
+    SpinglassOptRes(Spinglass(lattice, Js, hs), T(NaN), Js_grad, hs_grad)
+end
+
+fromfile(filename::String) = res->fromfile(filename, res)
+
 function tofile(filename::String, res::SpinglassOptConfig)
     sg = res.sg
     open(filename, "w") do f
         for (J, g) in zip(sg.Js, res.grad_Js)
-            write(f, "$J $g")
+            write(f, "$J $g\n")
         end
         for (h, g) in zip(sg.hs, res.grad_hs)
-            write(f, "$h $g")
+            write(f, "$h $g\n")
         end
     end
     return res

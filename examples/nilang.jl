@@ -11,5 +11,5 @@ hs = ones(Int, L^2)
 L = 7
 lt = ChimeraLattice(L, L)
 Js = rand(Int16[-1, 1], length(sgbonds(lt)))
-hs = ones(Int16, length(lt))
+hs = zeros(Int16, length(lt))
 tofile("chimera77.dat", @time gs = opt_config(Spinglass(lt, Js, hs)))

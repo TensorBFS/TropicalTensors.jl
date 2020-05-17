@@ -33,8 +33,7 @@ function square_solve(Lx::Int, Ly::Int, Js::AbstractVector{T}, hs::AbstractVecto
             reg |> put(Ly, j=>G2(Js |> popfirst!))
         end
         for j=1:Ly
-            hi = hs |> popfirst!
-            hi != 0 && (reg |> put(Ly, j=>Gh(hi)))
+            reg |> put(Ly, j=>Gh(hs |> popfirst!))
         end
         for j=1:Ly-1
             reg |> put(Ly, (j,j+1)=>G4(Js |> popfirst!))
