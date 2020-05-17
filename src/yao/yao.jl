@@ -23,6 +23,22 @@ struct SpinglassOptConfig{LT,T}
     grad_hs::Vector{T}
 end
 
+export tofile
+function tofile(filename::String, res::SpinglassOptConfig)
+    sg = res.sg
+    open(filename, "w") do f
+        for (J, g) in zip(sg.Js, res.grad_Js)
+            write(f, "$J $g")
+        end
+        for (h, g) in zip(sg.hs, res.grad_hs)
+            write(f, "$h $g")
+        end
+    end
+    return res
+end
+
+tofile(filename::String) = res->tofile(filename, res)
+
 include("square.jl")
 include("chimera.jl")
 
@@ -79,11 +95,11 @@ function Base.display(sgres::SpinglassOptConfig)
 end
 
 export vizgrad_J
-function vizgrad_J(sg::Spinglass, grad_Js::AbstractVector, grad_hs::AbstractVector)
+function vizgrad_J(sg::Spinglass, grad_Js::AbstractVector, grad_hs::AbstractVector; r=0.015)
     lt = sg.lattice
     grid = assign_Js_hs(lt, grad_Js, grad_hs)
-    nb1 = compose(nodestyle(:default; r=0.015), fill("white"), stroke("black"), linewidth(0.4mm))
-    nb2 = compose(nodestyle(:default; r=0.015), fill("black"), stroke("white"), linewidth(0.4mm))
+    nb1 = compose(nodestyle(:default; r=r), fill("white"), stroke("black"), linewidth(0.4mm))
+    nb2 = compose(nodestyle(:default; r=r), fill("black"), stroke("black"), linewidth(0.4mm))
     eb1 = compose(bondstyle(:default), linewidth(0.7mm), stroke("skyblue"))
     eb2 = compose(bondstyle(:default), linewidth(0.7mm), stroke("orange"))
     cdots = canvas() do
@@ -106,3 +122,6 @@ function vizgrad_J(sg::Spinglass, grad_Js::AbstractVector, grad_hs::AbstractVect
     end
     compose(context(), cdots)
 end
+
+export vizoptconfig
+vizoptconfig(res::SpinglassOptConfig; r=0.015) = vizgrad_J(res.sg, res.grad_Js, res.grad_hs; r=r)

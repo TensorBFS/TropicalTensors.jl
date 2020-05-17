@@ -28,7 +28,7 @@ function bfunc(::Type{T}, L::Int) where T
     hs = zeros(T, length(lt))
     sg = Spinglass(lt, Js, hs)
     if AD == "forwarddiff"
-        CuArrays.@sync ForwardDiff.gradient(x->solve(SquareLattice(L, L),
+        CuArrays.@sync ForwardDiff.gradient(x->solve(lt,
             convert.(eltype(x), Js),
             x; usecuda=true).n, hs)
     else

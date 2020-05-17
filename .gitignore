@@ -3,6 +3,7 @@
 *.jl.mem
 .DS_Store
 _*.svg
+_*.dat
 *.swp
 /dev/
 _local/
