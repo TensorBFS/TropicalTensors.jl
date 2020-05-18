@@ -28,6 +28,7 @@ function fromfile(::Type{T}, filename::String, lattice) where T
     nv = length(lattice)
     ne = length(sgbonds(lattice))
     Js = zeros(T, ne)
+    hs = zeros(T, nv)
     Js_grad = zeros(T, ne)
     hs_grad = zeros(T, nv)
     open(filename, "r") do f
@@ -44,7 +45,7 @@ function fromfile(::Type{T}, filename::String, lattice) where T
             hs_grad[i] = parse(T, g)
         end
     end
-    SpinglassOptRes(Spinglass(lattice, Js, hs), T(NaN), Js_grad, hs_grad)
+    SpinglassOptConfig(Spinglass(lattice, Js, hs), T(0), Js_grad, hs_grad)
 end
 
 fromfile(filename::String) = res->fromfile(filename, res)

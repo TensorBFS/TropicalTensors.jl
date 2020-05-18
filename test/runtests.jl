@@ -9,8 +9,11 @@ end
     include("yao/yao.jl")
 end
 
-@testset "yao reversible" begin
+@testset "reversible square" begin
     include("yao/reversible/square.jl")
+end
+
+@testset "reversible chimera" begin
     include("yao/reversible/chimera.jl")
 end
 

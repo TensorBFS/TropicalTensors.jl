@@ -28,6 +28,9 @@ end
     @safe println("Layer 1/$Lx")
     red_reg(reg, Ly, Js[k+1:k+nj_red], hs[1:4Ly], REG_STACK)
     k += identity(nj_red)
+    for j=1:Ly*4 # `hs` interated in red->black order
+        apply_Gh!(reg, j, hs[j+4Ly], REG_STACK)
+    end
 
     for i=2:Lx
         hk ← (i-1)*Ly*8
@@ -75,11 +78,11 @@ end
     end
     reg.state .*= identity.(rr.state)
     ~@routine
+    k += identity(nj_red)
+
     for j=1:Ly*4 # `hs` interated in red->black order
         apply_Gh!(reg, j, hs[j+4Ly], A_STACK)
     end
-
-    k += identity(nj_red)
 
     for i=2:Lx
         @safe println("Layer $i/$Lx")
