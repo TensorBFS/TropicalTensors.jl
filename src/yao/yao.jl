@@ -48,8 +48,6 @@ function fromfile(::Type{T}, filename::String, lattice) where T
     SpinglassOptConfig(Spinglass(lattice, Js, hs), T(0), Js_grad, hs_grad)
 end
 
-fromfile(filename::String) = res->fromfile(filename, res)
-
 function tofile(filename::String, res::SpinglassOptConfig)
     sg = res.sg
     open(filename, "w") do f
@@ -67,6 +65,7 @@ tofile(filename::String) = res->tofile(filename, res)
 
 include("square.jl")
 include("chimera.jl")
+include("second_neighbor.jl")
 
 function assign_Js(lt::Viznet.AbstractLattice, g::AbstractVector{T}) where T
     grid = zeros(length(lt))
