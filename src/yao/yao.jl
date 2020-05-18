@@ -111,7 +111,9 @@ function assign_one!(grid, x, y, g)
     elseif grid[y] == 0
         grid[y] = sign(g)*grid[x]
     else
-        @assert grid[y] == sign(g)*grid[x]
+        if grid[y] != sign(g)*grid[x]
+            error("Grid assign σ($y) = $(grid[y]) and σ($x) = $(grid[x]) inconsistent with bond gradient $(g)!")
+        end
     end
     return true
 end
