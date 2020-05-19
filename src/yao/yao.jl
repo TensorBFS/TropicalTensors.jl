@@ -11,9 +11,22 @@ Gh(::Type{T}, h) where T = matblock(Diagonal(spinglass_mag_tensor(T(h))) |> Luxu
 G2(::Type{T}, J) where T = matblock(spinglass_bond_tensor(T(J)) |> LuxurySparse.staticize)
 G4(::Type{T}, J) where T = matblock(Diagonal(spinglass_g4_tensor(T(J))) |> LuxurySparse.staticize)
 G16(::Type{T}, Js) where T = matblock(spinglass_g16_tensor(T.(Js)) |> LuxurySparse.staticize)
+"""
+    Gcp(T)
+
+copy state of qubit 2 -> 1.
+"""
+function Gcp(::Type{T}) where T
+    matblock(copytensor(Tropical{T}))
+end
+
+function Greset(::Type{T}) where T
+    TT = Tropical{T}
+    matblock([one(TT) one(TT); zero(TT) zero(TT)])
+end
 
 function _init_reg(::Type{T}, L::Int, usecuda::Val{:false}) where T
-    reg = ArrayReg(ones(Tropical{T}, 1<<L))
+    ArrayReg(ones(Tropical{T}, 1<<L))
 end
 
 struct SpinglassOptConfig{LT,T}
@@ -92,9 +105,8 @@ end
 
 function assign_Js_hs(lt::Viznet.AbstractLattice, grad_Js::AbstractVector{T}, grad_hs) where T
     grid = zeros(length(lt))
-    vorder = sgvertexorder(lt)
-    for (i, hg) in enumerate(grad_hs)
-        grid[vorder[i]] = hg
+    for (v, hg) in zip(sgvertices(lt), grad_hs)
+        grid[v] = hg
     end
     for ((i, j), Jg) in zip(sgbonds(lt), grad_Js)
         assign_one!(grid, i, j, Jg)
@@ -111,7 +123,7 @@ function assign_one!(grid, x, y, g)
         grid[y] = sign(g)*grid[x]
     else
         if grid[y] != sign(g)*grid[x]
-            error("Grid assign σ($y) = $(grid[y]) and σ($x) = $(grid[x]) inconsistent with bond gradient $(g)!")
+            @warn "Grid assign σ($y) = $(grid[y]) and σ($x) = $(grid[x]) inconsistent with bond gradient $(g)!"
         end
     end
     return true
@@ -130,7 +142,7 @@ function vizgrad_J(sg::Spinglass, grad_Js::AbstractVector, grad_hs::AbstractVect
     eb1 = compose(bondstyle(:default), linewidth(0.7mm), stroke("skyblue"))
     eb2 = compose(bondstyle(:default), linewidth(0.7mm), stroke("orange"))
     cdots = canvas() do
-        for i=1:length(lt)
+        for i in vertices(lt)
             if grid[i] > 0
                 nb1 >> lt[i]
             elseif grid[i] < 0

@@ -38,7 +38,7 @@ function solve(lattice::Viznet.AbstractLattice, Js::Vector{T}, hs::Vector{T}; us
 end
 
 # to index `h`.
-function sgvertexorder(lt::SquareLattice)
+function sgvertices(lt::SquareLattice)
     v = Int[]
     LI = LinearIndices(lt)
     for i=1:lt.Nx
@@ -71,3 +71,9 @@ function h_bonds(lt::SquareLattice, i::Int)
 end
 
 regsize(lt::SquareLattice) = lt.Ny
+cachesize_A(lt::SquareLattice) = lt.Ny
+cachesize_B(lt::SquareLattice) = lt.Nx-1
+
+function _init_reg(::Type{T}, lt::SquareLattice, usecuda) where T
+    _init_reg(T, lt.Ny, usecuda)
+end

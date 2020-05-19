@@ -30,7 +30,7 @@
         # but wait, `k` should not be uncomputed
         k += identity(Ly)
 
-        # store the stored state
+        # restore the state
         swap_state!(B_STACK, reg.state)
 
         for j=1:Ly
@@ -57,7 +57,7 @@ end
 
 @i function store_state!(B_STACK, state)
     @invcheckoff for j = 1:length(state)
-        @inbounds B_STACK[j] *= identity(state[j])
+        @inbounds TropicalYao.unsafe_store!(B_STACK[j], state[j])
     end
 end
 

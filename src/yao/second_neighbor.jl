@@ -1,137 +1,111 @@
 export hypercubicI, copyvertex, copytensor, copygate
 export Gcp, Greset
-export SquareLattice2nd
+export MaskedSquareLattice, rand_maskedsquare
 
-struct SquareLattice2nd <: Viznet.AbstractSquareLattice
-    Nx::Int
-    Ny::Int
+struct MaskedSquareLattice <: Viznet.AbstractSquareLattice
+    mask::Matrix{Bool}
 end
 
-Base.size(lt::SquareLattice2nd) = (lt.Nx, lt.Ny)
-Viznet.vertices(lt::SquareLattice2nd) = 1:lt.Nx*lt.Ny
-
-function sgbonds(lt::SquareLattice2nd)
-    edges = Tuple{Int, Int}[]
-    LI = LinearIndices(size(lt))
-    Lx, Ly = size(lt)
-    for i=1:Lx
-        for j=1:Ly-1
-            push!(edges, (LI[i,j], LI[i,j+1]))
-        end
-        (i!=Lx) && for j=1:Ly
-            j!=1 && push!(edges, (LI[i+1,j-1], LI[i,j]))
-            push!(edges, (LI[i,j], LI[i+1,j]))
-            j!=1 && push!(edges, (LI[i,j-1],LI[i+1,j]))
-        end
-    end
-    edges
+Base.size(lt::MaskedSquareLattice) = size(lt.mask)
+Base.size(lt::MaskedSquareLattice, i::Int) = size(lt.mask, i)
+Viznet.unit(lt::MaskedSquareLattice) = 1/(max(size(lt)...))
+Viznet.vertices(lt::MaskedSquareLattice) = [i for i in 1:length(lt.mask) if lt.mask[i]]
+function rand_maskedsquare(Nx::Int, Ny::Int, ρ::Real)
+    MaskedSquareLattice(rand(Nx, Ny) .< ρ)
+end
+function Base.getindex(lt::MaskedSquareLattice, i::Real, j::Real)
+    step = unit(lt)
+    (i-0.5)*step, (j-0.5)*step
 end
 
-function sgvertexorder(lt::SquareLattice2nd)
-    sgvertexorder(SquareLattice(lt.Nx, lt.Ny))
+function Viznet.isconnected(sq::MaskedSquareLattice, i::Int, j::Int)
+    u = unit(sq)
+    d = distance(sq[i], sq[j])
+    sq.mask[i] && sq.mask[j] && d > 0.999u && d < (sqrt(2)+0.001)*u
 end
 
-"""
-    hypercubicI([T], ndim::Int, D::Int)
+Viznet.bonds(lt::MaskedSquareLattice) = sgbonds(lt)
 
-Get a `ndim`-dimensional identity hypercubic, with bound dimension `D`.
-"""
-function hypercubicI(::Type{T}, ndim::Int, D::Int) where T
-    res = zeros(T, fill(D, ndim)...)
-    @inbounds for i=1:D
-        res[fill(i,ndim)...] = one(T)
-    end
-    return res
-end
-
-hypercubicI(ndim::Int, D::Int) = hypercubicI(Float64, ndim, D)
-function copyvertex(::Type{T}) where T
-    res = zeros(T, 2, 2, 2)
-    res[1,1,1] = one(T)
-    res[2,2,1] = one(T)
-    res
-end
-
-function copytensor(::Type{T}) where T
-    PermMatrix([1,4,3,2], [one(T), zero(T), zero(T), one(T)])
-end
-
-"""
-    copygate(T)
-
-copy state of qubit 2 -> 1.
-"""
-function Gcp(::Type{T}) where T
-    matblock(copytensor(Tropical{T}))
-end
-
-function Greset(::Type{T}) where T
-    TT = Tropical{T}
-    matblock([one(TT) one(TT); zero(TT) zero(TT)])
-end
-
-function solve(sg::Spinglass{LT,T}; usecuda=false) where {LT<:SquareLattice2nd,T}
+function solve(sg::Spinglass{LT,T}; usecuda=false) where {LT<:MaskedSquareLattice,T}
     lt = sg.lattice
     Lx, Ly = size(lt)
     nbit = Ly + 2
-    reg = _init_reg(T, nbit, Val(usecuda))
+    reg = _init_reg(T, lt, Val(usecuda))
     Js = copy(sg.Js)
     hs = copy(sg.hs)
+    LI = LinearIndices(lt)
+    _c(a, b) = isconnected(lt, LI[a...], LI[b...])
     for i=1:Lx
         println("Layer $i/$Lx")
         for j=1:Ly-1
-            reg |> put(nbit, (j,j+1)=>G4(T, Js |> popfirst!))
+            _c((i,j), (i,j+1)) && (reg |> put(nbit, (j,j+1)=>G4(T, Js |> popfirst!)))
         end
         for j=1:Ly
-            reg |> put(nbit, j=>Gh(T, hs |> popfirst!))
+            lt.mask[i,j] && (reg |> put(nbit, j=>Gh(T, hs |> popfirst!)))
         end
         (i!=Lx) && for j=1:Ly
             # store the information in qubit `j` to ancilla `nbit-j%2`
-            j!=Ly && (reg |> put(nbit, (j,nbit-j%2)=>Gcp(T)))
+            j!=Ly && _c((i,j), (i+1,j+1)) && (reg |> put(nbit, (j,nbit-j%2)=>Gcp(T)))
             # interact with j-1 th qubit (a)
-            j!=1 && (reg |> put(nbit, (j-1,j)=>G4(T, Js |> popfirst!)))
+            j!=1 && _c((i+1,j-1), (i,j)) && (reg |> put(nbit, (j-1,j)=>G4(T, Js |> popfirst!)))
             # onsite term (b)
-            reg |> put(nbit, j=>G2(T, Js |> popfirst!))
-            # interact with cached j-1 th qubit (c)
-            j!=1 && (reg |> put(nbit, (nbit-(j-1)%2,j)=>G4(T, Js |> popfirst!)))
-            # erease the information in previous ancilla `nbit-(j-1)%2`
-            j!=1 && (reg |> put(nbit, nbit-(j-1)%2=>Greset(T)))
+            _c((i,j), (i+1,j)) && (reg |> put(nbit, j=>G2(T, Js |> popfirst!)))
+            if j!=1 && _c((i,j-1), (i+1,j))
+                # interact with cached j-1 th qubit (c)
+                reg |> put(nbit, (nbit-(j-1)%2,j)=>G4(T, Js |> popfirst!))
+                # erease the information in previous ancilla `nbit-(j-1)%2`
+                reg |> put(nbit, nbit-(j-1)%2=>Greset(T))
+            end
         end
     end
     sum(state(reg))
 end
 
-# to index `h`.
-function sgvertexorder(lt::SquareLattice)
-    v = Int[]
-    LI = LinearIndices(lt)
-    for i=1:lt.Nx
-        for j=1:lt.Ny
-            push!(v, LI[i,j])
-        end
-    end
-    return v
+function sgvertices(lt::MaskedSquareLattice)
+    [v for v in sgvertices(SquareLattice(size(lt)...)) if lt.mask[v]]
 end
 
-# to index `J`.
-function sgbonds(lt::SquareLattice)
-    edges  =Tuple{Int,Int}[]
-    append!(edges, v_bonds(lt, 1))
-    for i=2:lt.Nx
-        append!(edges, h_bonds(lt, i-1))
-        append!(edges, v_bonds(lt, i))
+function sgbonds(lt::MaskedSquareLattice)
+    edges = Tuple{Int, Int}[]
+    LI = LinearIndices(size(lt))
+    function trypush!(i, j)
+        if lt.mask[i...] && lt.mask[j...]
+            push!(edges, (LI[i...], LI[j...]))
+        end
+    end
+    Lx, Ly = size(lt)
+    for i=1:Lx
+        for j=1:Ly-1
+            trypush!([i,j], [i,j+1])
+        end
+        (i!=Lx) && for j=1:Ly
+            j!=1 && trypush!([i+1,j-1], [i,j])
+            trypush!([i,j], [i+1,j])
+            j!=1 && trypush!([i,j-1],[i+1,j])
+        end
     end
     edges
 end
 
-function v_bonds(lt::SquareLattice, i::Int)
-    LI = LinearIndices(size(lt))
-    map(j -> (LI[i,j], LI[i,j+1]), 1:lt.Ny-1)
+regsize(lt::MaskedSquareLattice) = size(lt,2)+2
+cachesize_A(lt::MaskedSquareLattice) = size(lt,2)*2
+cachesize_B(lt::MaskedSquareLattice) = size(lt,1)-1
+
+function assign_Js_hs(lt::MaskedSquareLattice, grad_Js::AbstractVector{T}, grad_hs) where T
+    grid = zeros(size(lt.mask))
+    vorder = sgvertices(lt)
+    for (i, hg) in enumerate(grad_hs)
+        grid[vorder[i]] = hg
+    end
+    for ((i, j), Jg) in zip(sgbonds(lt), grad_Js)
+        assign_one!(grid, i, j, Jg)
+    end
+    return grid
 end
 
-function h_bonds(lt::SquareLattice, i::Int)
-    LI = LinearIndices(size(lt))
-    map(j -> (LI[i,j], LI[i+1,j]), 1:lt.Ny)
+function _init_reg(::Type{T}, lt::MaskedSquareLattice, ::Val{:false}) where T
+    nbit = size(lt, 2) + 2
+    state = zeros(Tropical{T}, 1<<nbit)
+    state[1:1<<(nbit-2)] .= one(Tropical{T})
+    ArrayReg(state)
 end
-
-regsize(lt::SquareLattice) = lt.Ny

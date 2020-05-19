@@ -2,15 +2,7 @@ using TropicalTensors, OMEinsum
 using Test, Random
 using Viznet
 using Yao
-
-@testset "copy vertex" begin
-    m = hypercubicI(3, 2)
-    ct = copyvertex(Float64)
-    cm = reshape(ein"kal,iaj->ikjl"(ct, m), 4, 4)
-    cm_adjoint = reshape(ein"kal,iaj->ikjl"(permutedims(copyvertex(Float64), (3,2,1)), m), 4, 4)
-    @test cm == copytensor(Float64)
-    @test cm_adjoint == cm'
-end
+using TropicalYao: hypercubicI
 
 @testset "copy and reset gates" begin
     reg = join(zero_state(Float64, 2), rand_state(Float64, 6))
@@ -40,16 +32,26 @@ end
     @test p3 ≈ p1
 end
 
-@testset "SquareLattice2nd" begin
-    lt = SquareLattice2nd(4, 4)
+@testset "MaskedSquareLattice" begin
+    lt = rand_maskedsquare(4, 4, 1.0)
     sq = SquareLattice(4, 4)
-    @test length(TropicalTensors.sgvertexorder(lt)) == 16
+    @test length(TropicalTensors.sgvertices(lt)) == 16
     @test length(TropicalTensors.sgbonds(lt)) == length(bonds(sq, nth=1)) + length(bonds(sq, nth=2))
 end
 
 @testset "solve" begin
-    lt = SquareLattice2nd(4, 4)
-    sg = rand_spinglass(Float64, lt; jt=Ferro(), ht=Zero())
+    lt = rand_maskedsquare(4, 4, 1.0)
+    sg = rand_spinglass(Float32, lt; jt=Ferro(), ht=Zero())
     res = solve(sg)
     @test res.n == length(sgbonds(lt))
+end
+
+@testset "solve masked" begin
+    lt = MaskedSquareLattice([1 1 1 1;
+        1 1 0 1;
+        1 1 1 1;
+        1 1 1 0])
+    sg = rand_spinglass(Float64, lt; jt=Ferro(), ht=Zero())
+    res = solve(sg)
+    @test res.n == 31
 end

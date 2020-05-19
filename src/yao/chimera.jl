@@ -111,7 +111,7 @@ function Base.getindex(lt::ChimeraLattice, k::Int, i::Int, j::Int)
 end
 
 # to index `h`.
-function sgvertexorder(lt::ChimeraLattice)
+function sgvertices(lt::ChimeraLattice)
     v = Int[]
     LI = LinearIndices(lt)
     for i=1:lt.Nx
@@ -128,3 +128,9 @@ function sgvertexorder(lt::ChimeraLattice)
 end
 
 regsize(lt::ChimeraLattice) = lt.Ny*4
+cachesize_A(lt::ChimeraLattice) = lt.Ny*4
+cachesize_B(lt::ChimeraLattice) = lt.Nx-1
+
+function _init_reg(::Type{T}, lt::ChimeraLattice, usecuda) where T
+    _init_reg(T, lt.Ny*4, usecuda)
+end
