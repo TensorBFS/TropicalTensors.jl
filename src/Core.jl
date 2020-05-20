@@ -59,3 +59,12 @@ end
 function Base.display(sg::Spinglass; r=0.02)
     Base.display(viz_sg(sg; r=r))
 end
+
+export eval_onconfig
+function eval_onconfig(sg::Spinglass{LT,T}, grid) where {LT,T}
+    out = T(0)
+    for ((i,j), J) in zip(sg.lattice |> sgbonds, sg.Js)
+        out += J * grid[i] * grid[j]
+    end
+    return out
+end

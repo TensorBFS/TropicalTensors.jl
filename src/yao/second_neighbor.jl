@@ -62,7 +62,6 @@ function solve(sg::Spinglass{LT,T}; usecuda=false) where {LT<:MaskedSquareLattic
                 reg |> put(nbit, (ancpre,j)=>G4(T, Js |> popfirst!))
                 # erease the information in previous ancilla
                 reg |> put(nbit, ancpre=>Gcut(T))
-                relax!(reg, ancpre)
             end
         end
     end
@@ -96,8 +95,6 @@ function sgbonds(lt::MaskedSquareLattice)
 end
 
 regsize(lt::MaskedSquareLattice) = size(lt,2)+2
-cachesize_A(lt::MaskedSquareLattice) = size(lt,2)*3-1
-cachesize_B(lt::MaskedSquareLattice) = size(lt,1)-1
 
 function assign_Js_hs(lt::MaskedSquareLattice, grad_Js::AbstractVector{T}, grad_hs) where T
     grid = zeros(size(lt.mask))

@@ -23,15 +23,6 @@ using TropicalTensors: cachesize_A, cachesize_B, cachesize_largemem
     @test isolve(Int32(0), sg, reg, A, B)[1] == solve(sg).n
 end
 
-function opt_config_largemem(sg::Spinglass{LT,T}) where {LT<:MaskedSquareLattice,T}
-    reg = TropicalTensors._init_reg(T, sg.lattice, Val(:false))
-    A = stack4reg(reg, cachesize_largemem(sg.lattice))
-    eng, sg, reg, A = isolve_largemem(T(0.0), sg, reg, A)
-    sgg = Spinglass(sg.lattice, GVar.(sg.Js, zero(sg.Js)), GVar.(sg.hs, zero(sg.hs)))
-    gres = (~isolve_largemem)(GVar(eng, T(1)), sgg, GVar(reg), GVar(A))
-    return TropicalTensors.SpinglassOptConfig(sg, eng, grad.(gres[2].Js), grad.(gres[2].hs))
-end
-
 @testset "optconfig" begin
     Random.seed!(5)
     sg = rand_spinglass(Int64, rand_maskedsquare(9, 7, 0.8); jt=Randpm(), ht=Zero(), seed=2)

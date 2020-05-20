@@ -19,16 +19,14 @@ end
             if (_c(lt, (i,j), (i,j+1)), ~)
                 INC(k)
                 apply_G4!(reg, (j, j+1), Js[k], REG_STACK)
-                @safe @show "G4 -> $j $(j+1)"
             end
         end
         for j=1:Ly
             if (lt.mask[i,j], ~)
-                if (lt.mask[i,j], ~)
-                    @safe @show "Gh -> $j"
-                    INC(l)
-                    apply_Gh!(reg, j, hs[l], REG_STACK)
-                end
+                INC(l)
+                apply_Gh!(reg, j, hs[l], REG_STACK)
+            else
+                apply_Gcut!(reg, j, REG_STACK)
             end
         end
         if (i!=Lx, ~)
@@ -36,30 +34,23 @@ end
                 # store the information in qubit `j` to ancilla `nbit-j%2`
                 if (j!=Ly && _c(lt, (i,j), (i+1,j+1)), ~)
                     apply_Gcp!(reg, (j,nbit-j%2), REG_STACK)
-                    @safe println("Gcp -> $j $(nbit-j%2)", (i,j), (i+1,j+1))
                 end
                 # interact with j-1 th qubit (a)
                 if (j!=1 && _c(lt, (i+1,j-1), (i,j)), ~)
                     INC(k)
                     apply_G4!(reg, (j-1, j), Js[k], REG_STACK)
-                    @safe println("G4 -> $(j-1) $j", (i+1,j-1), (i,j))
                 end
                 # onsite term (b)
                 if (_c(lt, (i,j), (i+1,j)), ~)
                     INC(k)
                     apply_G2!(reg, j, Js[k], REG_STACK)
-                    @safe println("G2 -> $j", (i,j), (i+1, j))
-                else
-                    apply_Gcut!(reg, j, REG_STACK)
                 end
                 if (j!=1 && _c(lt, (i,j-1), (i+1,j)), ~)
                     INC(k)
                     # interact with cached j-1 th qubit (c)
                     apply_G4!(reg, (j,nbit-(j-1)%2), Js[k], REG_STACK)
-                    @safe println("G4 -> $j $(nbit-(j-1)%2)", (i,j-1), (i+1,j))
                     # erease the information in previous ancilla `nbit-(j-1)%2`
                     apply_Gcut!(reg, nbit-(j-1)%2, REG_STACK)
-                    @safe println("Gcut -> $(nbit-(j-1)%2)", (i,j-1), (i+1,j))
                 end
             end
         end
@@ -71,6 +62,31 @@ end
     k → length(Js)
     summed → one(TT)
     end
+end
+
+function cachesize_largemem(lt::MaskedSquareLattice)
+    Lx = size(lt, 1)
+    Ly = size(lt, 2)
+    ncache = 0
+    for i=1:Lx
+        for j=1:Ly
+            if !lt.mask[i,j]
+                ncache += 1
+            end
+        end
+        i!=Lx && for j=1:Ly
+            if j!=Ly && _c(lt, (i,j), (i+1,j+1))
+                ncache += 1
+            end
+            if _c(lt, (i,j), (i+1,j))
+                ncache += 1
+            end
+            if j!=1 && _c(lt, (i,j-1), (i+1,j))
+                ncache += 1
+            end
+        end
+    end
+    return ncache
 end
 
 @i function isolve(out!::T, sg::Spinglass{LT,T}, reg::ArrayReg{1,TT}, A_STACK, B_STACK; usecuda=false) where {T,TT<:Tropical{T},LT<:MaskedSquareLattice}
@@ -90,12 +106,24 @@ end
                 apply_G4!(reg, (j, j+1), Js[k], A_STACK)
             end
         end
-        for j=1:Ly
+        @routine for j=1:Ly
             if (lt.mask[i,j], ~)
                 INC(l)
                 apply_Gh!(reg, j, hs[l], A_STACK)
+            else
+                apply_Gcut!(reg, j, A_STACK)
             end
         end
+        incstack!(B_STACK)
+        store_state!(B_STACK, reg.state)
+        ~@routine
+        for j=1:Ly
+            if (lt.mask[i,j], ~)
+                INC(l)
+            end
+        end
+        # restore state
+        swap_state!(B_STACK, reg.state)
         if (i!=Lx, ~)
             @routine begin
                 for j=1:Ly
@@ -112,8 +140,6 @@ end
                     if (_c(lt, (i,j), (i+1,j)), ~)
                         INC(k)
                         apply_G2!(reg, j, Js[k], A_STACK)
-                    else
-                        apply_Gcut!(reg, j, A_STACK)
                     end
                     if (j!=1 && _c(lt, (i,j-1), (i+1,j)), ~)
                         INC(k)
@@ -151,3 +177,6 @@ end
     k → length(Js)
     summed → one(TT)
 end
+
+cachesize_A(lt::MaskedSquareLattice) = size(lt,2)*3-1
+cachesize_B(lt::MaskedSquareLattice) = size(lt,1)*2-1
