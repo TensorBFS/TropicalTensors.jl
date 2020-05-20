@@ -10,7 +10,7 @@ Base.size(lt::MaskedSquareLattice) = size(lt.mask)
 Base.size(lt::MaskedSquareLattice, i::Int) = size(lt.mask, i)
 Viznet.unit(lt::MaskedSquareLattice) = 1/(max(size(lt)...))
 Viznet.vertices(lt::MaskedSquareLattice) = [i for i in 1:length(lt.mask) if lt.mask[i]]
-function rand_maskedsquare(Nx::Int, Ny::Int, ρ::Real)
+function rand_maskedsquare(Nx::Int, Ny::Int, ρ::Real; seed=2)
     MaskedSquareLattice(rand(Nx, Ny) .< ρ)
 end
 function Base.getindex(lt::MaskedSquareLattice, i::Real, j::Real)
@@ -41,20 +41,28 @@ function solve(sg::Spinglass{LT,T}; usecuda=false) where {LT<:MaskedSquareLattic
             _c((i,j), (i,j+1)) && (reg |> put(nbit, (j,j+1)=>G4(T, Js |> popfirst!)))
         end
         for j=1:Ly
-            lt.mask[i,j] && (reg |> put(nbit, j=>Gh(T, hs |> popfirst!)))
+            if lt.mask[i,j]
+                reg |> put(nbit, j=>Gh(T, hs |> popfirst!))
+            else
+                reg |> put(nbit, j=>Gcut(T))
+            end
         end
         (i!=Lx) && for j=1:Ly
+            ancpre = nbit-(j-1)%2
+            ancthis = nbit-(j)%2
             # store the information in qubit `j` to ancilla `nbit-j%2`
-            j!=Ly && _c((i,j), (i+1,j+1)) && (reg |> put(nbit, (j,nbit-j%2)=>Gcp(T)))
+            j!=Ly && _c((i,j), (i+1,j+1)) && (reg |> put(nbit, (j, ancthis)=>Gcp(T)))
             # interact with j-1 th qubit (a)
             j!=1 && _c((i+1,j-1), (i,j)) && (reg |> put(nbit, (j-1,j)=>G4(T, Js |> popfirst!)))
             # onsite term (b)
             _c((i,j), (i+1,j)) && (reg |> put(nbit, j=>G2(T, Js |> popfirst!)))
             if j!=1 && _c((i,j-1), (i+1,j))
                 # interact with cached j-1 th qubit (c)
-                reg |> put(nbit, (nbit-(j-1)%2,j)=>G4(T, Js |> popfirst!))
-                # erease the information in previous ancilla `nbit-(j-1)%2`
-                reg |> put(nbit, nbit-(j-1)%2=>Greset(T))
+                jj = Js[1]
+                reg |> put(nbit, (ancpre,j)=>G4(T, Js |> popfirst!))
+                # erease the information in previous ancilla
+                reg |> put(nbit, ancpre=>Gcut(T))
+                relax!(reg, ancpre)
             end
         end
     end
@@ -88,7 +96,7 @@ function sgbonds(lt::MaskedSquareLattice)
 end
 
 regsize(lt::MaskedSquareLattice) = size(lt,2)+2
-cachesize_A(lt::MaskedSquareLattice) = size(lt,2)*2
+cachesize_A(lt::MaskedSquareLattice) = size(lt,2)*3-1
 cachesize_B(lt::MaskedSquareLattice) = size(lt,1)-1
 
 function assign_Js_hs(lt::MaskedSquareLattice, grad_Js::AbstractVector{T}, grad_hs) where T
@@ -105,7 +113,8 @@ end
 
 function _init_reg(::Type{T}, lt::MaskedSquareLattice, ::Val{:false}) where T
     nbit = size(lt, 2) + 2
-    state = zeros(Tropical{T}, 1<<nbit)
-    state[1:1<<(nbit-2)] .= one(Tropical{T})
+    state = ones(Tropical{T}, 1<<nbit)
+    #state = zeros(Tropical{T}, 1<<nbit)
+    #state[1:1<<(nbit-2)] .= one(Tropical{T})
     ArrayReg(state)
 end

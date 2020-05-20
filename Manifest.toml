@@ -155,6 +155,9 @@ git-tree-sha1 = "6f0517056812fd6aa3af23d4b70d5325a2ae4e95"
 uuid = "e2ba6199-217a-4e67-a87a-7c52f15ade04"
 version = "0.1.1"
 
+[[FileWatching]]
+uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
+
 [[FillArrays]]
 deps = ["LinearAlgebra", "Random", "SparseArrays"]
 git-tree-sha1 = "6c89d5b673e59b8173c546c84127e5f623d865f6"
@@ -192,6 +195,12 @@ deps = ["Dates", "Mmap", "Parsers", "Unicode"]
 git-tree-sha1 = "b34d7cef7b337321e97d22242c3c2b91f476748e"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.0"
+
+[[JuliaInterpreter]]
+deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
+git-tree-sha1 = "4ab65b7deb5af83f022f26ad3351a3bd5d80c6e2"
+uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
+version = "0.7.16"
 
 [[LLVM]]
 deps = ["CEnum", "Libdl", "Printf", "Unicode"]
@@ -236,11 +245,17 @@ version = "0.4.0"
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
+[[LoweredCodeUtils]]
+deps = ["JuliaInterpreter"]
+git-tree-sha1 = "225f0035f01c24858c0884f38bb519e22b0a5150"
+uuid = "6f1432cf-f94c-5a45-995e-cdbf5db27b0b"
+version = "0.4.5"
+
 [[LuxurySparse]]
 deps = ["FillArrays", "LinearAlgebra", "Random", "SparseArrays", "StaticArrays"]
-git-tree-sha1 = "f5beb9d83b3e2a3463d3176dcbfc2e156c7a4949"
+git-tree-sha1 = "da795394571b24ceb4ae7700428ff090d993363c"
 uuid = "d05aeea4-b7d4-55ac-b691-9e7fabb07ba2"
-version = "0.6.2"
+version = "0.6.3"
 
 [[MLStyle]]
 git-tree-sha1 = "67f9a88611bc79f992aa705d9bbc833a2547dec7"
@@ -359,6 +374,12 @@ git-tree-sha1 = "d37400976e98018ee840e0ca4f9d20baa231dc6b"
 uuid = "ae029012-a4dd-5104-9daa-d747884805df"
 version = "1.0.1"
 
+[[Revise]]
+deps = ["CodeTracking", "Distributed", "FileWatching", "JuliaInterpreter", "LibGit2", "LoweredCodeUtils", "OrderedCollections", "Pkg", "REPL", "UUIDs", "Unicode"]
+git-tree-sha1 = "3185d2ee31756af9e20ce045ddfaedcd0df9e4aa"
+uuid = "295af30f-e4ad-537b-8983-00126c2a3abe"
+version = "2.6.6"
+
 [[SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 
@@ -429,17 +450,15 @@ uuid = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
 version = "0.5.5"
 
 [[TropicalNumbers]]
-git-tree-sha1 = "a144222fc86c50008ab432981fbe7b6638752670"
+git-tree-sha1 = "41b06533b14f11b6e962351d7eddd67ffbc7b505"
 repo-rev = "master"
 repo-url = "https://github.com/GiggleLiu/TropicalNumbers.jl"
 uuid = "b3a74e9c-7526-4576-a4eb-79c0d4c32334"
 version = "0.1.0"
 
 [[TropicalYao]]
-deps = ["BitBasis", "LinearAlgebra", "NiLang", "NiLogLikeNumbers", "StaticArrays", "TropicalNumbers", "TupleTools", "Yao", "YaoArrayRegister"]
-git-tree-sha1 = "e046ffba0a02d9e1034fa9b1002e9a207a1d7fc9"
-repo-rev = "master"
-repo-url = "https://github.com/JuliaReverse/TropicalYao.jl"
+deps = ["BitBasis", "LinearAlgebra", "LuxurySparse", "NiLang", "NiLogLikeNumbers", "StaticArrays", "TropicalNumbers", "TupleTools", "Yao", "YaoArrayRegister"]
+path = "/home/leo/.julia/dev/TropicalYao"
 uuid = "8a7e9035-3e12-4286-9ab6-425b4286d857"
 version = "0.1.0"
 
@@ -457,9 +476,7 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[Viznet]]
 deps = ["Compose", "Dierckx"]
-git-tree-sha1 = "e17d10f1b47db2f703a4808135e0ecffa94cb746"
-repo-rev = "master"
-repo-url = "https://github.com/GiggleLiu/Viznet.jl"
+path = "/home/leo/.julia/dev/Viznet"
 uuid = "52a3aca4-6234-47fd-b74a-806bdf78ede9"
 version = "0.1.0"
 

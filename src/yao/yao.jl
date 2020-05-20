@@ -7,6 +7,8 @@ using Viznet
 export solve, SquareLattice, ChimeraLattice
 export sgbonds
 
+export Gh, G2, G4, G16, Gcut, Gcp, Greset
+
 Gh(::Type{T}, h) where T = matblock(Diagonal(spinglass_mag_tensor(T(h))) |> LuxurySparse.staticize)
 G2(::Type{T}, J) where T = matblock(spinglass_bond_tensor(T(J)) |> LuxurySparse.staticize)
 G4(::Type{T}, J) where T = matblock(Diagonal(spinglass_g4_tensor(T(J))) |> LuxurySparse.staticize)
@@ -23,6 +25,11 @@ end
 function Greset(::Type{T}) where T
     TT = Tropical{T}
     matblock([one(TT) one(TT); zero(TT) zero(TT)])
+end
+
+function Gcut(::Type{T}) where T
+    TT = Tropical{T}
+    matblock([one(TT) one(TT); one(TT) one(TT)])
 end
 
 function _init_reg(::Type{T}, L::Int, usecuda::Val{:false}) where T

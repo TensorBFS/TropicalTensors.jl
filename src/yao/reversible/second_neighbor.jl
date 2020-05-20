@@ -19,12 +19,16 @@ end
             if (_c(lt, (i,j), (i,j+1)), ~)
                 INC(k)
                 apply_G4!(reg, (j, j+1), Js[k], REG_STACK)
+                @safe @show "G4 -> $j $(j+1)"
             end
         end
         for j=1:Ly
             if (lt.mask[i,j], ~)
-                INC(l)
-                apply_Gh!(reg, j, hs[l], REG_STACK)
+                if (lt.mask[i,j], ~)
+                    @safe @show "Gh -> $j"
+                    INC(l)
+                    apply_Gh!(reg, j, hs[l], REG_STACK)
+                end
             end
         end
         if (i!=Lx, ~)
@@ -32,23 +36,30 @@ end
                 # store the information in qubit `j` to ancilla `nbit-j%2`
                 if (j!=Ly && _c(lt, (i,j), (i+1,j+1)), ~)
                     apply_Gcp!(reg, (j,nbit-j%2), REG_STACK)
+                    @safe println("Gcp -> $j $(nbit-j%2)", (i,j), (i+1,j+1))
                 end
                 # interact with j-1 th qubit (a)
                 if (j!=1 && _c(lt, (i+1,j-1), (i,j)), ~)
                     INC(k)
                     apply_G4!(reg, (j-1, j), Js[k], REG_STACK)
+                    @safe println("G4 -> $(j-1) $j", (i+1,j-1), (i,j))
                 end
                 # onsite term (b)
                 if (_c(lt, (i,j), (i+1,j)), ~)
                     INC(k)
                     apply_G2!(reg, j, Js[k], REG_STACK)
+                    @safe println("G2 -> $j", (i,j), (i+1, j))
+                else
+                    apply_Gcut!(reg, j, REG_STACK)
                 end
                 if (j!=1 && _c(lt, (i,j-1), (i+1,j)), ~)
                     INC(k)
                     # interact with cached j-1 th qubit (c)
                     apply_G4!(reg, (j,nbit-(j-1)%2), Js[k], REG_STACK)
+                    @safe println("G4 -> $j $(nbit-(j-1)%2)", (i,j-1), (i+1,j))
                     # erease the information in previous ancilla `nbit-(j-1)%2`
-                    apply_Greset!(reg, nbit-(j-1)%2, REG_STACK)
+                    apply_Gcut!(reg, nbit-(j-1)%2, REG_STACK)
+                    @safe println("Gcut -> $(nbit-(j-1)%2)", (i,j-1), (i+1,j))
                 end
             end
         end
@@ -101,13 +112,15 @@ end
                     if (_c(lt, (i,j), (i+1,j)), ~)
                         INC(k)
                         apply_G2!(reg, j, Js[k], A_STACK)
+                    else
+                        apply_Gcut!(reg, j, A_STACK)
                     end
                     if (j!=1 && _c(lt, (i,j-1), (i+1,j)), ~)
                         INC(k)
                         # interact with cached j-1 th qubit (c)
                         apply_G4!(reg, (j,nbit-(j-1)%2), Js[k], A_STACK)
                         # erease the information in previous ancilla `nbit-(j-1)%2`
-                        apply_Greset!(reg, nbit-(j-1)%2, A_STACK)
+                        apply_Gcut!(reg, nbit-(j-1)%2, A_STACK)
                     end
                 end
             end

@@ -55,3 +55,9 @@ end
     res = solve(sg)
     @test res.n == 31
 end
+
+@testset "fallback cut" begin
+    lt = MaskedSquareLattice([0 1; 1 0; 0 1])
+    sg = Spinglass(lt, [-1,1], [0,0,0])
+    @test solve(sg).n == 2
+end
