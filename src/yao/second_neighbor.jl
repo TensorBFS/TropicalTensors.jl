@@ -11,6 +11,7 @@ Base.size(lt::MaskedSquareLattice, i::Int) = size(lt.mask, i)
 Viznet.unit(lt::MaskedSquareLattice) = 1/(max(size(lt)...))
 Viznet.vertices(lt::MaskedSquareLattice) = [i for i in 1:length(lt.mask) if lt.mask[i]]
 function rand_maskedsquare(Nx::Int, Ny::Int, ρ::Real; seed=2)
+    Random.seed!(seed)
     MaskedSquareLattice(rand(Nx, Ny) .< ρ)
 end
 function Base.getindex(lt::MaskedSquareLattice, i::Real, j::Real)

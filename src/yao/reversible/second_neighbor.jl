@@ -25,8 +25,6 @@ end
             if (lt.mask[i,j], ~)
                 INC(l)
                 apply_Gh!(reg, j, hs[l], REG_STACK)
-            else
-                apply_Gcut!(reg, j, REG_STACK)
             end
         end
         if (i!=Lx, ~)
@@ -44,6 +42,8 @@ end
                 if (_c(lt, (i,j), (i+1,j)), ~)
                     INC(k)
                     apply_G2!(reg, j, Js[k], REG_STACK)
+                else
+                    apply_Gcut!(reg, j, REG_STACK)
                 end
                 if (j!=1 && _c(lt, (i,j-1), (i+1,j)), ~)
                     INC(k)
@@ -69,18 +69,11 @@ function cachesize_largemem(lt::MaskedSquareLattice)
     Ly = size(lt, 2)
     ncache = 0
     for i=1:Lx
-        for j=1:Ly
-            if !lt.mask[i,j]
-                ncache += 1
-            end
-        end
         i!=Lx && for j=1:Ly
             if j!=Ly && _c(lt, (i,j), (i+1,j+1))
                 ncache += 1
             end
-            if _c(lt, (i,j), (i+1,j))
-                ncache += 1
-            end
+            ncache += 1
             if j!=1 && _c(lt, (i,j-1), (i+1,j))
                 ncache += 1
             end
@@ -106,24 +99,12 @@ end
                 apply_G4!(reg, (j, j+1), Js[k], A_STACK)
             end
         end
-        @routine for j=1:Ly
-            if (lt.mask[i,j], ~)
-                INC(l)
-                apply_Gh!(reg, j, hs[l], A_STACK)
-            else
-                apply_Gcut!(reg, j, A_STACK)
-            end
-        end
-        incstack!(B_STACK)
-        store_state!(B_STACK, reg.state)
-        ~@routine
         for j=1:Ly
             if (lt.mask[i,j], ~)
                 INC(l)
+                apply_Gh!(reg, j, hs[l], A_STACK)
             end
         end
-        # restore state
-        swap_state!(B_STACK, reg.state)
         if (i!=Lx, ~)
             @routine begin
                 for j=1:Ly
@@ -140,6 +121,8 @@ end
                     if (_c(lt, (i,j), (i+1,j)), ~)
                         INC(k)
                         apply_G2!(reg, j, Js[k], A_STACK)
+                    else
+                        apply_Gcut!(reg, j, A_STACK)
                     end
                     if (j!=1 && _c(lt, (i,j-1), (i+1,j)), ~)
                         INC(k)
@@ -179,4 +162,4 @@ end
 end
 
 cachesize_A(lt::MaskedSquareLattice) = size(lt,2)*3-1
-cachesize_B(lt::MaskedSquareLattice) = size(lt,1)*2-1
+cachesize_B(lt::MaskedSquareLattice) = size(lt,1)-1
