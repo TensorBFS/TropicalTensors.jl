@@ -6,15 +6,19 @@ using Test
 end
 
 @testset "yao" begin
-    include("yao/yao.jl")
+    include("yao.jl")
 end
 
 @testset "reversible square" begin
-    include("yao/reversible/square.jl")
+    include("reversible/square.jl")
 end
 
 @testset "reversible chimera" begin
-    include("yao/reversible/chimera.jl")
+    include("reversible/chimera.jl")
+end
+
+@testset "reversible second_neighbor" begin
+    include("reversible/second_neighbor.jl")
 end
 
 @testset "cuda" begin
