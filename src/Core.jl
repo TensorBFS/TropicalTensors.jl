@@ -20,6 +20,13 @@ struct Spinglass{LT,JT}
     hs::Vector{JT}
 end
 
+function bondtensor(::Type{TT}, sg::Spinglass, J) where TT
+    TT.([J -J; -J J])
+end
+function vertextensor(::Type{TT}, sg::Spinglass, h) where TT
+    TT.([h, -h])
+end
+
 function rand_spinglass(::Type{T}, lt::Viznet.AbstractLattice;
                     jt::Jtype=Randn(), ht::Jtype=Zero(), seed::Int=2,
                     dumpto=nothing) where T

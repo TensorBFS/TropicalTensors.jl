@@ -27,11 +27,11 @@ end
 
 Viznet.bonds(lt::MaskedSquareLattice) = sgbonds(lt)
 
-function solve(sg::Spinglass{LT,T}; usecuda=false) where {LT<:MaskedSquareLattice,T}
+function solve(::Type{TT}, sg::Spinglass{LT,T}; usecuda=false) where {TT, LT<:MaskedSquareLattice,T}
     lt = sg.lattice
     Lx, Ly = size(lt)
     nbit = Ly + 2
-    reg = _init_reg(T, lt, Val(usecuda))
+    reg = _init_reg(TT, lt, Val(usecuda))
     Js = copy(sg.Js)
     hs = copy(sg.hs)
     LI = LinearIndices(lt)
@@ -39,30 +39,30 @@ function solve(sg::Spinglass{LT,T}; usecuda=false) where {LT<:MaskedSquareLattic
     for i=1:Lx
         println("Layer $i/$Lx")
         for j=1:Ly-1
-            _c((i,j), (i,j+1)) && (reg |> put(nbit, (j,j+1)=>G4(T, Js |> popfirst!)))
+            _c((i,j), (i,j+1)) && (reg |> put(nbit, (j,j+1)=>Gvb(bondtensor(TT, sg, Js |> popfirst!))))
         end
         for j=1:Ly
             if lt.mask[i,j]
-                reg |> put(nbit, j=>Gh(T, hs |> popfirst!))
+                reg |> put(nbit, j=>Gh(vertextensor(TT, sg, hs |> popfirst!)))
             else
-                reg |> put(nbit, j=>Gcut(T))
+                reg |> put(nbit, j=>Gcut(TT))
             end
         end
         (i!=Lx) && for j=1:Ly
             ancpre = nbit-(j-1)%2
             ancthis = nbit-(j)%2
             # store the information in qubit `j` to ancilla `nbit-j%2`
-            j!=Ly && _c((i,j), (i+1,j+1)) && (reg |> put(nbit, (j, ancthis)=>Gcp(T)))
+            j!=Ly && _c((i,j), (i+1,j+1)) && (reg |> put(nbit, (j, ancthis)=>Gcp(TT)))
             # interact with j-1 th qubit (a)
-            j!=1 && _c((i+1,j-1), (i,j)) && (reg |> put(nbit, (j-1,j)=>G4(T, Js |> popfirst!)))
+            j!=1 && _c((i+1,j-1), (i,j)) && (reg |> put(nbit, (j-1,j)=>Gvb(bondtensor(TT, sg, Js |> popfirst!))))
             # onsite term (b)
-            _c((i,j), (i+1,j)) && (reg |> put(nbit, j=>G2(T, Js |> popfirst!)))
+            _c((i,j), (i+1,j)) && (reg |> put(nbit, j=>Ghb(bondtensor(TT, sg, Js |> popfirst!))))
             if j!=1 && _c((i,j-1), (i+1,j))
                 # interact with cached j-1 th qubit (c)
                 jj = Js[1]
-                reg |> put(nbit, (ancpre,j)=>G4(T, Js |> popfirst!))
+                reg |> put(nbit, (ancpre,j)=>Gvb(bondtensor(TT, sg, Js |> popfirst!)))
                 # erease the information in previous ancilla
-                reg |> put(nbit, ancpre=>Gcut(T))
+                reg |> put(nbit, ancpre=>Gcut(TT))
             end
         end
     end
@@ -111,8 +111,6 @@ end
 
 function _init_reg(::Type{T}, lt::MaskedSquareLattice, ::Val{:false}) where T
     nbit = size(lt, 2) + 2
-    state = ones(Tropical{T}, 1<<nbit)
-    #state = zeros(Tropical{T}, 1<<nbit)
-    #state[1:1<<(nbit-2)] .= one(Tropical{T})
+    state = ones(T, 1<<nbit)
     ArrayReg(state)
 end

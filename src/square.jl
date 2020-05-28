@@ -1,35 +1,33 @@
 export sgbonds
 
-function square_solve(reg::ArrayReg{B,Tropical{T}}, Lx::Int, Ly::Int, Js::AbstractVector, hs::AbstractVector) where {B,T}
+function solve(::Type{TT}, sg::Spinglass{LT,T}; usecuda=false) where {LT<:SquareLattice,T,TT}
+    # Yao gates
+    lt = sg.lattice
+    Lx, Ly = lt.Nx, lt.Ny
+    Js = copy(sg.Js)
+    hs = copy(sg.hs)
+    reg = _init_reg(TT, lt.Ny, Val(usecuda))
+
     println("Layer 1/$Lx")
-    Js = copy(Js)
-    hs = copy(hs)
     for j=1:Ly
-        reg |> put(Ly, j=>Gh(T, hs |> popfirst!))
+        reg |> put(Ly, j=>Gh(vertextensor(TT, sg, hs |> popfirst!)))
     end
     for j=1:Ly-1
-        reg |> put(Ly, (j,j+1)=>G4(T, Js |> popfirst!))
+        reg |> put(Ly, (j,j+1)=>Gvb(bondtensor(TT, sg, Js |> popfirst!)))
     end
     for i=2:Lx
         println("Layer $i/$Lx")
         for j=1:Ly
-            reg |> put(Ly, j=>G2(T, Js |> popfirst!))
+            reg |> put(Ly, j=>Ghb(bondtensor(TT, sg, Js |> popfirst!)))
         end
         for j=1:Ly
-            reg |> put(Ly, j=>Gh(T, hs |> popfirst!))
+            reg |> put(Ly, j=>Gh(vertextensor(TT, sg, hs |> popfirst!)))
         end
         for j=1:Ly-1
-            reg |> put(Ly, (j,j+1)=>G4(T, Js |> popfirst!))
+            reg |> put(Ly, (j,j+1)=>Gvb(bondtensor(TT, sg, Js |> popfirst!)))
         end
     end
     sum(state(reg))
-end
-
-function solve(sg::Spinglass{LT,T}; usecuda=false) where {LT<:SquareLattice,T}
-    # Yao gates
-    lt = sg.lattice
-    reg = _init_reg(T, lt.Ny, Val(usecuda))
-    square_solve(reg, lt.Nx, lt.Ny, sg.Js, sg.hs)
 end
 
 function solve(lattice::Viznet.AbstractLattice, Js::Vector{T}, hs::Vector{T}; usecuda=false) where {T}
@@ -75,6 +73,6 @@ cachesize_A(lt::SquareLattice) = lt.Ny
 cachesize_B(lt::SquareLattice) = lt.Nx-1
 cachesize_largemem(lt::SquareLattice) = (lt.Nx-1) * lt.Ny
 
-function _init_reg(::Type{T}, lt::SquareLattice, usecuda) where T
+function _init_reg(::Type{T}, lt::SquareLattice, usecuda) where T<:TropicalTypes
     _init_reg(T, lt.Ny, usecuda)
 end

@@ -7,33 +7,45 @@ using Viznet
 export solve, SquareLattice, ChimeraLattice
 export sgbonds
 
-export Gh, G2, G4, G16, Gcut, Gcp, Greset
+export Gh, Gvb, Ghb, G16, Gcut, Gcp, Greset
+export vertextensor, bondtensor
 
-Gh(::Type{T}, h) where T = matblock(Diagonal(spinglass_mag_tensor(T(h))) |> LuxurySparse.staticize)
-G2(::Type{T}, J) where T = matblock(spinglass_bond_tensor(T(J)) |> LuxurySparse.staticize)
-G4(::Type{T}, J) where T = matblock(Diagonal(spinglass_g4_tensor(T(J))) |> LuxurySparse.staticize)
-G16(::Type{T}, Js) where T = matblock(spinglass_g16_tensor(T.(Js)) |> LuxurySparse.staticize)
+Gh(vertex_tensor) where T = tropicalblock(Diagonal(vertex_tensor) |> LuxurySparse.staticize)
+# NOTE: be careful about orders of vertices!
+Gvb(bond_tensor::Matrix{T}) where T = tropicalblock(Diagonal([bond_tensor...]) |> LuxurySparse.staticize)
+Ghb(bond_tensor::Matrix{T}) where T = tropicalblock(bond_tensor |> LuxurySparse.staticize)
+function G16(::Type{TT}, Js) where TT<:TropicalTypes
+    mat = spinglass_g16_tensor(TT, Js)
+    tropicalblock(mat |> LuxurySparse.staticize)
+end
+
 """
     Gcp(T)
 
 copy state of qubit 2 -> 1.
 """
-function Gcp(::Type{T}) where T
-    matblock(copytensor(Tropical{T}))
+function Gcp(::Type{TT}) where TT<:TropicalTypes
+    tropicalblock(copytensor(TT))
 end
 
-function Greset(::Type{T}) where T
-    TT = Tropical{T}
-    matblock([one(TT) one(TT); zero(TT) zero(TT)])
+function Greset(::Type{TT}) where TT<:TropicalTypes
+    tropicalblock([one(TT) one(TT); zero(TT) zero(TT)])
 end
 
-function Gcut(::Type{T}) where T
-    TT = Tropical{T}
-    matblock([one(TT) one(TT); one(TT) one(TT)])
+function Gcut(::Type{TT}) where TT<:TropicalTypes
+    tropicalblock([one(TT) one(TT); one(TT) one(TT)])
 end
 
 function _init_reg(::Type{T}, L::Int, usecuda::Val{:false}) where T
-    ArrayReg(ones(Tropical{T}, 1<<L))
+    ArrayReg(ones(T, 1<<L))
+end
+
+function solve(sg::Spinglass{LT,T}; usecuda=false) where {LT,T}
+    solve(Tropical{T}, sg; usecuda=usecuda)
+end
+
+function solve_and_count(sg::Spinglass{LT,T}; usecuda=false) where {LT,T}
+    solve(CountingTropical{T}, sg; usecuda=usecuda)
 end
 
 struct SpinglassOptConfig{LT,T}

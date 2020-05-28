@@ -45,7 +45,7 @@ end
         end
 
         # Contract with RED
-        rr ← _init_reg(T, Ly*4, Val(false))
+        rr ← _init_reg(Tropical{T}, Ly*4, Val(false))
         red_reg(rr, Ly, Js[k+1:k+nj_red], hs[hk+1:hk+4Ly], REG_STACK)
         reg.state .*= identity.(rr.state)
         incstack!(REG_STACK)
@@ -73,7 +73,7 @@ end
 
     # initial reg
     @routine begin
-        rr ← _init_reg(T, Ly*4, Val(false))
+        rr ← _init_reg(Tropical{T}, Ly*4, Val(false))
         red_reg(rr, Ly, Js[k+1:k+nj_red], hs[1:4Ly], A_STACK)
     end
     reg.state .*= identity.(rr.state)
@@ -106,7 +106,7 @@ end
 
         # RED
         @routine begin
-            rr ← _init_reg(T, Ly*4, Val(false))
+            rr ← _init_reg(Tropical{T}, Ly*4, Val(false))
             red_reg(rr, Ly, Js[k+1:k+nj_red], hs[hk+1:hk+4Ly], A_STACK)
         end
         reg.state .*= identity.(rr.state)

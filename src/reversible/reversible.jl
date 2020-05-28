@@ -11,7 +11,7 @@ include("chimera.jl")
 include("second_neighbor.jl")
 
 function opt_config(sg::Spinglass{LT,T}) where {LT,T}
-    reg = _init_reg(T, sg.lattice, Val(false))
+    reg = _init_reg(Tropical{T}, sg.lattice, Val(false))
     A = stack4reg(reg, cachesize_A(sg.lattice))
     B = stack4reg(reg, cachesize_B(sg.lattice))
     eng, sg, reg, A, B = isolve(T(0.0), sg, reg, A, B)
@@ -22,7 +22,7 @@ function opt_config(sg::Spinglass{LT,T}) where {LT,T}
 end
 
 function opt_config_largemem(sg::Spinglass{LT,T}) where {LT,T}
-    reg = _init_reg(T, sg.lattice, Val(false))
+    reg = _init_reg(Tropical{T}, sg.lattice, Val(false))
     A = stack4reg(reg, cachesize_largemem(sg.lattice))
     eng, sg, reg, A = isolve_largemem(T(0.0), sg, reg, A)
     sgg = Spinglass(sg.lattice, GVar.(sg.Js, zero(sg.Js)), GVar.(sg.hs, zero(sg.hs)))

@@ -1,24 +1,24 @@
-function red_reg(::Type{T}, Ly::Int, Js, hs; usecuda=false) where T
-    reg = _init_reg(T, Ly*4, Val(usecuda))
+function red_reg(::Type{TT}, sg::Spinglass{LT,T}, Ly::Int, Js, hs; usecuda=false) where {LT,T,TT}
+    reg = _init_reg(TT, Ly*4, Val(usecuda))
     k = 0
     for i=1:Ly*4
-        hs[i] != 0 && (reg |> put(4*Ly, i=>Gh(T, hs[i])))
+        hs[i] != 0 && (reg |> put(4*Ly, i=>Gh(vertextensor(TT, sg, hs[i]))))
     end
     for i=1:Ly-1
         for j = 1:4
-            reg |> put(4*Ly, (4*(i-1)+j,4*i+j)=>G4(T, Js[k+1]))
+            reg |> put(4*Ly, (4*(i-1)+j,4*i+j)=>Gvb(bondtensor(TT, sg, Js[k+1])))
             k += 1
         end
     end
     for i=1:Ly
-        reg |> put(4*Ly, (4i-3,4i-2,4i-1,4i)=>G16(T, Js[k+1:k+16]))
+        reg |> put(4*Ly, (4i-3,4i-2,4i-1,4i)=>G16(TT, Js[k+1:k+16]))
         k += 16
     end
     @assert k==length(Js)
     return reg
 end
 
-function solve(sg::Spinglass{LT,T}; usecuda::Bool) where {LT<:ChimeraLattice,T}
+function solve(::Type{TT}, sg::Spinglass{LT,T}; usecuda::Bool) where {LT<:ChimeraLattice,T, TT}
     _, Lx, Ly = size(sg.lattice)
     Js = sg.Js
     hs = sg.hs
@@ -26,25 +26,25 @@ function solve(sg::Spinglass{LT,T}; usecuda::Bool) where {LT<:ChimeraLattice,T}
     nj_red = (Ly-1)*4 + 16 * Ly
     println("Layer 1/$Lx")
     k = 0
-    reg = red_reg(T, Ly, Js[k+1:k+nj_red], hs[1:4Ly]; usecuda=usecuda)
+    reg = red_reg(TT, sg, Ly, Js[k+1:k+nj_red], hs[1:4Ly]; usecuda=usecuda)
     k += nj_red
     for j=1:Ly*4
-        hs[j]!= 0 && (reg |> put(4*Ly, j=>Gh(T, hs[j])))
+        hs[j]!= 0 && (reg |> put(4*Ly, j=>Gh(vertextensor(TT, sg, hs[j]))))
     end
     for i=2:Lx
         hk = (i-1)*Ly*8
         println("Layer $i/$Lx")
         # BLACK
         for j=1:Ly*4
-            reg |> put(Ly*4, j=>G2(T, Js[k+1]))
+            reg |> put(Ly*4, j=>Ghb(bondtensor(TT, sg, Js[k+1])))
             k += 1
         end
         for j=1:Ly*4 # `hs` interated in red->black order
-            hs[j+hk+4Ly] != 0 && (reg |> put(4*Ly, j=>Gh(T, hs[j+hk+4Ly])))
+            hs[j+hk+4Ly] != 0 && (reg |> put(4*Ly, j=>Gh(vertextensor(TT, sg, hs[j+hk+4Ly]))))
         end
 
         # Contract with RED
-        rr = red_reg(T, Ly, Js[k+1:k+nj_red], hs[hk+1:hk+4Ly]; usecuda=usecuda)
+        rr = red_reg(TT, sg, Ly, Js[k+1:k+nj_red], hs[hk+1:hk+4Ly]; usecuda=usecuda)
         k += nj_red
         reg.state .*= rr.state
     end
@@ -132,6 +132,6 @@ cachesize_A(lt::ChimeraLattice) = lt.Ny*4
 cachesize_B(lt::ChimeraLattice) = lt.Nx-1
 cachesize_largemem(lt::ChimeraLattice) = (lt.Nx-1)*lt.Ny*4
 
-function _init_reg(::Type{T}, lt::ChimeraLattice, usecuda) where T
+function _init_reg(::Type{T}, lt::ChimeraLattice, usecuda) where T<:TropicalTypes
     _init_reg(T, lt.Ny*4, usecuda)
 end
