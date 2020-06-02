@@ -1,6 +1,6 @@
 abstract type Jtype end
 
-export Spinglass, Randn, Rand, Randpm, Ferro, Zero, rand_spinglass
+export AbstractSpinglass, Spinglass, Randn, Rand, Randpm, Ferro, Zero, rand_spinglass
 
 struct Randn <: Jtype end
 struct Rand <: Jtype end
@@ -14,7 +14,9 @@ _get_J(::Rand) = rand()
 _get_J(::Randpm) = rand([-1,1])
 _get_J(::Zero) = 0.0
 
-struct Spinglass{LT,JT}
+abstract type AbstractSpinglass{LT} end
+
+struct Spinglass{LT,JT} <: AbstractSpinglass{LT}
     lattice::LT
     Js::Vector{JT}
     hs::Vector{JT}

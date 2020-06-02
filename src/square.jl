@@ -1,6 +1,6 @@
 export sgbonds
 
-function solve(::Type{TT}, sg::Spinglass{LT,T}; usecuda=false) where {LT<:SquareLattice,T,TT}
+function solve(::Type{TT}, sg::AbstractSpinglass{LT}; usecuda=false) where {LT<:SquareLattice,TT}
     # Yao gates
     lt = sg.lattice
     Lx, Ly = lt.Nx, lt.Ny

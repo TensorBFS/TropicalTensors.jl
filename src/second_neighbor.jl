@@ -27,7 +27,7 @@ end
 
 Viznet.bonds(lt::MaskedSquareLattice) = sgbonds(lt)
 
-function solve(::Type{TT}, sg::Spinglass{LT,T}; usecuda=false) where {TT, LT<:MaskedSquareLattice,T}
+function solve(::Type{TT}, sg::AbstractSpinglass{LT}; usecuda=false) where {TT, LT<:MaskedSquareLattice}
     lt = sg.lattice
     Lx, Ly = size(lt)
     nbit = Ly + 2

@@ -5,7 +5,7 @@ using TropicalYao
 using Viznet
 
 export solve, SquareLattice, ChimeraLattice
-export sgbonds
+export sgbonds, sgvertices
 
 export Gh, Gvb, Ghb, G16, Gcut, Gcp, Greset
 export vertextensor, bondtensor
