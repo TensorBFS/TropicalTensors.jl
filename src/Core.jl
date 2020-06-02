@@ -20,10 +20,12 @@ struct Spinglass{LT,JT}
     hs::Vector{JT}
 end
 
-function bondtensor(::Type{TT}, sg::Spinglass, J) where TT
+function bondtensor(::Type{TT}, sg::Spinglass, i::Int) where TT
+    J = sg.Js[i]
     TT.([J -J; -J J])
 end
-function vertextensor(::Type{TT}, sg::Spinglass, h) where TT
+function vertextensor(::Type{TT}, sg::Spinglass, i::Int) where TT
+    h = sg.hs[i]
     TT.([h, -h])
 end
 

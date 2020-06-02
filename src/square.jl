@@ -4,27 +4,29 @@ function solve(::Type{TT}, sg::Spinglass{LT,T}; usecuda=false) where {LT<:Square
     # Yao gates
     lt = sg.lattice
     Lx, Ly = lt.Nx, lt.Ny
-    Js = copy(sg.Js)
-    hs = copy(sg.hs)
     reg = _init_reg(TT, lt.Ny, Val(usecuda))
+    k = 0
 
     println("Layer 1/$Lx")
     for j=1:Ly
-        reg |> put(Ly, j=>Gh(vertextensor(TT, sg, hs |> popfirst!)))
+        reg |> put(Ly, j=>Gh(vertextensor(TT, sg, j)))
     end
     for j=1:Ly-1
-        reg |> put(Ly, (j,j+1)=>Gvb(bondtensor(TT, sg, Js |> popfirst!)))
+        k += 1
+        reg |> put(Ly, (j,j+1)=>Gvb(bondtensor(TT, sg, k)))
     end
     for i=2:Lx
         println("Layer $i/$Lx")
         for j=1:Ly
-            reg |> put(Ly, j=>Ghb(bondtensor(TT, sg, Js |> popfirst!)))
+            k += 1
+            reg |> put(Ly, j=>Ghb(bondtensor(TT, sg, k)))
         end
         for j=1:Ly
-            reg |> put(Ly, j=>Gh(vertextensor(TT, sg, hs |> popfirst!)))
+            reg |> put(Ly, j=>Gh(vertextensor(TT, sg, (i-1)*Ly + j)))
         end
         for j=1:Ly-1
-            reg |> put(Ly, (j,j+1)=>Gvb(bondtensor(TT, sg, Js |> popfirst!)))
+            k += 1
+            reg |> put(Ly, (j,j+1)=>Gvb(bondtensor(TT, sg, k)))
         end
     end
     sum(state(reg))

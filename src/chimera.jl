@@ -2,12 +2,12 @@ function red_reg(::Type{TT}, sg::Spinglass{LT,T}, Ly::Int, Js, hs; usecuda=false
     reg = _init_reg(TT, Ly*4, Val(usecuda))
     k = 0
     for i=1:Ly*4
-        hs[i] != 0 && (reg |> put(4*Ly, i=>Gh(vertextensor(TT, sg, hs[i]))))
+        hs[i] != 0 && (reg |> put(4*Ly, i=>Gh(vertextensor(TT, sg, i))))
     end
     for i=1:Ly-1
         for j = 1:4
-            reg |> put(4*Ly, (4*(i-1)+j,4*i+j)=>Gvb(bondtensor(TT, sg, Js[k+1])))
             k += 1
+            reg |> put(4*Ly, (4*(i-1)+j,4*i+j)=>Gvb(bondtensor(TT, sg, k)))
         end
     end
     for i=1:Ly
@@ -36,11 +36,11 @@ function solve(::Type{TT}, sg::Spinglass{LT,T}; usecuda::Bool) where {LT<:Chimer
         println("Layer $i/$Lx")
         # BLACK
         for j=1:Ly*4
-            reg |> put(Ly*4, j=>Ghb(bondtensor(TT, sg, Js[k+1])))
             k += 1
+            reg |> put(Ly*4, j=>Ghb(bondtensor(TT, sg, k)))
         end
         for j=1:Ly*4 # `hs` interated in red->black order
-            hs[j+hk+4Ly] != 0 && (reg |> put(4*Ly, j=>Gh(vertextensor(TT, sg, hs[j+hk+4Ly]))))
+            hs[j+hk+4Ly] != 0 && (reg |> put(4*Ly, j=>Gh(vertextensor(TT, sg, j+hk+4Ly))))
         end
 
         # Contract with RED

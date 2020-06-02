@@ -32,18 +32,19 @@ function solve(::Type{TT}, sg::Spinglass{LT,T}; usecuda=false) where {TT, LT<:Ma
     Lx, Ly = size(lt)
     nbit = Ly + 2
     reg = _init_reg(TT, lt, Val(usecuda))
-    Js = copy(sg.Js)
-    hs = copy(sg.hs)
     LI = LinearIndices(lt)
+    k = 0
+    l = 0
     _c(a, b) = isconnected(lt, LI[a...], LI[b...])
     for i=1:Lx
         println("Layer $i/$Lx")
         for j=1:Ly-1
-            _c((i,j), (i,j+1)) && (reg |> put(nbit, (j,j+1)=>Gvb(bondtensor(TT, sg, Js |> popfirst!))))
+            _c((i,j), (i,j+1)) && (k += 1; reg |> put(nbit, (j,j+1)=>Gvb(bondtensor(TT, sg, k))))
         end
         for j=1:Ly
             if lt.mask[i,j]
-                reg |> put(nbit, j=>Gh(vertextensor(TT, sg, hs |> popfirst!)))
+                l += 1
+                reg |> put(nbit, j=>Gh(vertextensor(TT, sg, l)))
             else
                 reg |> put(nbit, j=>Gcut(TT))
             end
@@ -54,13 +55,13 @@ function solve(::Type{TT}, sg::Spinglass{LT,T}; usecuda=false) where {TT, LT<:Ma
             # store the information in qubit `j` to ancilla `nbit-j%2`
             j!=Ly && _c((i,j), (i+1,j+1)) && (reg |> put(nbit, (j, ancthis)=>Gcp(TT)))
             # interact with j-1 th qubit (a)
-            j!=1 && _c((i+1,j-1), (i,j)) && (reg |> put(nbit, (j-1,j)=>Gvb(bondtensor(TT, sg, Js |> popfirst!))))
+            j!=1 && _c((i+1,j-1), (i,j)) && (k += 1; reg |> put(nbit, (j-1,j)=>Gvb(bondtensor(TT, sg, k))))
             # onsite term (b)
-            _c((i,j), (i+1,j)) && (reg |> put(nbit, j=>Ghb(bondtensor(TT, sg, Js |> popfirst!))))
+            _c((i,j), (i+1,j)) && (k+=1; reg |> put(nbit, j=>Ghb(bondtensor(TT, sg, k))))
             if j!=1 && _c((i,j-1), (i+1,j))
                 # interact with cached j-1 th qubit (c)
-                jj = Js[1]
-                reg |> put(nbit, (ancpre,j)=>Gvb(bondtensor(TT, sg, Js |> popfirst!)))
+                k += 1
+                reg |> put(nbit, (ancpre,j)=>Gvb(bondtensor(TT, sg, k)))
                 # erease the information in previous ancilla
                 reg |> put(nbit, ancpre=>Gcut(TT))
             end
