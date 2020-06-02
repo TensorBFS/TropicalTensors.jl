@@ -1,4 +1,4 @@
-@i function isolve(out!, sg::Spinglass{<:SquareLattice, T}, reg::ArrayReg{B,TT}, A_STACK, B_STACK) where {B,T,TT<:Tropical{T}}
+@i function isolve(out!::T, sg::AbstractSpinglass{SquareLattice, T}, reg::ArrayReg{B,TT}, A_STACK, B_STACK) where {B,T,TT<:Tropical{T}}
     @invcheckoff begin
     Lx ← sg.lattice.Nx
     Ly ← sg.lattice.Ny
@@ -61,7 +61,7 @@ end
     end
 end
 
-@i function isolve_largemem(out!, sg::Spinglass{<:SquareLattice, T}, reg::ArrayReg{B,TT}, REG_STACK) where {B,T,TT<:Tropical{T}}
+@i function isolve_largemem(out!, sg::Spinglass{SquareLattice, T}, reg::ArrayReg{B,TT}, REG_STACK) where {B,T,TT<:Tropical{T}}
     @invcheckoff begin
     Lx ← sg.lattice.Nx
     Ly ← sg.lattice.Ny

@@ -14,12 +14,12 @@ _get_J(::Rand) = rand()
 _get_J(::Randpm) = rand([-1,1])
 _get_J(::Zero) = 0.0
 
-abstract type AbstractSpinglass{LT} end
+abstract type AbstractSpinglass{LT, T} end
 
-struct Spinglass{LT,JT} <: AbstractSpinglass{LT}
+struct Spinglass{LT,T} <: AbstractSpinglass{LT,T}
     lattice::LT
-    Js::Vector{JT}
-    hs::Vector{JT}
+    Js::Vector{T}
+    hs::Vector{T}
 end
 
 function bondtensor(::Type{TT}, sg::Spinglass, i::Int) where TT

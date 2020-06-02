@@ -40,7 +40,7 @@ function _init_reg(::Type{T}, L::Int, usecuda::Val{:false}) where T
     ArrayReg(ones(T, 1<<L))
 end
 
-function solve(sg::Spinglass{LT,T}; usecuda=false) where {LT,T}
+function solve(sg::AbstractSpinglass{LT,T}; usecuda=false) where {LT,T}
     solve(Tropical{T}, sg; usecuda=usecuda)
 end
 

@@ -16,7 +16,7 @@
     k → length(Js)
 end
 
-@i function isolve_largemem(out!::T, sg::Spinglass{<:ChimeraLattice, T}, reg::ArrayReg{B,TT}, REG_STACK) where {B,T,TT<:Tropical{T}}
+@i function isolve_largemem(out!::T, sg::Spinglass{ChimeraLattice, T}, reg::ArrayReg{B,TT}, REG_STACK) where {B,T,TT<:Tropical{T}}
     @invcheckoff begin
     Lx ← sg.lattice.Nx
     Ly ← sg.lattice.Ny
@@ -60,7 +60,7 @@ end
     end
 end
 
-@i function isolve(out!::T, sg::Spinglass{<:ChimeraLattice, T}, reg::ArrayReg{B,TT}, A_STACK, B_STACK) where {B,T,TT<:Tropical{T}}
+@i function isolve(out!::T, sg::AbstractSpinglass{ChimeraLattice, T}, reg::ArrayReg{B,TT}, A_STACK, B_STACK) where {B,T,TT<:Tropical{T}}
     @invcheckoff begin
     Lx ← sg.lattice.Nx
     Ly ← sg.lattice.Ny
