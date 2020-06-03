@@ -3,6 +3,7 @@ using LuxurySparse
 using LinearAlgebra
 using TropicalYao
 using Viznet
+using OMEinsum
 
 export solve, SquareLattice, ChimeraLattice
 export sgbonds, sgvertices
@@ -15,8 +16,13 @@ Gh(vertex_tensor) where T = tropicalblock(Diagonal(vertex_tensor) |> LuxurySpars
 Gvb(bond_tensor::Matrix{T}) where T = tropicalblock(Diagonal([bond_tensor...]) |> LuxurySparse.staticize)
 Ghb(bond_tensor::Matrix{T}) where T = tropicalblock(bond_tensor |> LuxurySparse.staticize)
 function G16(::Type{TT}, Js) where TT<:TropicalTypes
-    mat = spinglass_g16_tensor(TT, Js)
+    xs = map(x->_bondtensor(TT, x), Js)
+    mat = reshape(ein"aα,aβ,aγ,aδ,bα,bβ,bγ,bδ,cα,cβ,cγ,cδ,dα,dβ,dγ,dδ->abcdαβγδ"(xs...), 16, 16)
     tropicalblock(mat |> LuxurySparse.staticize)
+end
+
+function _bondtensor(::Type{TT}, J) where TT
+    TT.([J -J; -J J])
 end
 
 """

@@ -5,7 +5,7 @@ using Requires
 
 using TropicalNumbers
 
-export Tropical
+export Tropical, CountingTropical
 
 include("Core.jl")
 include("dumpload.jl")

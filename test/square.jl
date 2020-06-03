@@ -14,6 +14,14 @@ end
     @test res.n == 142
 end
 
+@testset "counting tropical" begin
+    lt = SquareLattice(10, 8)
+    sg = Spinglass(lt, ones(Float32, 142), zeros(Float32, 80))
+    res = solve(CountingTropical{Float32}, sg; usecuda=false)
+    @test res.n == 142
+    @test res.c == 2
+end
+
 @testset "forwarddiff" begin
     L = 3
     Js = ones(Float32, 2L*(L-1))
