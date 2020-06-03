@@ -450,15 +450,15 @@ uuid = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
 version = "0.5.5"
 
 [[TropicalNumbers]]
-git-tree-sha1 = "41b06533b14f11b6e962351d7eddd67ffbc7b505"
-repo-rev = "master"
-repo-url = "https://github.com/GiggleLiu/TropicalNumbers.jl"
+git-tree-sha1 = "a144222fc86c50008ab432981fbe7b6638752670"
 uuid = "b3a74e9c-7526-4576-a4eb-79c0d4c32334"
 version = "0.1.0"
 
 [[TropicalYao]]
 deps = ["BitBasis", "LinearAlgebra", "LuxurySparse", "NiLang", "NiLogLikeNumbers", "StaticArrays", "TropicalNumbers", "TupleTools", "Yao", "YaoArrayRegister"]
-path = "/home/leo/.julia/dev/TropicalYao"
+git-tree-sha1 = "8ca51c7383c50021f5e4b21ed7dcf6c6d1566eff"
+repo-rev = "master"
+repo-url = "https://github.com/JuliaReverse/TropicalYao.jl"
 uuid = "8a7e9035-3e12-4286-9ab6-425b4286d857"
 version = "0.1.0"
 
@@ -476,7 +476,9 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
 [[Viznet]]
 deps = ["Compose", "Dierckx"]
-path = "/home/leo/.julia/dev/Viznet"
+git-tree-sha1 = "e17d10f1b47db2f703a4808135e0ecffa94cb746"
+repo-rev = "master"
+repo-url = "https://github.com/GiggleLiu/Viznet.jl"
 uuid = "52a3aca4-6234-47fd-b74a-806bdf78ede9"
 version = "0.1.0"
 
