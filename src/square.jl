@@ -7,17 +7,9 @@ function solve(::Type{TT}, sg::AbstractSpinglass{LT}; usecuda=false) where {LT<:
     reg = _init_reg(TT, lt.Ny, Val(usecuda))
     k = 0
 
-    println("Layer 1/$Lx")
-    for j=1:Ly
-        reg |> put(Ly, j=>Gh(vertextensor(TT, sg, j)))
-    end
-    for j=1:Ly-1
-        k += 1
-        reg |> put(Ly, (j,j+1)=>Gvb(bondtensor(TT, sg, k)))
-    end
-    for i=2:Lx
+    for i=1:Lx
         println("Layer $i/$Lx")
-        for j=1:Ly
+        i!=1 && for j=1:Ly
             k += 1
             reg |> put(Ly, j=>Ghb(bondtensor(TT, sg, k)))
         end
