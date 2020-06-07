@@ -59,7 +59,7 @@ function viz_sg(sg::Spinglass; r=0.015)
         for ((i,j),v) in zip(sgbonds(lt), sg.Js)
             if v > 0
                 eb1 >> lt[i;j]
-            else
+            elseif v < 0
                 eb2 >> lt[i;j]
             end
         end
