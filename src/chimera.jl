@@ -1,8 +1,8 @@
-function red_reg(::Type{TT}, sg::Spinglass{LT,T}, Ly::Int, Js, hs; usecuda=false) where {LT,T,TT}
+function red_reg(::Type{TT}, sg::Spinglass{LT,T}, Ly::Int, k::Int, hk::Int; usecuda=false) where {LT,T,TT}
     reg = _init_reg(TT, Ly*4, Val(usecuda))
-    k = 0
     for i=1:Ly*4
-        hs[i] != 0 && (reg |> put(4*Ly, i=>Gh(vertextensor(TT, sg, i))))
+        hk += 1
+        sg.hs[hk] != 0 && (reg |> put(4*Ly, i=>Gh(vertextensor(TT, sg, hk+i))))
     end
     for i=1:Ly-1
         for j = 1:4
@@ -11,10 +11,9 @@ function red_reg(::Type{TT}, sg::Spinglass{LT,T}, Ly::Int, Js, hs; usecuda=false
         end
     end
     for i=1:Ly
-        reg |> put(4*Ly, (4i-3,4i-2,4i-1,4i)=>G16(TT, Js[k+1:k+16]))
+        reg |> put(4*Ly, (4i-3,4i-2,4i-1,4i)=>G16(TT, sg.Js[k+1:k+16]))
         k += 16
     end
-    @assert k==length(Js)
     return reg
 end
 
@@ -44,7 +43,7 @@ function solve(::Type{TT}, sg::Spinglass{LT,T}; usecuda::Bool) where {LT<:Chimer
         end
 
         # Contract with RED
-        rr = red_reg(TT, sg, Ly, Js[k+1:k+nj_red], hs[hk+1:hk+4Ly]; usecuda=usecuda)
+        rr = red_reg(TT, sg, Ly, k, hk; usecuda=usecuda)
         k += nj_red
         reg.state .*= rr.state
     end
