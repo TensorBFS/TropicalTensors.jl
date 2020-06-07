@@ -7,7 +7,7 @@ function run_chimera44(::Type{T}; nrepeat, usecuda=false) where T
         99, 111, 118, 121, 123, 127] .+ 1
     lt = ChimeraLattice(4, 4)
     bonds = sgbonds(lt)
-    #@assert length(holes) == 20
+    @assert length(holes) == 20
     out = zeros(T, 2, nrepeat)
 
     for j=1:nrepeat
@@ -31,3 +31,5 @@ function run_chimera44(::Type{T}; nrepeat, usecuda=false) where T
     writedlm(joinpath(@__DIR__, "data", "chimera44_degeneracy.dat"), out)
     return out
 end
+
+run_chimera44(Float32; nrepeat=1000, usecuda=false)

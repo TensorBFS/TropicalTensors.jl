@@ -25,7 +25,7 @@ function solve(::Type{TT}, sg::Spinglass{LT,T}; usecuda::Bool) where {LT<:Chimer
     nj_red = (Ly-1)*4 + 16 * Ly
     println("Layer 1/$Lx")
     k = 0
-    reg = red_reg(TT, sg, Ly, Js[k+1:k+nj_red], hs[1:4Ly]; usecuda=usecuda)
+    reg = red_reg(TT, sg, Ly, k, 0; usecuda=usecuda)
     k += nj_red
     for j=1:Ly*4
         hs[j]!= 0 && (reg |> put(4*Ly, j=>Gh(vertextensor(TT, sg, hs[j]))))
