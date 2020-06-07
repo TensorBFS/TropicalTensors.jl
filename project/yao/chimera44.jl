@@ -20,7 +20,7 @@ function run_chimera44(; nrepeat, usecuda=false)
             end
         end
         sg = Spinglass(lt, Js, hs)
-        display(sg)
+        #display(sg)
         res = solve(CountingTropical{Int32}, sg; usecuda=usecuda)
         out[:,j] .= (res.n, res.c)
     end
