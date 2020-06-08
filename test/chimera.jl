@@ -4,7 +4,7 @@ using Yao
 
 @testset "test red reg" begin
     sg = Spinglass(ChimeraLattice(3,3), ones(Float32, 100), ones(Float32, 100))
-    reg = TropicalTensors.red_reg(Tropical{Float32}, sg, 3, randn(Float32, 8+16*3), randn(Float32, 4*3); usecuda=false)
+    reg = TropicalTensors.red_reg(Tropical{Float32}, sg, 3, 1, 1; usecuda=false)
     @test reg isa ArrayReg{1,Tropical{Float32},Matrix{Tropical{Float32}}}
 end
 
