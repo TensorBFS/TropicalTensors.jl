@@ -32,8 +32,9 @@ name(::Type{<:SquareLattice}) = "square"
 name(::Type{<:Cylinder}) = "cylinder"
 
 if abspath(PROGRAM_FILE) == @__FILE__
-    main(Int32, ChimeraLattice, 2:4, 1000; usecuda=false)
-    main(Int32, ChimeraLattice, 5, 1000; usecuda=true)
+    #main(Int32, ChimeraLattice, 2:4, 10000; usecuda=false)
+    #main(Int32, ChimeraLattice, 5:6, 10000; usecuda=true)
+    main(Int32, ChimeraLattice, 7, 10000; usecuda=true)
     #main(Int32, SquareLattice, 8:4:16, 1000; usecuda=false)
     #main(Float64, SquareLattice, parse(Int, ARGS[2]), 1000; usecuda=true)
     #main(Float64, Cylinder, 4:4:12, 1000; usecuda=false)
