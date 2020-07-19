@@ -52,9 +52,10 @@ false
 ```
 
 You will see the following graph
+
 ![lattice](lattice.svg)
 
-1. Computing the maximum energy
+#### Case 1: Computing the maximum energy
 
 ```julia repl
 julia> solve(sg; usecuda=false)
@@ -75,7 +76,7 @@ Layer 10/10
 Tropical(106)
 ```
 
-2. Computing the energy degeneracy
+#### Case 2: Computing the energy degeneracy
 ```julia repl
 julia> solve(CountingTropical{Int}, sg; usecuda=false)
 ┌ Warning: Input type of `ArrayReg` is not Complex, got CountingTropical{Int64}
@@ -95,7 +96,7 @@ Layer 10/10
 CountingTropical{Int64}(106, 1504)
 ```
 
-3. Computing the optimal spin configuration with ForwardDiff and GPU
+#### Case 3: Computing the optimal spin configuration with ForwardDiff and GPU
 ```julia repl
 julia> using ForwardDiff, CUDA
 
@@ -119,7 +120,7 @@ julia> ForwardDiff.gradient(hs) do x
  -1
 ```
 
-4. Computing the optimal spin configuration with NiLang
+#### Case 4: Computing the optimal spin configuration with NiLang
 
 ```julia repl
 julia> using TropicalTensors.Reversible: opt_config
@@ -152,5 +153,7 @@ Layer 1/10, stack size: 0 & 0
 
 julia> vizoptconfig(cfg) |> SVG("_optconfig.svg")
 ```
+
 You will see the following graph
+
 ![optconfig](optconfig.svg)
