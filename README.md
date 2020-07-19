@@ -13,9 +13,18 @@ Solving tropical tensor network with Yao. It contains
 Type `]` in Julia REPL to enter pkg mode and
 ```julia pkg
 pkg> add https://github.com/JuliaReverse/TropicalYao.jl#master
-pkg> dev git@github.com:TensorBFS/TropicalTensors.jl.git
+pkg> add https://github.com/TensorBFS/TropicalTensors.jl.git#master
+pkg> add CuYao#master
 ```
 The last line is required only when you use GPU for computing.
+
+## Gists
+Minimum implementation (~50 lines) of tropical circuit based spinglass solver about
+#### 1. Finding maximum energy
+https://gist.github.com/GiggleLiu/db9efa143aefbbe1d542e7b78d3a65bc
+
+#### 2. Counting degeneracy
+https://gist.github.com/wangleiphy/ef1f616f26ab37ef7fd3d329f2a5be0e
 
 ## Examples
 First we define the lattice and coupling.
