@@ -6,6 +6,7 @@ using Requires
 using TropicalNumbers
 
 export Tropical, CountingTropical
+export Reversible
 
 include("Core.jl")
 include("dumpload.jl")

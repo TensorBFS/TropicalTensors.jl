@@ -1,6 +1,7 @@
 abstract type Jtype end
 
 export AbstractSpinglass, Spinglass, Randn, Rand, Randpm, Ferro, Zero, rand_spinglass
+import TropicalYao: vertextensor, bondtensor
 
 struct Randn <: Jtype end
 struct Rand <: Jtype end
@@ -26,6 +27,7 @@ function bondtensor(::Type{TT}, sg::Spinglass, i::Int) where TT
     J = sg.Js[i]
     TT.([J -J; -J J])
 end
+
 function vertextensor(::Type{TT}, sg::Spinglass, i::Int) where TT
     h = sg.hs[i]
     TT.([h, -h])

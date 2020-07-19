@@ -3,44 +3,12 @@ using LuxurySparse
 using LinearAlgebra
 using TropicalYao
 using Viznet
-using OMEinsum
 
 export solve, SquareLattice, ChimeraLattice
 export sgbonds, sgvertices
 
 export Gh, Gvb, Ghb, G16, Gcut, Gcp, Greset
 export vertextensor, bondtensor
-
-Gh(vertex_tensor) where T = tropicalblock(Diagonal(vertex_tensor) |> LuxurySparse.staticize)
-# NOTE: be careful about orders of vertices!
-Gvb(bond_tensor::Matrix{T}) where T = tropicalblock(Diagonal([bond_tensor...]) |> LuxurySparse.staticize)
-Ghb(bond_tensor::Matrix{T}) where T = tropicalblock(bond_tensor |> LuxurySparse.staticize)
-function G16(::Type{TT}, Js) where TT<:TropicalTypes
-    xs = map(x->_bondtensor(TT, x), Js)
-    mat = reshape(ein"aα,aβ,aγ,aδ,bα,bβ,bγ,bδ,cα,cβ,cγ,cδ,dα,dβ,dγ,dδ->abcdαβγδ"(xs...), 16, 16)
-    tropicalblock(mat |> LuxurySparse.staticize)
-end
-
-function _bondtensor(::Type{TT}, J) where TT
-    TT.([J -J; -J J])
-end
-
-"""
-    Gcp(T)
-
-copy state of qubit 2 -> 1.
-"""
-function Gcp(::Type{TT}) where TT<:TropicalTypes
-    tropicalblock(copytensor(TT))
-end
-
-function Greset(::Type{TT}) where TT<:TropicalTypes
-    tropicalblock([one(TT) one(TT); zero(TT) zero(TT)])
-end
-
-function Gcut(::Type{TT}) where TT<:TropicalTypes
-    tropicalblock([one(TT) one(TT); one(TT) one(TT)])
-end
 
 function _init_reg(::Type{T}, L::Int, usecuda::Val{:false}) where T
     ArrayReg(ones(T, 1<<L))

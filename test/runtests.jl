@@ -9,16 +9,8 @@ end
     include("yao.jl")
 end
 
-@testset "reversible square" begin
-    include("reversible/square.jl")
-end
-
-@testset "reversible chimera" begin
-    include("reversible/chimera.jl")
-end
-
-@testset "reversible second_neighbor" begin
-    include("reversible/second_neighbor.jl")
+@testset "reversible" begin
+    include("reversible/reversible.jl")
 end
 
 @testset "cuda" begin

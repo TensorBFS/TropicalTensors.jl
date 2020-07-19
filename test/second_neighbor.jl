@@ -1,4 +1,4 @@
-using TropicalTensors, OMEinsum
+using TropicalTensors
 using Test, Random
 using Viznet
 using Yao

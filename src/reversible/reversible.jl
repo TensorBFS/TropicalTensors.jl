@@ -1,10 +1,13 @@
-using TropicalYao
-using NiLogLikeNumbers
+module Reversible
+using TropicalYao, TropicalYao.Reversible
 using NiLang, NiLang.AD
 using Yao
 using Compose
+using ..TropicalTensors
+using ..TropicalTensors: _init_reg, SpinglassOptConfig
+using Viznet: isconnected
 
-export opt_config, isolve, isolve_largemem, opt_config_largemem
+export opt_config, isolve, isolve_largemem, opt_config_largemem, stack4reg
 
 include("square.jl")
 include("chimera.jl")
@@ -29,4 +32,5 @@ function opt_config_largemem(sg::Spinglass{LT,T}) where {LT,T}
     gres = (~isolve_largemem)(GVar(eng, T(1)), sgg, GVar(reg), GVar(A))
     empty!(NiLang.GLOBAL_STACK)
     return SpinglassOptConfig(sg, eng, grad.(gres[2].Js), grad.(gres[2].hs))
+end
 end

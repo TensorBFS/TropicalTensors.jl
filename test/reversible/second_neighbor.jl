@@ -1,10 +1,10 @@
-using TropicalTensors
+using TropicalTensors, TropicalTensors.Reversible
 using Yao, TropicalYao
 using Test
 using Viznet
 using NiLang, NiLang.AD
 using Random
-using TropicalTensors: cachesize_A, cachesize_B, cachesize_largemem
+using TropicalTensors.Reversible: cachesize_A, cachesize_B, cachesize_largemem
 
 @testset "spinglass" begin
     Random.seed!(2)

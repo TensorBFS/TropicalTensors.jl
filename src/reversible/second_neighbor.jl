@@ -18,7 +18,7 @@ end
         for j=1:Ly-1
             if (_c(lt, (i,j), (i,j+1)), ~)
                 INC(k)
-                apply_G4!(reg, (j, j+1), Js[k], REG_STACK)
+                apply_Gvb!(reg, (j, j+1), Js[k], REG_STACK)
             end
         end
         for j=1:Ly
@@ -36,19 +36,19 @@ end
                 # interact with j-1 th qubit (a)
                 if (j!=1 && _c(lt, (i+1,j-1), (i,j)), ~)
                     INC(k)
-                    apply_G4!(reg, (j-1, j), Js[k], REG_STACK)
+                    apply_Gvb!(reg, (j-1, j), Js[k], REG_STACK)
                 end
                 # onsite term (b)
                 if (_c(lt, (i,j), (i+1,j)), ~)
                     INC(k)
-                    apply_G2!(reg, j, Js[k], REG_STACK)
+                    apply_Ghb!(reg, j, Js[k], REG_STACK)
                 else
                     apply_Gcut!(reg, j, REG_STACK)
                 end
                 if (j!=1 && _c(lt, (i,j-1), (i+1,j)), ~)
                     INC(k)
                     # interact with cached j-1 th qubit (c)
-                    apply_G4!(reg, (j,nbit-(j-1)%2), Js[k], REG_STACK)
+                    apply_Gvb!(reg, (j,nbit-(j-1)%2), Js[k], REG_STACK)
                     # erease the information in previous ancilla `nbit-(j-1)%2`
                     apply_Gcut!(reg, nbit-(j-1)%2, REG_STACK)
                 end
@@ -56,7 +56,7 @@ end
         end
     end
     summed ← one(TT)
-    isum(summed, reg.state)
+    i_sum(summed, reg.state)
     NiLang.SWAP(summed.n, out!)
     l → length(hs)
     k → length(Js)
@@ -96,7 +96,7 @@ end
         for j=1:Ly-1
             if (_c(lt, (i,j), (i,j+1)), ~)
                 INC(k)
-                apply_G4!(reg, (j, j+1), Js[k], A_STACK)
+                apply_Gvb!(reg, (j, j+1), Js[k], A_STACK)
             end
         end
         for j=1:Ly
@@ -115,19 +115,19 @@ end
                     # interact with j-1 th qubit (a)
                     if (j!=1 && _c(lt, (i+1,j-1), (i,j)), ~)
                         INC(k)
-                        apply_G4!(reg, (j-1, j), Js[k], A_STACK)
+                        apply_Gvb!(reg, (j-1, j), Js[k], A_STACK)
                     end
                     # onsite term (b)
                     if (_c(lt, (i,j), (i+1,j)), ~)
                         INC(k)
-                        apply_G2!(reg, j, Js[k], A_STACK)
+                        apply_Ghb!(reg, j, Js[k], A_STACK)
                     else
                         apply_Gcut!(reg, j, A_STACK)
                     end
                     if (j!=1 && _c(lt, (i,j-1), (i+1,j)), ~)
                         INC(k)
                         # interact with cached j-1 th qubit (c)
-                        apply_G4!(reg, (j,nbit-(j-1)%2), Js[k], A_STACK)
+                        apply_Gvb!(reg, (j,nbit-(j-1)%2), Js[k], A_STACK)
                         # erease the information in previous ancilla `nbit-(j-1)%2`
                         apply_Gcut!(reg, nbit-(j-1)%2, A_STACK)
                     end
@@ -154,7 +154,7 @@ end
         end
     end
     summed ← one(TT)
-    isum(summed, reg.state)
+    i_sum(summed, reg.state)
     NiLang.SWAP(summed.n, out!)
     l → length(hs)
     k → length(Js)

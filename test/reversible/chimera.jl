@@ -1,4 +1,4 @@
-using TropicalTensors
+using TropicalTensors, TropicalTensors.Reversible
 using Yao, TropicalYao
 using Test
 using Viznet

@@ -127,9 +127,6 @@ function sgvertices(lt::ChimeraLattice)
 end
 
 regsize(lt::ChimeraLattice) = lt.Ny*4
-cachesize_A(lt::ChimeraLattice) = lt.Ny*4
-cachesize_B(lt::ChimeraLattice) = lt.Nx-1
-cachesize_largemem(lt::ChimeraLattice) = (lt.Nx-1)*lt.Ny*4
 
 function _init_reg(::Type{T}, lt::ChimeraLattice, usecuda) where T<:TropicalTypes
     _init_reg(T, lt.Ny*4, usecuda)

@@ -63,9 +63,6 @@ function h_bonds(lt::SquareLattice, i::Int)
 end
 
 regsize(lt::SquareLattice) = lt.Ny
-cachesize_A(lt::SquareLattice) = lt.Ny
-cachesize_B(lt::SquareLattice) = lt.Nx-1
-cachesize_largemem(lt::SquareLattice) = (lt.Nx-1) * lt.Ny
 
 function _init_reg(::Type{T}, lt::SquareLattice, usecuda) where T<:TropicalTypes
     _init_reg(T, lt.Ny, usecuda)
