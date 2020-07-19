@@ -1,15 +1,15 @@
 # TropicalTensors
 
-Solving tropical tensor network with Yao. It contains
+Solving spinglass ground state with [Yao](https://github.com/QuantumBFS/Yao.jl). It contains
 
 * Spinglass solvers for three predefined lattices,including
     * square lattice,
     * cylinder lattice,
     * chimera lattice,
     * second-nearest neighor coupled square lattice.
-* GPU backend,
-* Forward mode automatic differentiation and reversible programming automatic differention to find the optimal configuration,
-* A visualization toolkit.
+* [GPU backend](https://github.com/JuliaGPU/CUDA.jl),
+* [Forward mode](https://github.com/JuliaDiff/ForwardDiff.jl) automatic differentiation and [reversible programming automatic differention](https://github.com/GiggleLiu/NiLang.jl) to find the optimal configuration,
+* A [visualization toolkit](https://github.com/GiggleLiu/Viznet.jl).
 
 ## To Start
 
@@ -97,7 +97,7 @@ Layer 10/10
 CountingTropical{Int64}(106, 1504)
 ```
 
-#### Case 3: Computing the optimal spin configuration with ForwardDiff and GPU
+#### Case 3: Computing the optimal spin configuration with [ForwardDiff](https://github.com/JuliaDiff/ForwardDiff.jl) and [CUDA](https://github.com/JuliaGPU/CUDA.jl)
 ```julia repl
 julia> using ForwardDiff, CUDA
 
@@ -120,7 +120,7 @@ Layer 3/10, stack size: 0 & 1
  -1
 ```
 
-#### Case 4: Computing the optimal spin configuration with NiLang
+#### Case 4: Computing the optimal spin configuration with [NiLang](https://github.com/GiggleLiu/NiLang.jl)
 
 ```julia repl
 julia> using TropicalTensors.Reversible: opt_config
