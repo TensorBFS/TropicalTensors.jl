@@ -2,7 +2,7 @@ using Yao
 using LuxurySparse
 using LinearAlgebra
 using TropicalYao
-using Viznet
+using Viznet, Compose
 
 export solve, SquareLattice, ChimeraLattice
 export sgbonds, sgvertices
