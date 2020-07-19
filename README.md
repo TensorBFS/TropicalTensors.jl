@@ -8,9 +8,6 @@ Solving tropical tensor network with Yao. It contains
 * A reversible programming automatic differention.
 * A visualization toolkit for spinglass solvers.
 
-[![Build Status](https://travis-ci.com/TensorBFS/TropicalTensors.jl.svg?branch=master)](https://travis-ci.com/TensorBFS/TropicalTensors.jl)
-[![Codecov](https://codecov.io/gh/TensorBFS/TropicalTensors.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/TensorBFS/TropicalTensors.jl)
-
 ## To Start
 
 Type `]` in Julia REPL to enter pkg mode and
