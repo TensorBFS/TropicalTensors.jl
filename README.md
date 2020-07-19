@@ -3,7 +3,10 @@
 Solving tropical tensor network with Yao. It contains
 
 * Spinglass solvers for three predefined lattices,including
-  square lattice, cylinder lattice, chimera lattice and second-nearest neighor coupled square lattice,
+    * square lattice,
+    * cylinder lattice,
+    * chimera lattice,
+    * second-nearest neighor coupled square lattice.
 * GPU backend,
 * Forward mode automatic differentiation and reversible programming automatic differention to find the optimal configuration,
 * A visualization toolkit.
