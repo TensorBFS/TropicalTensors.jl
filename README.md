@@ -19,7 +19,7 @@ pkg> add CuYao#master
 The last line is required only when you use GPU for computing.
 
 ## Gists
-Minimum implementation (~50 lines) of tropical circuit based spinglass solver about
+For someone who are interested in the implementation, we provide a minimum implementation (~50 lines) of tropical circuit based spinglass solver about
 #### 1. Finding maximum energy
 https://gist.github.com/GiggleLiu/db9efa143aefbbe1d542e7b78d3a65bc
 
