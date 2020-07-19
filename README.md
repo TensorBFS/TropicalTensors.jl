@@ -68,10 +68,6 @@ You will see the following graph
 
 ```julia repl
 julia> solve(sg; usecuda=false)
-┌ Warning: Input type of `ArrayReg` is not Complex, got Tropical{Int64}
-└ @ YaoArrayRegister ~/.julia/dev/YaoArrayRegister/src/register.jl:54
-┌ Warning: Input type of `ArrayReg` is not Complex, got Tropical{Int64}
-└ @ YaoArrayRegister ~/.julia/dev/YaoArrayRegister/src/register.jl:54
 Layer 1/10
 Layer 2/10
 Layer 3/10
@@ -88,10 +84,6 @@ Tropical(106)
 #### Case 2: Computing the energy degeneracy
 ```julia repl
 julia> solve(CountingTropical{Int}, sg; usecuda=false)
-┌ Warning: Input type of `ArrayReg` is not Complex, got CountingTropical{Int64}
-└ @ YaoArrayRegister ~/.julia/dev/YaoArrayRegister/src/register.jl:54
-┌ Warning: Input type of `ArrayReg` is not Complex, got CountingTropical{Int64}
-└ @ YaoArrayRegister ~/.julia/dev/YaoArrayRegister/src/register.jl:54
 Layer 1/10
 Layer 2/10
 Layer 3/10
@@ -113,10 +105,9 @@ julia> ForwardDiff.gradient(hs) do x
            sg = Spinglass(lt, eltype(x).(Js), x)
            solve(sg; usecuda=true).n
        end
-┌ Warning: Input type of `ArrayReg` is not Complex, got Tropical{ForwardDiff.Dual{ForwardDiff.Tag{var"#7#8",Int64},Int64,12}}
-└ @ YaoArrayRegister ~/.julia/dev/YaoArrayRegister/src/register.jl:54
-┌ Warning: Input type of `ArrayReg` is not Complex, got Tropical{ForwardDiff.Dual{ForwardDiff.Tag{var"#7#8",Int64},Int64,12}}
-└ @ YaoArrayRegister ~/.julia/dev/YaoArrayRegister/src/register.jl:54
+Layer 1/10, stack size: 0 & 0
+Layer 2/10, stack size: 0 & 0
+Layer 3/10, stack size: 0 & 1
 ...
   1
  -1
@@ -135,10 +126,6 @@ julia> ForwardDiff.gradient(hs) do x
 julia> using TropicalTensors.Reversible: opt_config
 
 julia> cfg = opt_config(sg);
-┌ Warning: Input type of `ArrayReg` is not Complex, got Tropical{Int64}
-└ @ YaoArrayRegister ~/.julia/dev/YaoArrayRegister/src/register.jl:54
-┌ Warning: Input type of `ArrayReg` is not Complex, got Tropical{Int64}
-└ @ YaoArrayRegister ~/.julia/dev/YaoArrayRegister/src/register.jl:54
 Layer 1/10, stack size: 0 & 0
 Layer 2/10, stack size: 0 & 0
 Layer 3/10, stack size: 0 & 1
