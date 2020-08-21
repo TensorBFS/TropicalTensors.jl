@@ -30,9 +30,8 @@ julia = "1"
 [extras]
 BitBasis = "50ba71b6-fa0f-514d-ae9a-0916efc90dcf"
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
-CuYao = "b48ca7a8-dd42-11e8-2b8e-1b7706800275"
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "ForwardDiff", "CUDA", "CuYao", "BitBasis"]
+test = ["Test", "ForwardDiff", "CUDA", "BitBasis"]
