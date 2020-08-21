@@ -17,7 +17,7 @@ Type `]` in Julia REPL to enter pkg mode and
 ```julia pkg
 pkg> add https://github.com/JuliaReverse/TropicalYao.jl#master
 pkg> add https://github.com/TensorBFS/TropicalTensors.jl.git#master
-pkg> add CuYao#master
+pkg> add CuYao
 ```
 The last line is required only when you use GPU for computing.
 

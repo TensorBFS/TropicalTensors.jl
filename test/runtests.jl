@@ -14,5 +14,7 @@ end
 end
 
 @testset "cuda" begin
-    include("cuda.jl")
+    if Base.find_package("CuYao") != nothing
+        include("cuda.jl")
+    end
 end
