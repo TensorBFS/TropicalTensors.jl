@@ -63,6 +63,9 @@ You will see the following graph
 
 ![lattice](lattice.svg)
 
+
+If it errors, please install required visualization tools with `pkg> add Viznet Compose`.
+
 #### Case 1: Computing the maximum energy
 
 ```julia repl
