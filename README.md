@@ -15,7 +15,6 @@ Solving spinglass ground state with [Yao](https://github.com/QuantumBFS/Yao.jl).
 
 Type `]` in Julia REPL to enter pkg mode and
 ```julia pkg
-pkg> add https://github.com/JuliaReverse/TropicalYao.jl#master
 pkg> add https://github.com/TensorBFS/TropicalTensors.jl.git#master
 pkg> add CuYao
 ```
