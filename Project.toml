@@ -19,7 +19,7 @@ Yao = "5872b779-8223-5990-8dd0-5abbb0748c8c"
 [compat]
 Compose = "0.9"
 LuxurySparse = "0.6"
-NiLang = "0.7"
+NiLang = "0.7, 0.8"
 Requires = "1"
 TropicalNumbers = "0.2"
 TropicalYao = "0.1"
