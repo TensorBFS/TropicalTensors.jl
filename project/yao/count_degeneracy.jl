@@ -37,8 +37,9 @@ if abspath(PROGRAM_FILE) == @__FILE__
     #main(Int32, ChimeraLattice, 7, 10000; usecuda=true)
     #main(Int32, SquareLattice, 8:4:16, 1000; usecuda=false)
     #main(Float64, SquareLattice, parse(Int, ARGS[2]), 1000; usecuda=true)
+    main(Float64, Cylinder, 2, 1000; usecuda=false)
     #main(Float64, Cylinder, 6:4:14, 1000; usecuda=false)
     #main(Float64, Cylinder, [18, 22, 26], 1000; usecuda=true)
-    main(Float64, Cylinder, [28], 1000; usecuda=true)
+    #main(Float64, Cylinder, [28], 1000; usecuda=true)
     #main(Int64, SquareLattice, [12 14], 1000; usecuda=false)
 end
