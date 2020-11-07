@@ -20,3 +20,23 @@ using TropicalTensors
         @test eout ≈ out
     end
 end
+
+@testset "tensor contract" begin
+    A = zeros(Float64, 10, 32, 21);
+    B = zeros(Float64, 32, 11, 5, 2, 41, 10);
+    tA = LabeledTensor(A, [1,2,3])
+    tB = LabeledTensor(B, [2,4,5,6,7,1])
+
+    tOut = tA * tB
+    @test tOut.array == ein"abc,bdefga->cdefg"(A, B)
+    @test tOut.labels == [3,4,5,6,7]
+
+    tnet1 = TensorNetwork([tA])
+    @test tnet1 isa TensorNetwork
+    tnet = TensorNetwork([tA, tB])
+
+    tOut2, contracted_labels = contract!(tnet, 1)
+    @test tnet.tensors[] ≈ tOut
+    @test tnet.tensors[] ≈ tOut2
+    @test contracted_labels == [1, 2]
+end

@@ -1,4 +1,4 @@
-export tensorcontract
+export tensorcontract, LabeledTensor, TensorNetwork, contract!, TensorMeta
 
 function _align_eltypes(xs::AbstractArray...)
     T = promote_type(eltype.(xs)...)
@@ -61,4 +61,84 @@ function _conditioned_permutedims(A::AbstractArray{T,N}, perm) where {T,N}
     else
         return A
     end
+end
+
+# abstractions
+struct LabeledTensor{T,N,AT<:AbstractArray{T,N}, LT}
+    array::AT
+    labels::Vector{LT}
+end
+
+function Base.:(*)(A::LabeledTensor, B::LabeledTensor)
+    labels_AB = setdiff(A.labels, B.labels) ∪ setdiff(B.labels, A.labels)
+    LabeledTensor(tensorcontract(A.labels, A.array, B.labels, B.array, labels_AB), labels_AB)
+end
+
+function Base.isapprox(a::LabeledTensor, b::LabeledTensor; kwargs...)
+    isapprox(a.array, b.array; kwargs...) && a.labels == b.labels
+end
+
+struct TensorMeta
+    loc::Tuple{Float64, Float64}
+    name::String
+end
+rand_meta() = TensorMeta((rand(), rand()), "")
+merge_meta(m1::TensorMeta, m2::TensorMeta) = TensorMeta((m1.loc .+ m2.loc) ./ 2, m1.name*m2.name)
+
+struct TensorNetwork{T,LT}
+    tensors::Vector{LabeledTensor{T,N,AT,LT} where {N, AT}}
+    metas::Vector{TensorMeta}
+end
+
+function TensorNetwork(tensors; metas=[rand_meta() for i=1:length(tensors)])
+    T = promote_type([eltype(x.array) for x in tensors]...)
+    LT = promote_type([eltype(x.labels) for x in tensors]...)
+    TensorNetwork((LabeledTensor{T,N,AT,LT} where {N,AT})[tensors...], metas)
+end
+
+Base.copy(tn::TensorNetwork) = TensorNetwork(copy(tn.tensors))
+
+function contract!(tn::TensorNetwork{T, LT}, label::LT) where {T, LT}
+    ts = findall(x->label ∈ x.labels, tn.tensors)
+    @assert length(ts) == 2 "number of tensors with the same label $label is not 2, find $ts"
+    t1, t2 = tn.tensors[ts[1]], tn.tensors[ts[2]]
+    tout = t1 * t2
+    meta_out = merge_meta(tn.metas[ts[1]], tn.metas[ts[2]])
+    deleteat!(tn.tensors, ts)
+    deleteat!(tn.metas, ts)
+    push!(tn.tensors, tout)
+    push!(tn.metas, meta_out)
+    return tout, t1.labels ∩ t2.labels
+end
+
+function viz_tnet(tnet::TensorNetwork; r=0.03)
+    nt = length(tnet.tensors)
+    nb = compose(nodestyle(:default; r=r), fill("white"), stroke("black"), linewidth(0.4mm))
+    eb = compose(bondstyle(:default), linewidth(0.7mm), stroke("skyblue"))
+    tb1 = textstyle(:default)
+    tb2 = textstyle(:default)
+    compose(context(r, r, 1-2r, 1-2r), canvas() do
+        for (t, meta) in zip(tnet.tensors, tnet.metas)
+            nb >> meta.loc
+            if !isempty(meta.name)
+                tb2 >> (meta.loc, meta.name)
+            end
+        end
+        for i=1:nt
+            for j=i+1:nt
+                li = tnet.tensors[i].labels
+                lj = tnet.tensors[j].labels
+                loci, locj = tnet.metas[i].loc, tnet.metas[j].loc
+                common_labels = li ∩ lj
+                if !isempty(common_labels)
+                    eb >> (loci, locj)
+                    tb2 >> ((loci .+ locj) ./ 2, join(common_labels, ", "))
+                end
+            end
+        end
+    end)
+end
+
+function Base.show(io::IO, mime::MIME"text/html", tnet::TensorNetwork)
+    show(io, mime, viz_tnet(tnet))
 end
