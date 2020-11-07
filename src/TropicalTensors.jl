@@ -11,6 +11,7 @@ export Reversible
 include("Core.jl")
 include("dumpload.jl")
 include("yao.jl")
+include("tensorcontract.jl")
 #export Reversible
 include("reversible/reversible.jl")
 
