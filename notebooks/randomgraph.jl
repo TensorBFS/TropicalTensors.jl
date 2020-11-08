@@ -23,10 +23,10 @@ begin
 	using Compose
 	Compose.set_default_graphic_size(10cm, 10cm)
 	
-	function rand_3regular_tn(::Type{T}, n, k; D=2) where T
-		g = LightGraphs.random_regular_graph(n, k)
+	function rand_3regular_tn(::Type{T}, n; D=2) where T
+		g = LightGraphs.random_regular_graph(n, 3)
 		labels = 1:ne(g)
-		arrays = [rand(T, fill(2, k)...) for i=1:n]
+		arrays = [rand(T, fill(2, 3)...) for i=1:n]
 		labels = [Int[] for i=1:n]
 		for (k, e) in enumerate(edges(g))
 			push!(labels[e.src], k)
@@ -38,8 +38,11 @@ begin
 	end
 end
 
+# ╔═╡ 6b01ff60-217a-11eb-2a5c-13eb2716c727
+md"number of nodes = $(@bind nnodes Slider(2:2:40, default=16))"
+
 # ╔═╡ 2d5dd844-2136-11eb-176f-e53e2ac97d82
-tn = rand_3regular_tn(Float64, 20, 3)
+tn = rand_3regular_tn(Float64, nnodes; D=2)
 
 # ╔═╡ 1aabc318-2137-11eb-33b7-cfcec36e631f
 @bind step Button(label="contract")
@@ -55,6 +58,7 @@ end
 
 # ╔═╡ Cell order:
 # ╠═c7118f3c-209e-11eb-1f79-bdc2dd17aea0
+# ╟─6b01ff60-217a-11eb-2a5c-13eb2716c727
 # ╠═2d5dd844-2136-11eb-176f-e53e2ac97d82
 # ╟─1aabc318-2137-11eb-33b7-cfcec36e631f
 # ╟─72d7474c-2137-11eb-030b-eb894e4b22dc

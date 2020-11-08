@@ -23,10 +23,6 @@ function viz_sg(sg::Spinglass; r=0.3*unit(sg.lattice))
     compose(context(), cdots)
 end
 
-function Base.display(sg::Spinglass; r=0.02)
-    Base.display(viz_sg(sg; r=r))
-end
-
 function Base.show(io::IO, mime::MIME"text/html", lt::Viznet.AbstractLattice)
     Base.show(io, mime, showlattice(lt, node_style=compose(nodestyle(:default; r=0.3*unit(lt)), stroke("black"), fill("white"))))
 end
@@ -41,10 +37,6 @@ end
 
 export vizoptconfig
 vizoptconfig(res::SpinglassOptConfig; r=0.3*unit(res.sg.lattice)) = vizgrad_J(res.sg, res.grad_Js, res.grad_hs; r=r)
-
-function Base.display(sgres::SpinglassOptConfig)
-    Base.display(vizgrad_J(sgres.sg, sgres.grad_Js, sgres.grad_hs))
-end
 
 export vizgrad_J
 function vizgrad_J(sg::Spinglass, grad_Js::AbstractVector, grad_hs::AbstractVector; r=0.3*unit(sg.lattice))
