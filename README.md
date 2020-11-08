@@ -20,6 +20,15 @@ pkg> add CuYao
 ```
 The last line is required only when you use GPU for computing.
 
+## Notebooks
+Then open the notebook in a Julia REPL with
+
+```julia
+julia> using TropicalTensors
+
+julia> notebook("spinglass")
+```
+
 ## Gists
 For someone who are interested in the implementation, we provide a minimum implementation (~50 lines) of tropical circuit based spinglass solver about
 #### 1. Finding maximum energy

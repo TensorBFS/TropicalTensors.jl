@@ -100,15 +100,6 @@ function black_bond!(lt, i::Int, bonds)
     return bonds
 end
 
-# for beautiful printing.
-function Base.getindex(lt::ChimeraLattice, k::Int, i::Int, j::Int)
-    ki = (k-1) ÷ 4
-    kj = mod1(k, 4)-1
-    x = ((i-1)*(Viznet.gap_x(lt) + 2)+ki+0.5)*unit(lt)
-    y = ((j-1)*(Viznet.gap_y(lt) + 4)+kj+0.5)*unit(lt)
-    return (x+0.01*kj, y+0.02*ki)
-end
-
 # to index `h`.
 function sgvertices(lt::ChimeraLattice)
     v = Int[]

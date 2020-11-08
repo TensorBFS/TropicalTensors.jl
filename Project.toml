@@ -9,6 +9,8 @@ DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 LuxurySparse = "d05aeea4-b7d4-55ac-b691-9e7fabb07ba2"
 NiLang = "ab4ef3a6-0b42-11ea-31f6-e34652774712"
+Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
+PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Requires = "ae029012-a4dd-5104-9daa-d747884805df"
 TropicalNumbers = "b3a74e9c-7526-4576-a4eb-79c0d4c32334"
@@ -31,7 +33,8 @@ julia = "1"
 BitBasis = "50ba71b6-fa0f-514d-ae9a-0916efc90dcf"
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
 ForwardDiff = "f6369f11-7733-5829-9624-2563aa707210"
+OMEinsum = "ebe7aa44-baf0-506c-a96f-8464559b3922"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "ForwardDiff", "CUDA", "BitBasis"]
+test = ["Test", "ForwardDiff", "CUDA", "BitBasis", "OMEinsum"]

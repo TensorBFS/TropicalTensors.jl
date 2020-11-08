@@ -110,35 +110,3 @@ function contract!(tn::TensorNetwork{T, LT}, label::LT) where {T, LT}
     push!(tn.metas, meta_out)
     return tout, t1.labels ∩ t2.labels
 end
-
-function viz_tnet(tnet::TensorNetwork; r=0.03)
-    nt = length(tnet.tensors)
-    nb = compose(nodestyle(:default; r=r), fill("white"), stroke("black"), linewidth(0.4mm))
-    eb = compose(bondstyle(:default), linewidth(0.7mm), stroke("skyblue"))
-    tb1 = textstyle(:default)
-    tb2 = textstyle(:default)
-    compose(context(r, r, 1-2r, 1-2r), canvas() do
-        for (t, meta) in zip(tnet.tensors, tnet.metas)
-            nb >> meta.loc
-            if !isempty(meta.name)
-                tb2 >> (meta.loc, meta.name)
-            end
-        end
-        for i=1:nt
-            for j=i+1:nt
-                li = tnet.tensors[i].labels
-                lj = tnet.tensors[j].labels
-                loci, locj = tnet.metas[i].loc, tnet.metas[j].loc
-                common_labels = li ∩ lj
-                if !isempty(common_labels)
-                    eb >> (loci, locj)
-                    tb2 >> ((loci .+ locj) ./ 2, join(common_labels, ", "))
-                end
-            end
-        end
-    end)
-end
-
-function Base.show(io::IO, mime::MIME"text/html", tnet::TensorNetwork)
-    show(io, mime, viz_tnet(tnet))
-end

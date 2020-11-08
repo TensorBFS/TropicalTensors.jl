@@ -122,39 +122,3 @@ function assign_one!(grid, x, y, g)
     end
     return true
 end
-
-function Base.display(sgres::SpinglassOptConfig)
-    Base.display(vizgrad_J(sgres.sg, sgres.grad_Js, sgres.grad_hs))
-end
-
-export vizgrad_J
-function vizgrad_J(sg::Spinglass, grad_Js::AbstractVector, grad_hs::AbstractVector; r=0.015)
-    lt = sg.lattice
-    grid = assign_Js_hs(lt, grad_Js, grad_hs)
-    nb1 = compose(nodestyle(:default; r=r), fill("white"), stroke("black"), linewidth(0.4mm))
-    nb2 = compose(nodestyle(:default; r=r), fill("black"), stroke("black"), linewidth(0.4mm))
-    eb1 = compose(bondstyle(:default), linewidth(0.7mm), stroke("skyblue"))
-    eb2 = compose(bondstyle(:default), linewidth(0.7mm), stroke("orange"))
-    cdots = canvas() do
-        for i in vertices(lt)
-            if grid[i] > 0
-                nb1 >> lt[i]
-            elseif grid[i] < 0
-                nb2 >> lt[i]
-            else
-                error("index $i not set!")
-            end
-        end
-        for ((i,j),v) in zip(sgbonds(lt), sg.Js)
-            if v > 0
-                eb1 >> lt[i;j]
-            else
-                eb2 >> lt[i;j]
-            end
-        end
-    end
-    compose(context(), cdots)
-end
-
-export vizoptconfig
-vizoptconfig(res::SpinglassOptConfig; r=0.015) = vizgrad_J(res.sg, res.grad_Js, res.grad_hs; r=r)

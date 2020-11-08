@@ -46,33 +46,6 @@ function rand_spinglass(::Type{T}, lt::Viznet.AbstractLattice;
     return sg
 end
 
-export viz_sg
-function viz_sg(sg::Spinglass; r=0.015)
-    lt = sg.lattice
-    nb1 = compose(nodestyle(:default; r=r), fill("white"), stroke("black"), linewidth(0.4mm))
-    eb1 = compose(bondstyle(:default), linewidth(0.7mm), stroke("skyblue"))
-    eb2 = compose(bondstyle(:default), linewidth(0.7mm), stroke("orange"))
-    tb = textstyle(:default)
-    cdots = canvas() do
-        for v in sgvertices(lt)
-            nb1 >> lt[v]
-            tb >> (lt[v], "$v")
-        end
-        for ((i,j),v) in zip(sgbonds(lt), sg.Js)
-            if v > 0
-                eb1 >> lt[i;j]
-            elseif v < 0
-                eb2 >> lt[i;j]
-            end
-        end
-    end
-    compose(context(), cdots)
-end
-
-function Base.display(sg::Spinglass; r=0.02)
-    Base.display(viz_sg(sg; r=r))
-end
-
 export eval_onconfig
 function eval_onconfig(sg::Spinglass{LT,T}, grid) where {LT,T}
     out = T(0)
