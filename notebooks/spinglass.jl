@@ -14,7 +14,7 @@ macro bind(def, element)
 end
 
 # ╔═╡ c5eda0dc-215e-11eb-22d1-d76f1b9e047c
-using Compose, Viznet, PlutoUI, TropicalTensors
+using Revise, Compose, Viznet, PlutoUI, TropicalTensors
 
 # ╔═╡ 08f66f3c-2183-11eb-2260-cb73d013a3a9
 begin
@@ -103,7 +103,7 @@ DownloadButton(svgstring(vizoptconfig(optimal_config)), "optimalconfig_$(lattice
 
 # ╔═╡ Cell order:
 # ╠═c5eda0dc-215e-11eb-22d1-d76f1b9e047c
-# ╟─08f66f3c-2183-11eb-2260-cb73d013a3a9
+# ╠═08f66f3c-2183-11eb-2260-cb73d013a3a9
 # ╟─2824ef46-2165-11eb-23c9-a3335e6a6dba
 # ╟─47cbb81c-2169-11eb-0b07-9ff0d4a4c6b9
 # ╟─9725485e-2161-11eb-2cf2-99d30b6a6dd6
@@ -121,4 +121,4 @@ DownloadButton(svgstring(vizoptconfig(optimal_config)), "optimalconfig_$(lattice
 # ╠═246f7f8c-2170-11eb-2659-a9ae4bc4022f
 # ╟─6ff289d6-2166-11eb-3a5c-4f1e686b2810
 # ╠═3f5c4dba-2162-11eb-14b9-632cdafa348d
-# ╟─e0469c76-21f8-11eb-39fa-d399a9f6654d
+# ╠═e0469c76-21f8-11eb-39fa-d399a9f6654d

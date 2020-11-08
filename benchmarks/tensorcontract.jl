@@ -1,8 +1,15 @@
-using TropicalTensors, BenchmarkTools, CUDA
-using LinearAlgebra, TropicalNumbers
-using BenchmarkTools
+using JLD2
+using TropicalTensors, BenchmarkTools
+using TropicalNumbers
+using FileIO
+
+#load(joinpath(@__DIR__, "ising.hdf5"))
+load(joinpath("benchmarks", "ising.hdf5"))
+
+#=
 using CUDA
 CUDA.allowscalar(false)
+=#
 
 #=
 function LinearAlgebra.mul!(C::Matrix{T}, A::Matrix{T}, B::Matrix{T}) where T<:TropicalTypes

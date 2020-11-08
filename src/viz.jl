@@ -1,11 +1,11 @@
 export viz_sg
 function viz_sg(sg::Spinglass; r=0.3*unit(sg.lattice))
     lt = sg.lattice
-    nb0 = compose(nodestyle(:default; r=r), fill("white"), stroke("black"), linewidth(0.4mm))
-    nb1 = compose(nodestyle(:default; r=r), fill("skyblue"), stroke("black"), linewidth(0.4mm))
-    nb2 = compose(nodestyle(:default; r=r), fill("orange"), stroke("black"), linewidth(0.4mm))
-    eb1 = compose(bondstyle(:default), linewidth(0.7mm), stroke("skyblue"))
-    eb2 = compose(bondstyle(:default), linewidth(0.7mm), stroke("orange"))
+    nb0 = nodestyle(:default, fill("white"), stroke("black"); r=r)
+    nb1 = nodestyle(:default, fill("skyblue"), stroke("black"); r=r)
+    nb2 = nodestyle(:default, fill("orange"), stroke("black"); r=r)
+    eb1 = bondstyle(:default, linewidth(0.4mm), stroke("skyblue"))
+    eb2 = bondstyle(:default, linewidth(0.4mm), stroke("orange"))
     tb = textstyle(:default)
     cdots = canvas() do
         for (i, v) in enumerate(sgvertices(lt))
@@ -42,10 +42,10 @@ export vizgrad_J
 function vizgrad_J(sg::Spinglass, grad_Js::AbstractVector, grad_hs::AbstractVector; r=0.3*unit(sg.lattice))
     lt = sg.lattice
     grid = assign_Js_hs(lt, grad_Js, grad_hs)
-    nb1 = compose(nodestyle(:default; r=r), fill("white"), stroke("black"), linewidth(0.4mm))
-    nb2 = compose(nodestyle(:default; r=r), fill("black"), stroke("black"), linewidth(0.4mm))
-    eb1 = compose(bondstyle(:default), linewidth(0.7mm), stroke("skyblue"))
-    eb2 = compose(bondstyle(:default), linewidth(0.7mm), stroke("orange"))
+    nb1 = nodestyle(:default, fill("white"), stroke("black"); r=r)
+    nb2 = nodestyle(:default, fill("black"), stroke("black"); r=r)
+    eb1 = bondstyle(:default, linewidth(0.4mm), stroke("skyblue"))
+    eb2 = bondstyle(:default, linewidth(0.4mm), stroke("orange"))
     cdots = canvas() do
         for i in vertices(lt)
             if grid[i] > 0
@@ -71,8 +71,8 @@ export viz_tnet
 
 function viz_tnet(tnet::TensorNetwork; r=0.03)
     nt = length(tnet.tensors)
-    nb = compose(nodestyle(:default; r=r), fill("white"), stroke("black"), linewidth(0.4mm))
-    eb = compose(bondstyle(:default), linewidth(0.7mm), stroke("skyblue"))
+    nb = nodestyle(:default, fill("white"), stroke("black"), linewidth(0.4mm); r=r)
+    eb = bondstyle(:default, linewidth(0.4mm), stroke("skyblue"))
     tb1 = textstyle(:default)
     tb2 = textstyle(:default)
     compose(context(r, r, 1-2r, 1-2r), canvas() do

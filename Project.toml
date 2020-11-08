@@ -25,7 +25,7 @@ NiLang = "0.7, 0.8"
 Requires = "1"
 TropicalNumbers = "0.2"
 TropicalYao = "0.1"
-Viznet = "0.1"
+Viznet = "0.2"
 Yao = "0.6"
 julia = "1"
 
