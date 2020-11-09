@@ -58,5 +58,5 @@ end
 @testset "counting tropical matmul" begin
     a = CountingTropical{Float64}.(randn(5, 7))
     b = CountingTropical{Float64}.(randn(7, 5))
-    @test a * b ≈ Array(CuArray(a) * CuArray(b))
+    @test all(a * b .≈ Array(CuArray(a) * CuArray(b)))
 end

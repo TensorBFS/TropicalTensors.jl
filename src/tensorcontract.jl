@@ -121,3 +121,26 @@ function contract_label!(tn::TensorNetwork{T, LT}, label::LT) where {T, LT}
     push!(tn.metas, meta_out)
     return tout, t1.labels ∩ t2.labels
 end
+
+using Base.Cartesian
+@generated function c2l(size::NTuple{N, Int}, c::NTuple{N,Int}) where N
+    quote
+        res = c[1]
+        stride = size[1]
+        @nexprs $(N-1) i->begin
+            res += (c[i+1]-1) * stride
+            stride *= size[i+1]
+        end
+        return res
+    end
+end
+
+@generated function l2c(size::NTuple{N, Int}, l::Int) where N
+    quote
+        l -= 1
+        @nexprs $(N-1) i->begin
+            @inbounds l, s_i = divrem(l, size[i])
+        end
+        $(Expr(:tuple, [:($(Symbol(:s_, i))+1) for i=1:N-1]..., :(l+1)))
+    end
+end

@@ -22,7 +22,7 @@ begin
 	using LightGraphs
 	using Compose
 	using HDF5
-	Compose.set_default_graphic_size(10cm, 10cm)
+	Compose.set_default_graphic_size(14cm, 14cm)
 	
 	function rand_3regular_tn(::Type{T}, n; D=2) where T
 		g = LightGraphs.random_regular_graph(n, 3)
@@ -34,8 +34,80 @@ begin
 			push!(labels[e.dst], k)
 		end
 		tensors = LabeledTensor.(arrays, labels)
-		metas = [TensorMeta((0.5+0.5*cos(i/n*2π), 0.5+0.5*sin(i/n*2π)), string('A'+(i-1))) for i=1:n]
+		locs_x, locs_y = spring_layout(g)
+		metas = [TensorMeta((0.5+0.5*locs_x[i], 0.5+0.5*locs_y[i]), string('A'+(i-1))) for i=1:n]
 		TensorNetwork(tensors; metas=metas)
+	end
+	
+	function spring_layout(g::AbstractGraph,
+						   locs_x=2*rand(nv(g)).-1.0,
+						   locs_y=2*rand(nv(g)).-1.0;
+						   C=2.0,
+						   MAXITER=100,
+						   INITTEMP=2.0)
+
+		nvg = nv(g)
+		adj_matrix = adjacency_matrix(g)
+
+		# The optimal distance bewteen vertices
+		k = C * sqrt(4.0 / nvg)
+		k² = k * k
+
+		# Store forces and apply at end of iteration all at once
+		force_x = zeros(nvg)
+		force_y = zeros(nvg)
+
+		# Iterate MAXITER times
+		@inbounds for iter = 1:MAXITER
+			# Calculate forces
+			for i = 1:nvg
+				force_vec_x = 0.0
+				force_vec_y = 0.0
+				for j = 1:nvg
+					i == j && continue
+					d_x = locs_x[j] - locs_x[i]
+					d_y = locs_y[j] - locs_y[i]
+					dist²  = (d_x * d_x) + (d_y * d_y)
+					dist = sqrt(dist²)
+
+					if !( iszero(adj_matrix[i,j]) && iszero(adj_matrix[j,i]) )
+						# Attractive + repulsive force
+						# F_d = dist² / k - k² / dist # original FR algorithm
+						F_d = dist / k - k² / dist²
+					else
+						# Just repulsive
+						# F_d = -k² / dist  # original FR algorithm
+						F_d = -k² / dist²
+					end
+					force_vec_x += F_d*d_x
+					force_vec_y += F_d*d_y
+				end
+				force_x[i] = force_vec_x
+				force_y[i] = force_vec_y
+			end
+			# Cool down
+			temp = INITTEMP / iter
+			# Now apply them, but limit to temperature
+			for i = 1:nvg
+				fx = force_x[i]
+				fy = force_y[i]
+				force_mag  = sqrt((fx * fx) + (fy * fy))
+				scale      = min(force_mag, temp) / force_mag
+				locs_x[i] += force_x[i] * scale
+				locs_y[i] += force_y[i] * scale
+			end
+		end
+
+		# Scale to unit square
+		min_x, max_x = minimum(locs_x), maximum(locs_x)
+		min_y, max_y = minimum(locs_y), maximum(locs_y)
+		function scaler(z, a, b)
+			2.0*((z - a)/(b - a)) - 1.0
+		end
+		map!(z -> scaler(z, min_x, max_x), locs_x, locs_x)
+		map!(z -> scaler(z, min_y, max_y), locs_y, locs_y)
+
+		return locs_x, locs_y
 	end
 end
 
@@ -102,7 +174,9 @@ tn = let
 		LabeledTensor(CountingTropical{Float64}.(arr, degen), labels[:,i]) 
 	end
 	# circle layout
-	metas = [TensorMeta((0.5+0.5*cos(i/n*2π), 0.5+0.5*sin(i/n*2π)), string(i)) for i=1:n]
+	g = LightGraphs.SimpleGraph(length(neighbors) ÷ 2, [neighbors[:,i].+1 for i=1:n])
+	locs_x, locs_y = spring_layout(g)
+	metas = [TensorMeta((0.5+locs_x[i]/2, 0.5+locs_y[i]/2), string(i)) for i=1:n]
 	TensorNetwork(tensors, metas=metas)
 end
 
@@ -154,7 +228,7 @@ end
 # ╠═2316240e-2230-11eb-0b78-4182b35b1b77
 # ╠═2717c314-2217-11eb-03b4-b3ee8f221a02
 # ╠═3d04dd42-223a-11eb-14f7-9d3d29d35349
-# ╟─3c7bb01c-2235-11eb-2c39-8bbcd2b9a08c
+# ╠═3c7bb01c-2235-11eb-2c39-8bbcd2b9a08c
 # ╠═c521ec84-2232-11eb-051e-bbbbfaf9c128
 # ╠═84b2cb76-2240-11eb-0bf3-99e314c513be
 # ╠═bcefc45c-2232-11eb-2615-21c5314bf0f3

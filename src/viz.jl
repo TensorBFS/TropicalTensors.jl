@@ -69,17 +69,17 @@ end
 
 export viz_tnet
 
-function viz_tnet(tnet::TensorNetwork; r=0.03)
+function viz_tnet(tnet::TensorNetwork; r=0.25/sqrt(length(tnet.tensors)+1), show_edgeindex=false, node_fontsize=100pt/sqrt(length(tnet.tensors)+1), edge_fontsize=200pt/sqrt(length(tnet.tensors)+1))
     nt = length(tnet.tensors)
-    nb = nodestyle(:default, fill("white"), stroke("black"), linewidth(0.4mm); r=r)
-    eb = bondstyle(:default, linewidth(0.4mm), stroke("skyblue"))
-    tb1 = textstyle(:default)
-    tb2 = textstyle(:default)
+    nb = nodestyle(:default, fill("white"), stroke("black"), linewidth(2mm/sqrt(length(tnet.tensors)+1)); r=r)
+    eb = bondstyle(:default, linewidth(4mm/sqrt(length(tnet.tensors)+1)), stroke("skyblue"))
+    tb1 = textstyle(:default, fontsize(node_fontsize))
+    tb2 = textstyle(:default, fontsize(edge_fontsize))
     compose(context(r, r, 1-2r, 1-2r), canvas() do
         for (t, meta) in zip(tnet.tensors, tnet.metas)
             nb >> meta.loc
             if !isempty(meta.name)
-                tb2 >> (meta.loc, meta.name)
+                tb1 >> (meta.loc, meta.name)
             end
         end
         for i=1:nt
@@ -90,7 +90,7 @@ function viz_tnet(tnet::TensorNetwork; r=0.03)
                 common_labels = li ∩ lj
                 if !isempty(common_labels)
                     eb >> (loci, locj)
-                    tb2 >> ((loci .+ locj) ./ 2, join(common_labels, ", "))
+                    show_edgeindex && tb2 >> ((loci .+ locj) ./ 2, join(common_labels, ", "))
                 end
             end
         end

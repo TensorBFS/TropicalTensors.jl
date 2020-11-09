@@ -1,6 +1,7 @@
 using .CuYao
 using .CuYao: CUDA
 using .CUDA: CuArray, @linearidx, GPUArrays
+using LinearAlgebra
 
 export togpu
 
@@ -8,8 +9,6 @@ CUDA.ones(::Type{Tropical{T}}, dims...) where T = fill!(CuArray{Tropical{T}}(und
 CUDA.zeros(::Type{Tropical{T}}, dims...) where T = fill!(CuArray{Tropical{T}}(undef, dims...), zero(Tropical{T}))
 CUDA.ones(::Type{CountingTropical{T}}, dims...) where T = fill!(CuArray{CountingTropical{T}}(undef, dims...), one(CountingTropical{T}))
 CUDA.zeros(::Type{CountingTropical{T}}, dims...) where T = fill!(CuArray{CountingTropical{T}}(undef, dims...), zero(CountingTropical{T}))
-Base.:(*)(a::CountingTropical, b::Bool) = b ? a : zero(a)
-Base.:(*)(b::Bool, a::CountingTropical) = b ? a : zero(a)
 
 function _init_reg(::Type{T}, L::Int, usecuda::Val{:true}) where T
     ArrayReg(CUDA.ones(T, 1<<L))
@@ -45,28 +44,4 @@ function LinearAlgebra.permutedims!(dest::GPUArrays.AbstractGPUArray, src::GPUAr
         return
     end
     return reshape(dest, size(dest))
-end
-
-using Base.Cartesian
-@generated function c2l(size::NTuple{N, Int}, c::NTuple{N,Int}) where N
-    quote
-        res = c[1]
-        stride = size[1]
-        @nexprs $(N-1) i->begin
-            res += (c[i+1]-1) * stride
-            stride *= size[i+1]
-        end
-        return res
-    end
-end
-
-@generated function l2c(size::NTuple{N, Int}, l::Int) where N
-    quote
-        l -= 1
-        @nexprs $(N-1) i->begin
-            s_i = l % size[i] + 1
-            l = l ÷ size[i]
-        end
-        $(Expr(:tuple, [Symbol(:s_, i) for i=1:N-1]..., :(l+1)))
-    end
 end
