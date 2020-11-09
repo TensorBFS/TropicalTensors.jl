@@ -2,6 +2,9 @@ using Test
 using TropicalTensors
 using CUDA, CuYao
 using ForwardDiff
+using TropicalTensors: c2l, l2c
+using Random
+
 CUDA.allowscalar(false)
 
 @testset "cuda" begin
@@ -29,4 +32,16 @@ end
     Js = ones(Float32, 2L*(L-1))
     gs = ForwardDiff.gradient(x->solve(SquareLattice(L, L), x, zeros(eltype(x), L^2); usecuda=true).n, Js)
     @test gs ≈ ones(Float32, 2L*(L-1))
+end
+
+@testset "c2l" begin
+    @test c2l((4,3,2,5,19), (3,2,2,5,10)) == LinearIndices((4,3,2,5,19))[3,2,2,5,10]
+    @test l2c((4,3,8,15,19), 1008) == CartesianIndices((4,3,8,15,19))[1008].I
+end
+
+@testset "permutedims" begin
+    a = randn(fill(2, 18)...)
+    A = CuArray(a)
+    p = randperm(18)
+    @test Array(permutedims(A, p)) ≈ permutedims(a, p)
 end

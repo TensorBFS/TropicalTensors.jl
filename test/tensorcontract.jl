@@ -35,7 +35,7 @@ end
     @test tnet1 isa TensorNetwork
     tnet = TensorNetwork([tA, tB])
 
-    tOut2, contracted_labels = contract!(tnet, 1)
+    tOut2, contracted_labels = contract_label!(tnet, 1)
     @test tnet.tensors[] ≈ tOut
     @test tnet.tensors[] ≈ tOut2
     @test contracted_labels == [1, 2]
