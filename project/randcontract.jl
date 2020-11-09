@@ -36,8 +36,8 @@ function build_tree(order)
 	ids[1]
 end
 
-function panzhang(::Type{T}, n::Int; seed::Int, usecuda=false) where T
-	loadeddata = HDF5.h5open(TropicalTensors.project_relative_path("data", "ising.hdf5"), "r")
+function panzhang(::Type{T}, n::Int; seed::Int, usecuda=false, datafile="ising.hdf5") where T
+	loadeddata = HDF5.h5open(TropicalTensors.project_relative_path("data", datafile), "r")
     instance = loadeddata["n$n"]["seed$seed"]
     #return instance
     arrays = read(instance, "tensors")
@@ -67,7 +67,7 @@ res = @time panzhang(Float64, 60; seed=97, usecuda=false)
 @show res
 res = @time panzhang(Float64, 60; seed=97, usecuda=true)
 @show res
-res = @time panzhang(Float64, 200; seed=97, usecuda=true)
+res = @time panzhang(Float64, 200; seed=97, usecuda=true, datafile="n200seed97.hdf5")
 @show res
-res = @time panzhang(Float64, 200; seed=97, usecuda=true)
+res = @time panzhang(Float64, 200; seed=97, usecuda=true, datafile="n200seed97.hdf5")
 @show res
