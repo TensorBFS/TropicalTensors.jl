@@ -1,4 +1,4 @@
-export tensorcontract, LabeledTensor, TensorNetwork, contract!, TensorMeta
+export tensorcontract, LabeledTensor, TensorNetwork, contract_label!, TensorMeta, contract, ContractionTree
 
 function _align_eltypes(xs::AbstractArray...)
     T = promote_type(eltype.(xs)...)
@@ -98,7 +98,18 @@ end
 
 Base.copy(tn::TensorNetwork) = TensorNetwork(copy(tn.tensors))
 
-function contract!(tn::TensorNetwork{T, LT}, label::LT) where {T, LT}
+struct ContractionTree
+    left
+    right
+    function ContractionTree(left::Union{Integer, ContractionTree}, right::Union{Integer, ContractionTree})
+        new(left, right)
+    end
+end
+
+contract_tree(tn::TensorNetwork, ctree) = ctree isa ContractionTree ? contract_tree(tn, ctree.left) * contract_tree(tn, ctree.right) : tn.tensors[ctree]
+contract(tn::TensorNetwork, ctree::ContractionTree) = contract_tree(copy(tn), ctree)
+
+function contract_label!(tn::TensorNetwork{T, LT}, label::LT) where {T, LT}
     ts = findall(x->label ∈ x.labels, tn.tensors)
     @assert length(ts) == 2 "number of tensors with the same label $label is not 2, find $ts"
     t1, t2 = tn.tensors[ts[1]], tn.tensors[ts[2]]
