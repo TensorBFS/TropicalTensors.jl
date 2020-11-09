@@ -37,7 +37,7 @@ function LinearAlgebra.permutedims!(dest::GPUArrays.AbstractGPUArray, src::GPUAr
     CUDA.gpu_call(dest, src, perm; name="permutedims!") do ctx, dest, src, perm
         i = @linearidx src
         I = l2c(size(src), i)
-        @inbounds dest[c2l(size(src), GPUArrays.genperm(I, perm))] = src[i]
+        @inbounds dest[c2l(size(dest), GPUArrays.genperm(I, perm))] = src[i]
         return
     end
     return dest

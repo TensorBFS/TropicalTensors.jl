@@ -35,12 +35,21 @@ end
 end
 
 @testset "c2l" begin
-    @test c2l((4,3,2,5,19), (3,2,2,5,10)) == LinearIndices((4,3,2,5,19))[3,2,2,5,10]
-    @test l2c((4,3,8,15,19), 1008) == CartesianIndices((4,3,8,15,19))[1008].I
+    for i=1:100
+        shape = (4,rand(1:5),rand(1:7),5,19)
+        target = ([rand(1:s) for s in shape]...,)
+        @test c2l(shape, target) == LinearIndices(shape)[target...]
+    end
+    for i=1:100
+        shape = (4,rand(1:5),rand(1:12),15,19)
+        ci = CartesianIndices(shape)
+        i = rand(1:prod(shape))
+        @test l2c(shape, i) == ci[i].I
+    end
 end
 
 @testset "permutedims" begin
-    a = randn(fill(2, 18)...)
+    a = randn(rand(1:3, 18)...)
     A = CuArray(a)
     p = randperm(18)
     @test Array(permutedims(A, p)) ≈ permutedims(a, p)
