@@ -49,8 +49,8 @@ end
 end
 
 @testset "permutedims" begin
-    a = randn(rand(1:3, 18)...)
+    a = randn(rand(1:3, 20)...)
     A = CuArray(a)
-    p = randperm(18)
+    p = randperm(20)
     @test Array(permutedims(A, p)) ≈ permutedims(a, p)
 end

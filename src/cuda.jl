@@ -32,15 +32,17 @@ function GPUArrays.genperm(I::NTuple{N}, perm::NTuple{N}) where N
     ntuple(d-> (@inbounds return I[perm[d]]), Val(N))
 end
 
-function LinearAlgebra.permutedims!(dest::GPUArrays.AbstractGPUArray, src::GPUArrays.AbstractGPUArray, perm) where N
+function LinearAlgebra.permutedims!(dest::GPUArrays.AbstractGPUArray, src::GPUArrays.AbstractGPUArray, perm)
     perm isa Tuple || (perm = Tuple(perm))
-    CUDA.gpu_call(dest, src, perm; name="permutedims!") do ctx, dest, src, perm
+    size_dest = size(dest)
+    size_src = size(src)
+    CUDA.gpu_call(vec(dest), vec(src), perm; name="permutedims!") do ctx, dest, src, perm
         i = @linearidx src
-        I = l2c(size(src), i)
-        @inbounds dest[c2l(size(dest), GPUArrays.genperm(I, perm))] = src[i]
+        I = l2c(size_src, i)
+        @inbounds dest[c2l(size_dest, GPUArrays.genperm(I, perm))] = src[i]
         return
     end
-    return dest
+    return reshape(dest, size(dest))
 end
 
 using Base.Cartesian
