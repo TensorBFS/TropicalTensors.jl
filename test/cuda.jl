@@ -54,3 +54,9 @@ end
     p = randperm(20)
     @test Array(permutedims(A, p)) ≈ permutedims(a, p)
 end
+
+@testset "counting tropical matmul" begin
+    a = randn(5, 7)
+    b = randn(7, 5)
+    @test a * b ≈ Array(CuArray(a) * CuArray(b))
+end

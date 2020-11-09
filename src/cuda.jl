@@ -8,6 +8,8 @@ CUDA.ones(::Type{Tropical{T}}, dims...) where T = fill!(CuArray{Tropical{T}}(und
 CUDA.zeros(::Type{Tropical{T}}, dims...) where T = fill!(CuArray{Tropical{T}}(undef, dims...), zero(Tropical{T}))
 CUDA.ones(::Type{CountingTropical{T}}, dims...) where T = fill!(CuArray{CountingTropical{T}}(undef, dims...), one(CountingTropical{T}))
 CUDA.zeros(::Type{CountingTropical{T}}, dims...) where T = fill!(CuArray{CountingTropical{T}}(undef, dims...), zero(CountingTropical{T}))
+Base.:(*)(a::CountingTropical, b::Bool) = b ? a : zero(CountingTropical)
+Base.:(*)(b::Bool, a::CountingTropical) = b ? a : zero(CountingTropical)
 
 function _init_reg(::Type{T}, L::Int, usecuda::Val{:true}) where T
     ArrayReg(CUDA.ones(T, 1<<L))
