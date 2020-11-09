@@ -1,5 +1,5 @@
-using CUDA
-device!(parse(Int, get(ARGS, 1, "0")))
+using CUDA, CuYao
+device!(parse(Int, ARGS[1]))
 
 using TropicalTensors
 using HDF5
@@ -50,17 +50,18 @@ function panzhang(::Type{T}, n::Int; seed::Int, usecuda=false) where T
 	labels = tensor_labels(neighbors)
 	tensors = map(1:n) do i
 		arr = T.(permutedims(arrays[:,:,:,i], (3,2,1)))
-		degen = round.(T, exp.(permutedims(entros[:,:,:,i], (3,2,1))))
+		degen = T.(round.(exp.(permutedims(entros[:,:,:,i], (3,2,1)))))
 		LabeledTensor(CountingTropical{T}.(arr, degen), labels[:,i]) 
 	end
 	# circle layout
 	metas = [TensorMeta((0.5+0.5*cos(i/n*2π), 0.5+0.5*sin(i/n*2π)), string(i)) for i=1:n]
     tn = TensorNetwork(tensors, metas=metas)
     if usecuda
-        tn = togpu(tn)
+        tn = TropicalTensors.togpu(tn)
     end
     tree = build_tree(order)
     TropicalTensors.contract(tn, tree).array[]
 end
 
-@time panzhang(160; seed=97, usecuda=true)
+@time panzhang(Float64, 160; seed=97, usecuda=true)
+@time panzhang(Float64, 160; seed=97, usecuda=true)

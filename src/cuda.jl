@@ -21,5 +21,9 @@ function _init_reg(::Type{T}, lt::MaskedSquareLattice, ::Val{:true}) where T
 end
 
 function togpu(tn::TensorNetwork)
-    TensorNetwork(CuArray.(tn.tensors); metas=tn.metas)
+    TensorNetwork(togpu.(tn.tensors); metas=tn.metas)
+end
+
+function togpu(t::LabeledTensor)
+    LabeledTensor(CuArray(t.array), t.labels)
 end
