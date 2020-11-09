@@ -60,8 +60,14 @@ function panzhang(::Type{T}, n::Int; seed::Int, usecuda=false) where T
         tn = TropicalTensors.togpu(tn)
     end
     tree = build_tree(order)
-    TropicalTensors.contract(tn, tree).array[]
+    Array(TropicalTensors.contract(tn, tree).array)[]
 end
 
-@time panzhang(Float64, 160; seed=97, usecuda=true)
-@time panzhang(Float64, 160; seed=97, usecuda=true)
+res = @time panzhang(Float64, 60; seed=97, usecuda=false)
+@show res
+res = @time panzhang(Float64, 60; seed=97, usecuda=true)
+@show res
+res = @time panzhang(Float64, 200; seed=97, usecuda=true)
+@show res
+res = @time panzhang(Float64, 200; seed=97, usecuda=true)
+@show res
