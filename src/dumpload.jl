@@ -15,7 +15,7 @@ function dump_params(folder, sg::Spinglass{LT}, jt::JT, ht::HT, seed::Int) where
     end
     open(hfilename, "w") do f
         write(f, "# $HT\n")
-        for (i, h) in zip(vertices(sg.lattice), sg.hs)
+        for (i, h) in zip(sgvertices(sg.lattice), sg.hs)
             write(f, "$i $h\n")
         end
     end
@@ -44,9 +44,10 @@ function load_params(folder, sg::Spinglass{LT,T}, jt::JT, ht::HT, seed::Int) whe
     end
     open(hfilename, "r") do f
         readline(f)
-        for i in vertices(sg.lattice)
+        for i in 1:length(sgvertices(sg.lattice))
             line = strip(readline(f))
-            sg.hs[i] = parse(T, split(line, ' ')[2])
+            a, b = split(line, ' ')
+            sg.hs[i] = parse(T, b)
         end
     end
     return sg

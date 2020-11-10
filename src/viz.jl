@@ -1,4 +1,19 @@
-export viz_sg
+export viz_sg, viz_lattice
+
+function viz_lattice(lt; line_style=bondstyle(:default, stroke("black")),
+        node_style=nodestyle(:default, stroke("black"), fill("white"), linewidth(0.5mm)),
+        text_style=textstyle(:default))
+    Viznet.empty_cache!()
+    for node in sgvertices(lt)
+        node_style >> lt[node]
+        text_style >> (lt[node], "$node")
+    end
+    for bond in sgbonds(lt)
+        line_style >> lt[bond[1]; bond[2]]
+    end
+    Viznet.flush!()
+end
+
 function viz_sg(sg::Spinglass; r=0.3*unit(sg.lattice))
     lt = sg.lattice
     nb0 = nodestyle(:default, fill("white"), stroke("black"); r=r)
@@ -24,19 +39,19 @@ function viz_sg(sg::Spinglass; r=0.3*unit(sg.lattice))
 end
 
 function Base.show(io::IO, mime::MIME"text/html", lt::Viznet.AbstractLattice)
-    Base.show(io, mime, showlattice(lt, node_style=compose(nodestyle(:default; r=0.3*unit(lt)), stroke("black"), fill("white"))))
+    Base.show(io, mime, viz_lattice(lt, node_style=compose(nodestyle(:default; r=0.3*unit(lt)), stroke("black"), fill("white"))))
 end
 
 function Base.show(io::IO, mime::MIME"text/html", sg::Spinglass)
     Base.show(io, mime, viz_sg(sg))
 end
 
+export viz_optconfig
 function Base.show(io::IO, mime::MIME"text/html", sg::SpinglassOptConfig)
-    Base.show(io, mime, vizoptconfig(sg))
+    Base.show(io, mime, viz_optconfig(sg))
 end
 
-export vizoptconfig
-vizoptconfig(res::SpinglassOptConfig; r=0.3*unit(res.sg.lattice)) = vizgrad_J(res.sg, res.grad_Js, res.grad_hs; r=r)
+viz_optconfig(res::SpinglassOptConfig; r=0.3*unit(res.sg.lattice)) = vizgrad_J(res.sg, res.grad_Js, res.grad_hs; r=r)
 
 export vizgrad_J
 function vizgrad_J(sg::Spinglass, grad_Js::AbstractVector, grad_hs::AbstractVector; r=0.3*unit(sg.lattice))
@@ -47,7 +62,7 @@ function vizgrad_J(sg::Spinglass, grad_Js::AbstractVector, grad_hs::AbstractVect
     eb1 = bondstyle(:default, linewidth(0.4mm), stroke("skyblue"))
     eb2 = bondstyle(:default, linewidth(0.4mm), stroke("orange"))
     cdots = canvas() do
-        for i in vertices(lt)
+        for i in sgvertices(lt)
             if grid[i] > 0
                 nb1 >> lt[i]
             elseif grid[i] < 0
