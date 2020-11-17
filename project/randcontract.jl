@@ -1,4 +1,5 @@
 using CUDA, CuYao
+using DelimitedFiles
 device!(parse(Int, ARGS[1]))
 
 include("panzhangreader.jl")
@@ -30,16 +31,23 @@ function panzhang(::Type{T}, n::Int; seed::Int, usecuda=false, datafile="ising.h
     Array(TropicalTensors.contract(tn, tree).array)[]
 end
 
-function run(n::Int; saveto)
+function run(n::Int; dataset)
+    saveto = joinpath(@__DIR__, "$(dataset)_n$(n)_elsl.dat")
     elsl = zeros(2, 100)
     for seed = 1:100
-        res = @time panzhang(Float64, n; seed=97, usecuda=true)
-        @show res
-        elsl[1,seed] = res.n/n
-        elsl[2,seed] = log(res.c)/n
+        try
+            res = @time panzhang(Float64, n; seed=seed, usecuda=true, datafile=dataset*".hdf5")
+            @show seed
+            @show res
+            elsl[1,seed] = res.n/n
+            elsl[2,seed] = log(res.c)/n
+        catch e
+            println("Fail on seed $seed.")
+        end
     end
+    writedlm(saveto, elsl)
     return elsl
 end
 
-const n = 100
-run(n; saveto=joinpath(@__DIR__, "n$(n)_elsl.dat"))
+const n = 200
+@time run(n; dataset=ARGS[2])
