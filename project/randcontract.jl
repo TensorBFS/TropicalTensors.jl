@@ -33,14 +33,17 @@ end
 
 function run(n::Int; dataset)
     saveto = joinpath(@__DIR__, "$(dataset)_n$(n)_elsl.dat")
-    elsl = zeros(2, 100)
+    elsl = zeros(3, 100)
+    t = @elapsed res = panzhang(Float64, n; seed=1, usecuda=true, datafile=dataset*".hdf5")
     for seed = 1:100
         try
-            res = @time panzhang(Float64, n; seed=seed, usecuda=true, datafile=dataset*".hdf5")
+            t = @elapsed res = panzhang(Float64, n; seed=seed, usecuda=true, datafile=dataset*".hdf5")
             @show seed
             @show res
+            @show t
             elsl[1,seed] = res.n/n
             elsl[2,seed] = log(res.c)/n
+            elsl[3,seed] = t
         catch e
             println("Fail on seed $seed.")
         end
@@ -49,5 +52,5 @@ function run(n::Int; dataset)
     return elsl
 end
 
-const n = 200
+const n = parse(Int, ARGS[3])
 @time run(n; dataset=ARGS[2])
