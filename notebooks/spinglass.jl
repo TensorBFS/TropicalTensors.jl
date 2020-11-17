@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.12.7
+# v0.12.10
 
 using Markdown
 using InteractiveUtils
@@ -99,7 +99,7 @@ md"The minimum energy is $(res.n), degenercy is $(res.c)"
 optimal_config = Reversible.opt_config(sg)
 
 # ╔═╡ e0469c76-21f8-11eb-39fa-d399a9f6654d
-DownloadButton(svgstring(vizoptconfig(optimal_config)), "optimalconfig_$(lattice_type)_Lx$(Lx)_Ly$Ly.svg")
+DownloadButton(svgstring(viz_optconfig(optimal_config)), "optimalconfig_$(lattice_type)_Lx$(Lx)_Ly$Ly.svg")
 
 # ╔═╡ Cell order:
 # ╠═c5eda0dc-215e-11eb-22d1-d76f1b9e047c
@@ -121,4 +121,4 @@ DownloadButton(svgstring(vizoptconfig(optimal_config)), "optimalconfig_$(lattice
 # ╠═246f7f8c-2170-11eb-2659-a9ae4bc4022f
 # ╟─6ff289d6-2166-11eb-3a5c-4f1e686b2810
 # ╠═3f5c4dba-2162-11eb-14b9-632cdafa348d
-# ╠═e0469c76-21f8-11eb-39fa-d399a9f6654d
+# ╟─e0469c76-21f8-11eb-39fa-d399a9f6654d

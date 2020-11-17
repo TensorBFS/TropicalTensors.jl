@@ -1,9 +1,7 @@
-using CUDA, CuYao
-device!(parse(Int, ARGS[1]))
-
+using Test
 include("panzhangreader.jl")
 
-function panzhang(::Type{T}, n::Int; seed::Int, usecuda=false, datafile="ising.hdf5") where T
+function panzhang_check(::Type{T}, n::Int; seed::Int, datafile="ising_test.hdf5") where T
 	loadeddata = HDF5.h5open(TropicalTensors.project_relative_path("data", datafile), "r")
     instance = loadeddata["n$n"]["seed$seed"]
     #return instance
@@ -11,6 +9,8 @@ function panzhang(::Type{T}, n::Int; seed::Int, usecuda=false, datafile="ising.h
     entros = read(instance, "entros")
     order = read(instance, "order")
     neighbors = read(instance, "labels")
+    E = read(instance, "E")
+    S = read(instance, "S")
     close(loadeddata)
 
     # build tensor network
@@ -23,22 +23,20 @@ function panzhang(::Type{T}, n::Int; seed::Int, usecuda=false, datafile="ising.h
 	# circle layout
 	metas = [TensorMeta((0.5+0.5*cos(i/n*2π), 0.5+0.5*sin(i/n*2π)), string(i)) for i=1:n]
     tn = TensorNetwork(tensors, metas=metas)
-    if usecuda
-        tn = TropicalTensors.togpu(tn)
-    end
     tree = build_tree(order)
-    Array(TropicalTensors.contract(tn, tree).array)[]
+    res = Array(TropicalTensors.contract(tn, tree).array)[]
+    println("Mine: E = $(res.n/n), S = $(log(res.c)/n)")
+    println("PanZhang: E = $E, S = $S")
+    @test isapprox(res.n, E * n; atol=1e-2)
+    @test isapprox(res.c, exp(S*n), atol=1e-2)
 end
 
-function run(n::Int; saveto)
-    elsl = zeros(2, 100)
-    for seed = 1:100
-        res = @time panzhang(Float64, n; seed=97, usecuda=true)
-        @show res
-        elsl[1,seed] = res.n/n
-        elsl[2,seed] = log(res.c)/n
+
+@testset "checking" begin
+    for n=[10,16]
+        for seed = 1:3
+            panzhang_check(Float64, n; seed=seed, datafile="ising_test_n1016_seed123.hdf5")
+            panzhang_check(Float64, n; seed=seed, datafile="2sat_test_n1016_seed123.hdf5")
+        end
     end
-    return elsl
 end
-
-run(200; saveto=joinpath(@__DIR__, "n200_elsl.dat"))
