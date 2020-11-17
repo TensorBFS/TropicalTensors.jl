@@ -41,4 +41,5 @@ function run(n::Int; saveto)
     return elsl
 end
 
-run(200; saveto=joinpath(@__DIR__, "n200_elsl.dat"))
+const n = 100
+run(n; saveto=joinpath(@__DIR__, "n$(n)_elsl.dat"))
