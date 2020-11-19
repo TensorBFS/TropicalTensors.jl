@@ -47,7 +47,7 @@ function solve(::Type{TT}, sg::AbstractSpinglass{LT}; usecuda=false) where {TT, 
             if lt.mask[i,j]
                 l += 1
                 reg |> put(nbit, j=>Gh(vertextensor(TT, sg, l)))
-            elseif i!=Lx && lt.mask[i+1,j]
+            elseif i!=Lx && lt.mask[i+1,j] && any(lt.mask[1:i,j])
                 reg |> put(nbit, j=>Gcut(TT))
             end
         end
