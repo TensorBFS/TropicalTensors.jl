@@ -24,7 +24,7 @@ The last line is required only when you use GPU for computing.
 Then open the notebook in a Julia REPL with
 
 ```julia
-julia> using TropicalTensors
+julia> using TropicalTensors, Pluto
 
 julia> notebook("spinglass")
 ```

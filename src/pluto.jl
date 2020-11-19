@@ -1,4 +1,6 @@
-using Pluto
+using .Pluto
+
+@info "You can use the notebooks now by typing, e.g. `TropicalTensors.notebook(\"spinglass\")`"
 
 export notebook
 
