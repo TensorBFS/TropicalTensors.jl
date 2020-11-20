@@ -4,8 +4,6 @@ using .Pluto
 
 export notebook
 
-project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
-
 """
     notebook(which; dev=false, kwargs...)
 

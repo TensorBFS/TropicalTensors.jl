@@ -31,13 +31,13 @@ function panzhang(::Type{T}, n::Int; seed::Int, usecuda=false, datafile="ising.h
     Array(TropicalTensors.contract(tn, tree).array)[]
 end
 
-function run(n::Int; dataset)
+function run(::Type{T}, n::Int; dataset) where T
     saveto = joinpath(@__DIR__, "$(dataset)_n$(n)_elsl.dat")
-    elsl = zeros(3, 100)
-    t = @elapsed res = panzhang(Float64, n; seed=1, usecuda=true, datafile=dataset*".hdf5")
+    elsl = zeros(T, 3, 100)
+    t = @elapsed res = panzhang(T, n; seed=1, usecuda=true, datafile=dataset*".hdf5")
     for seed = 1:100
         try
-            t = @elapsed res = panzhang(Float64, n; seed=seed, usecuda=true, datafile=dataset*".hdf5")
+            t = @elapsed res = panzhang(T, n; seed=seed, usecuda=true, datafile=dataset*".hdf5")
             @show seed
             @show res
             @show t
@@ -53,4 +53,4 @@ function run(n::Int; dataset)
 end
 
 const n = parse(Int, ARGS[3])
-@time run(n; dataset=ARGS[2])
+@time run(Float32, n; dataset=ARGS[2])

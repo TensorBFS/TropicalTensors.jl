@@ -8,6 +8,8 @@ using TropicalNumbers
 export Tropical, CountingTropical
 export Reversible
 
+project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
+
 include("Core.jl")
 include("dumpload.jl")
 include("yao.jl")
