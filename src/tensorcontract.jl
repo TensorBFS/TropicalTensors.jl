@@ -1,4 +1,5 @@
 export tensorcontract, LabeledTensor, TensorNetwork, contract_label!, TensorMeta, contract, ContractionTree
+export contract_tree
 
 function _align_eltypes(xs::AbstractArray...)
     T = promote_type(eltype.(xs)...)
