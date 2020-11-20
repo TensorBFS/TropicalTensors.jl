@@ -7,7 +7,6 @@ include("panzhangreader.jl")
 function panzhang(::Type{T}, n::Int; seed::Int, usecuda=false, datafile="ising.hdf5") where T
 	loadeddata = HDF5.h5open(TropicalTensors.project_relative_path("data", datafile), "r")
     instance = loadeddata["n$n"]["seed$seed"]
-    #return instance
     arrays = read(instance, "tensors")
     entros = read(instance, "entros")
     order = read(instance, "order")
@@ -34,10 +33,13 @@ end
 function run(::Type{T}, n::Int; dataset) where T
     saveto = joinpath(@__DIR__, "$(dataset)_n$(n)_elsl.dat")
     elsl = zeros(T, 3, 100)
-    t = @elapsed res = panzhang(T, n; seed=1, usecuda=true, datafile=dataset*".hdf5")
+    datafile = dataset*".hdf5"
+	loadeddata = HDF5.h5open(TropicalTensors.project_relative_path("data", datafile), "r")
+    println("number of seeds = $(length(read(loadeddata["n$n"])))")
+    t = @elapsed res = panzhang(T, n; seed=10, usecuda=true, datafile=dataset*".hdf5")
     for seed = 1:100
         try
-            t = @elapsed res = panzhang(T, n; seed=seed, usecuda=true, datafile=dataset*".hdf5")
+            t = @elapsed res = panzhang(T, n; seed=seed, usecuda=true, datafile=datafile)
             @show seed
             @show res
             @show t
@@ -45,7 +47,7 @@ function run(::Type{T}, n::Int; dataset) where T
             elsl[2,seed] = log(res.c)/n
             elsl[3,seed] = t
         catch e
-            println("Fail on seed $seed.")
+            println("Fail on seed $seed. $e")
         end
     end
     writedlm(saveto, elsl)
