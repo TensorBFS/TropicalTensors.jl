@@ -1,5 +1,6 @@
 using CUDA, CuYao
 using DelimitedFiles
+using Random
 device!(parse(Int, ARGS[1]))
 
 using TropicalTensors
@@ -79,28 +80,40 @@ function build_J(lt::SquareLattice)
     return d
 end
 
-lt = SquareLattice(9, 9)
-res = solve_potts(Tropical{Float64}, Val(3), lt, build_J(lt); usecuda=false)
-
 using Test
 @testset "check potts" begin
     L = 9
     lt = SquareLattice(L, L)
     CI = CartesianIndices(lt)
-    dj = build_J(lt)
-    sj = Float64[]
-    for b in sgbonds(lt)
-        push!(sj, dj[CI[b[1]].I => CI[b[2]].I])
+    for i=1:10
+        Random.seed!(i)
+        dj = build_J(lt)
+        sj = Float64[]
+        for b in sgbonds(lt)
+            push!(sj, dj[CI[b[1]].I => CI[b[2]].I])
+        end
+        res1 = solve_potts(CountingTropical{Float64}, Val(2), lt, dj; usecuda=false)
+        res2 = solve(CountingTropical{Float64}, Spinglass(lt, sj, zeros(L*L)); usecuda=false)
+        @test res1.n ≈ res2.n
+        @test res1.c ≈ res2.c
     end
-    res1 = solve_potts(Tropical{Float64}, Val(2), lt, dj; usecuda=false)
-    res2 = solve(Tropical{Float64}, Spinglass(lt, sj, zeros(L*L)); usecuda=false)
-    @test res1.n ≈ res2.n
-    @test res1.c ≈ res2.c
 end
-#=
+
+function run(::Type{T}, L::Int; nrepeat, usecuda) where T
+    elsl = zeros(T, 3, nrepeat)
+    for i=1:nrepeat
+        lt = SquareLattice(L, L)
+        t = @elapsed res = solve_potts(CountingTropical{T}, Val(3), lt, build_J(lt); usecuda=usecuda)
+        @show i
+        @show res
+        @show t
+        elsl[1,i] = res.n/n
+        elsl[2,i] = log(res.c)/n
+        elsl[3,i] = t
+    end
+    writedlm(saveto, elsl)
+    return elsl
+end
+
 L = parse(Int, ARGS[2])
-lt = SquareLattice(L, L)
-res = @time solve_potts3(CountingTropical{Float32}, lt, build_J(lt); usecuda=true)
-res = @time solve_potts3(CountingTropical{Float32}, lt, build_J(lt); usecuda=true)
-@show res
-=#
+run(Float32, L; nrepeat=100, usecuda=true)
