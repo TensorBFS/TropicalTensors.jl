@@ -3,7 +3,7 @@
 ## How to run the 6x6x6 cubic benchmark with multi-threading
 
 ```julia
-pkg> add YaoArrayRegister#multi-threading-ngates
+pkg> add YaoArrayRegister#master
 
 pkg> dev https://github.com/TensorBFS/TropicalTensors.jl.git
 ```

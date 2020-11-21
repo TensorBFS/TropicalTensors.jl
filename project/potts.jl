@@ -1,19 +1,22 @@
 using TropicalTensors
 
-function potts3_bondtensor(::Type{T}, J, ::Val{q}) where {T, q}
+"""
+`digits` will make the floating point numbers to have better numeric properties, it is important to the success of degeneracy counting!
+"""
+function potts_bondtensor(::Type{T}, ::Val{q}, J; digits=5) where {T, q}
     angles = cos.(2π .* ((1:q) ./ q))
     res = zeros(T, q, q)
     for i=1:q
         for j=1:q
-            res[i,j] = T(J*angles[mod1(abs(j-i), q)])
+            res[i,j] = T(round(J*angles[mod1(abs(j-i), q)]; digits=5))
         end
     end
     res
 end
 
-function δ3(::Type{T}, n::Int) where T
-    res = zeros(T, fill(3, n)...)
-    for i=1:3
+function δ(::Type{T}, ::Val{q}, n::Int) where {T, q}
+    res = zeros(T, fill(q, n)...)
+    for i=1:q
         res[fill(i, n)...] = one(T)
     end
     res
@@ -24,21 +27,21 @@ function sequential_tree(n::Int)
     TropicalTensors.ContractionTree(sequential_tree(n-1), n)
 end
 
-function solve_potts3(::Type{T}, lt::SquareLattice, J::Dict; usecuda=false) where T
+function solve_potts(::Type{T}, ::Val{q}, lt::SquareLattice, J::Dict; usecuda=false, digits=5) where {T, q}
     # generate tensors
     tensors = Matrix{Any}(undef,lt.Nx, lt.Ny)
 
     for i=1:lt.Nx
         for j=1:lt.Ny
-            v = δ3(T, 4)
+            v = δ(T, Val(q), 4)
             labels = [(i,j-1)=>(i,j), (i-1,j)=>(i,j), (i,j)=>(i,j+1), (i,j)=>(i+1,j)]
             mask = [j==1, i==1, j==lt.Ny, i==lt.Nx]
             if i!=lt.Nx
-                b = potts3_bondtensor(T, J[(i,j)=>(i+1,j)], Val(3))
+                b = potts_bondtensor(T, Val(q), J[(i,j)=>(i+1,j)]; digits=digits)
                 v = tensorcontract((1,2,3,4), v, (4,5), b, (1,2,3,5))
             end
             if j!=lt.Ny
-                a = potts3_bondtensor(T, J[(i,j)=>(i,j+1)], Val(3))
+                a = potts_bondtensor(T, Val(q), J[(i,j)=>(i,j+1)]; digits=digits)
                 v = tensorcontract((1,2,3,4), v, (3,5), a, (1,2,5,4))
             end
             w = dropdims(sum(v, dims=findall(mask)); dims=(findall(mask)...,))
@@ -57,7 +60,7 @@ function solve_potts3(::Type{T}, lt::SquareLattice, J::Dict; usecuda=false) wher
     TropicalTensors.contract_tree(tn, tree).array[].n
 end
 
-function build_J(lt)
+function build_J(lt::SquareLattice)
     d = Dict{Pair{Tuple{Int,Int},Tuple{Int,Int}},Int}()
     for i=1:lt.Nx
         for j=1:lt.Ny
@@ -73,4 +76,20 @@ function build_J(lt)
 end
 
 lt = SquareLattice(9, 9)
-res = solve_potts3(Tropical{Float64}, lt, build_J(lt); usecuda=false)
+res = solve_potts(Tropical{Float64}, Val(3), lt, build_J(lt); usecuda=false)
+
+using Test
+@testset "check potts" begin
+    L = 9
+    lt = SquareLattice(L, L)
+    CI = CartesianIndices(lt)
+    dj = build_J(lt)
+    sj = Float64[]
+    for b in sgbonds(lt)
+        push!(sj, dj[CI[b[1]].I => CI[b[2]].I])
+    end
+    res1 = solve_potts(Tropical{Float64}, Val(2), lt, dj; usecuda=false)
+    res2 = solve(Tropical{Float64}, Spinglass(lt, sj, zeros(L*L)); usecuda=false)
+    @test res1.n ≈ res2.n
+    @test res1.c ≈ res2.c
+end
