@@ -1,3 +1,7 @@
+using CUDA, CuYao
+using DelimitedFiles
+device!(parse(Int, ARGS[1]))
+
 using TropicalTensors
 
 function potts3_bondtensor(::Type{T}, J, ::Val{q}) where {T, q}
@@ -54,7 +58,7 @@ function solve_potts3(::Type{T}, lt::SquareLattice, J::Dict; usecuda=false) wher
     tree = sequential_tree(length(tensors))
 
     # contract
-    TropicalTensors.contract_tree(tn, tree).array[].n
+    Array(TropicalTensors.contract_tree(tn, tree).array)[]
 end
 
 function build_J(lt)
@@ -72,5 +76,8 @@ function build_J(lt)
     return d
 end
 
-lt = SquareLattice(9, 9)
-res = solve_potts3(Tropical{Float64}, lt, build_J(lt); usecuda=false)
+L = parse(Int, ARGS[2])
+lt = SquareLattice(L, L)
+res = @time solve_potts3(CountingTropical{Float32}, lt, build_J(lt); usecuda=true)
+res = @time solve_potts3(CountingTropical{Float32}, lt, build_J(lt); usecuda=true)
+@show res
