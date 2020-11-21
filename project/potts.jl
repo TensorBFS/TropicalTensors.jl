@@ -1,3 +1,7 @@
+using CUDA, CuYao
+using DelimitedFiles
+device!(parse(Int, ARGS[1]))
+
 using TropicalTensors
 
 """
@@ -57,7 +61,7 @@ function solve_potts(::Type{T}, ::Val{q}, lt::SquareLattice, J::Dict; usecuda=fa
     tree = sequential_tree(length(tensors))
 
     # contract
-    TropicalTensors.contract_tree(tn, tree).array[].n
+    Array(TropicalTensors.contract_tree(tn, tree).array)[]
 end
 
 function build_J(lt::SquareLattice)
@@ -93,3 +97,10 @@ using Test
     @test res1.n ≈ res2.n
     @test res1.c ≈ res2.c
 end
+#=
+L = parse(Int, ARGS[2])
+lt = SquareLattice(L, L)
+res = @time solve_potts3(CountingTropical{Float32}, lt, build_J(lt); usecuda=true)
+res = @time solve_potts3(CountingTropical{Float32}, lt, build_J(lt); usecuda=true)
+@show res
+=#
