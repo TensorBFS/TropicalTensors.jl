@@ -10,7 +10,7 @@ function run(::Type{T}, n::Int; nrepeat, usecuda) where T
     elsl = zeros(T, 3, nrepeat)
     for i=1:nrepeat
         lt = SquareLattice(n, n)
-        t = @elapsed res = solve_potts(CountingTropical{T}, Val(3), lt, build_J(lt); usecuda=usecuda)
+        t = @elapsed res = solve_potts(CountingTropical{T}, Val(3), lt, TropicalTensors.potts_randpm_J(lt); usecuda=usecuda)
         @show i
         @show res
         @show t
