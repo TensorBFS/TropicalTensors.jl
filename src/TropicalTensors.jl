@@ -16,6 +16,7 @@ include("yao.jl")
 include("tensorcontract.jl")
 #export Reversible
 include("reversible/reversible.jl")
+include("potts.jl")
 include("viz.jl")
 
 function __init__()
