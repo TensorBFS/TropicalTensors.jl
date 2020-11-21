@@ -1,8 +1,8 @@
 using CUDA, CuYao
 using DelimitedFiles
-using Random
 device!(parse(Int, ARGS[1]))
 
+using Random
 using TropicalTensors
 
 """
@@ -99,10 +99,11 @@ using Test
     end
 end
 
-function run(::Type{T}, L::Int; nrepeat, usecuda) where T
+function run(::Type{T}, n::Int; nrepeat, usecuda) where T
+    saveto = joinpath(@__DIR__, "potts_n$(n)_elsl.dat")
     elsl = zeros(T, 3, nrepeat)
     for i=1:nrepeat
-        lt = SquareLattice(L, L)
+        lt = SquareLattice(n, n)
         t = @elapsed res = solve_potts(CountingTropical{T}, Val(3), lt, build_J(lt); usecuda=usecuda)
         @show i
         @show res
