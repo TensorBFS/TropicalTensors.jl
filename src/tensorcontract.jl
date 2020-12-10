@@ -64,6 +64,22 @@ function _conditioned_permutedims(A::AbstractArray{T,N}, perm) where {T,N}
     end
 end
 
+function Base.show(io::IO, tn::TensorNetwork)
+    print(io, "$(typeof(tn).name):\n  $(join(["$(m.name) => $t" for (m, t) in zip(tn.metas, tn.tensors)], "\n  "))")
+end
+
+function Base.show(io::IO, ::MIME"plain/text", tn::TensorNetwork)
+    Base.show(io, tn)
+end
+
+function Base.show(io::IO, lt::LabeledTensor)
+    print(io, "$(typeof(lt).name){$(eltype(lt.array))}($(join(lt.labels, ", ")))")
+end
+
+function Base.show(io::IO, ::MIME"plain/text", lt::LabeledTensor)
+    Base.show(io, lt)
+end
+
 # abstractions
 struct LabeledTensor{T,N,AT<:AbstractArray{T,N}, LT}
     array::AT
