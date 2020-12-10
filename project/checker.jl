@@ -1,5 +1,5 @@
 using Test
-include("panzhangreader.jl")
+include("dataload.jl")
 
 function panzhang_check(::Type{T}, n::Int; seed::Int, datafile="ising_test.hdf5") where T
 	loadeddata = HDF5.h5open(TropicalTensors.project_relative_path("data", datafile), "r")

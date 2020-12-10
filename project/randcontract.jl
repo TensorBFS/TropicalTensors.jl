@@ -2,7 +2,7 @@ using CUDA, CuYao
 using DelimitedFiles
 device!(parse(Int, ARGS[1]))
 
-include("panzhangreader.jl")
+include("dataload.jl")
 
 function panzhang(::Type{T}, n::Int; seed::Int, usecuda=false, datafile="ising.hdf5") where T
 	loadeddata = HDF5.h5open(TropicalTensors.project_relative_path("data", datafile), "r")
