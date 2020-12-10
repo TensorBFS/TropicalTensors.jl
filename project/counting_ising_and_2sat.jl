@@ -40,9 +40,7 @@ function run(::Type{T}, n::Int; dataset) where T
     for seed = 1:100
         try
             t = @elapsed res = panzhang(T, n; seed=seed, usecuda=true, datafile=datafile)
-            @show seed
-            @show res
-            @show t
+            println("seed = $seed, Δt = $t, maximum energy = $(res.n), degeneracy = $(res.c)")
             elsl[1,seed] = res.n/n
             elsl[2,seed] = log(res.c)/n
             elsl[3,seed] = t

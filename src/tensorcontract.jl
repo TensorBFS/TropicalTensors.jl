@@ -33,7 +33,7 @@ _isunique(x) = length(unique(x)) == length(x)
     pA = indexin(lA, iAs)
     pB = indexin(lB, iBs)
     pOut = indexin(iOuts, lOut)
-    pA, pB, pOut, length(kdims)
+    Int[pA...], Int[pB...], Int[pOut...], length(kdims)
 end
 
 @noinline function analyse_size(pA, sA, pB, sB, nc)
@@ -62,22 +62,6 @@ function _conditioned_permutedims(A::AbstractArray{T,N}, perm) where {T,N}
     else
         return A
     end
-end
-
-function Base.show(io::IO, tn::TensorNetwork)
-    print(io, "$(typeof(tn).name):\n  $(join(["$(m.name) => $t" for (m, t) in zip(tn.metas, tn.tensors)], "\n  "))")
-end
-
-function Base.show(io::IO, ::MIME"plain/text", tn::TensorNetwork)
-    Base.show(io, tn)
-end
-
-function Base.show(io::IO, lt::LabeledTensor)
-    print(io, "$(typeof(lt).name){$(eltype(lt.array))}($(join(lt.labels, ", ")))")
-end
-
-function Base.show(io::IO, ::MIME"plain/text", lt::LabeledTensor)
-    Base.show(io, lt)
 end
 
 # abstractions
@@ -161,3 +145,20 @@ end
         $(Expr(:tuple, [:($(Symbol(:s_, i))+1) for i=1:N-1]..., :(l+1)))
     end
 end
+
+function Base.show(io::IO, tn::TensorNetwork)
+    print(io, "$(typeof(tn).name):\n  $(join(["$(m.name) => $t" for (m, t) in zip(tn.metas, tn.tensors)], "\n  "))")
+end
+
+function Base.show(io::IO, ::MIME"plain/text", tn::TensorNetwork)
+    Base.show(io, tn)
+end
+
+function Base.show(io::IO, lt::LabeledTensor)
+    print(io, "$(typeof(lt).name){$(eltype(lt.array))}($(join(lt.labels, ", ")))")
+end
+
+function Base.show(io::IO, ::MIME"plain/text", lt::LabeledTensor)
+    Base.show(io, lt)
+end
+
