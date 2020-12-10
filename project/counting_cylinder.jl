@@ -11,7 +11,7 @@ function random_degeneracy(::Type{T}, lt; usecuda) where T
 end
 
 function main(::Type{T}, ::Type{LT}, Llist, nrepeat::Int; usecuda=false) where {T, LT}
-    println("The number of repeatition is $nrepeat.")
+    println("The number of repetition is $nrepeat.")
     for (i, L) in enumerate(Llist)
         lt = LT(L, L)
         out = zeros(T, nrepeat, 2)

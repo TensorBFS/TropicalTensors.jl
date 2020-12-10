@@ -8,7 +8,7 @@ using TropicalTensors
 function run(::Type{T}, n::Int; nrepeat, usecuda) where T
     saveto = joinpath(@__DIR__, "potts_n$(n)_elsl.dat")
     elsl = zeros(T, 3, nrepeat)
-    println("number of repeatition is $nrepeat.")
+    println("The number of repetition is $nrepeat.")
     for i=1:nrepeat
         lt = SquareLattice(n, n)
         t = @elapsed res = solve_potts(CountingTropical{T}, Val(3), lt, TropicalTensors.potts_randpm_J(lt); usecuda=usecuda)
