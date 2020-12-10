@@ -4,7 +4,7 @@ device!(parse(Int, ARGS[1]))
 
 include("dataload.jl")
 
-function panzhang(::Type{T}, n::Int; seed::Int, usecuda=false, datafile="ising.hdf5") where T
+function load_and_contract(::Type{T}, n::Int; seed::Int, usecuda=false, datafile="ising.hdf5") where T
 	loadeddata = HDF5.h5open(TropicalTensors.project_relative_path("data", datafile), "r")
     instance = loadeddata["n$n"]["seed$seed"]
     arrays = read(instance, "tensors")
@@ -36,10 +36,10 @@ function run(::Type{T}, n::Int; dataset) where T
     datafile = dataset*".hdf5"
 	loadeddata = HDF5.h5open(TropicalTensors.project_relative_path("data", datafile), "r")
     println("number of seeds = $(length(read(loadeddata["n$n"])))")
-    t = @elapsed res = panzhang(T, n; seed=10, usecuda=true, datafile=dataset*".hdf5")
+    t = @elapsed res = load_and_contract(T, n; seed=10, usecuda=true, datafile=dataset*".hdf5")
     for seed = 1:100
         try
-            t = @elapsed res = panzhang(T, n; seed=seed, usecuda=true, datafile=datafile)
+            t = @elapsed res = load_and_contract(T, n; seed=seed, usecuda=true, datafile=datafile)
             println("seed = $seed, Δt = $t, maximum energy = $(res.n), degeneracy = $(res.c)")
             elsl[1,seed] = res.n/n
             elsl[2,seed] = log(res.c)/n

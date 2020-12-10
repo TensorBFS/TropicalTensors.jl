@@ -22,7 +22,7 @@ The first parameter `0` is the GPU device ID, `18` is the lattice size in both `
 
 3. Sample the degeneracy of 3-state Potts model on GPU by tensor network contraction.
 ```
-$ julia project/counting_potts.jl 0 15
+$ julia project/counting_potts.jl 0 12
 ```
 The parameters are GPU device ID, and square lattice size.
 The default number of samples is 100.

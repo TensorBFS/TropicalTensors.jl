@@ -1,7 +1,6 @@
 using Random
 using TropicalTensors
 using DelimitedFiles
-using Suppressor
 using CuYao, CUDA
 CUDA.device!(parse(Int, ARGS[1]))
 
@@ -12,20 +11,16 @@ function random_degeneracy(::Type{T}, lt; usecuda) where T
 end
 
 function main(::Type{T}, ::Type{LT}, Llist, nrepeat::Int; usecuda=false) where {T, LT}
-    @suppress_err begin
-        for (i, L) in enumerate(Llist)
-            lt = LT(L, L)
-            out = zeros(T, nrepeat, 2)
-            for j = 1:nrepeat
-                println("L=$L, $j")
-                @time out[j,:] .= random_degeneracy(T, lt; usecuda=usecuda)
-            end
-            fname = joinpath(@__DIR__, "data", "$(name(LT))_degeneracy_L$L.dat")
-            if isfile(fname)
-                out = [readdlm(fname); out]
-            end
-            writedlm(fname, out)
+    println("The number of repeatition is $nrepeat.")
+    for (i, L) in enumerate(Llist)
+        lt = LT(L, L)
+        out = zeros(T, nrepeat, 2)
+        for j = 1:nrepeat
+            println("L=$L, $j")
+            @time out[j,:] .= random_degeneracy(T, lt; usecuda=usecuda)
         end
+        fname = joinpath(@__DIR__, "$(name(LT))_degeneracy_L$L.dat")
+        writedlm(fname, out)
     end
 end
 
