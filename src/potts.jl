@@ -64,7 +64,7 @@ function solve_potts(::Type{T}, ::Val{q}, lt::SquareLattice, J::Dict; usecuda=fa
     tree = sequential_tree(length(tensors))
 
     # contract
-    Array(TropicalTensors.contract_tree(tn, tree).array)[]
+    Array(TropicalTensors.contract(tn, tree).array)[]
 end
 
 function potts_randpm_J(lt::SquareLattice)

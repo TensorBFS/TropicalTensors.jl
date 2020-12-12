@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.12.10
+# v0.12.17
 
 using Markdown
 using InteractiveUtils
@@ -84,7 +84,7 @@ end;
 sg = Spinglass(lt, Js, hs)
 
 # ╔═╡ b1036188-21f8-11eb-39cc-a5c83f86483b
-DownloadButton(svgstring(viz_sg(sg)), "spinglass_$(lattice_type)_Lx$(Lx)_Ly$Ly.svg")
+DownloadButton(svgstring(viz(sg)), "spinglass_$(lattice_type)_Lx$(Lx)_Ly$Ly.svg")
 
 # ╔═╡ 4c38a7f6-2165-11eb-15fd-7559fe9bbe86
 md"## Find the optimal configuration"
@@ -99,7 +99,7 @@ md"The minimum energy is $(res.n), degenercy is $(res.c)"
 optimal_config = Reversible.opt_config(sg)
 
 # ╔═╡ e0469c76-21f8-11eb-39fa-d399a9f6654d
-DownloadButton(svgstring(viz_optconfig(optimal_config)), "optimalconfig_$(lattice_type)_Lx$(Lx)_Ly$Ly.svg")
+DownloadButton(svgstring(viz(optimal_config)), "optimalconfig_$(lattice_type)_Lx$(Lx)_Ly$Ly.svg")
 
 # ╔═╡ Cell order:
 # ╠═c5eda0dc-215e-11eb-22d1-d76f1b9e047c

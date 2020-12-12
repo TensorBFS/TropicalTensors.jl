@@ -2,7 +2,6 @@ using Test
 using TropicalTensors
 using CUDA, CuYao
 using ForwardDiff
-using TropicalTensors: c2l, l2c
 using Random
 
 CUDA.allowscalar(false)
@@ -32,27 +31,6 @@ end
     Js = ones(Float32, 2L*(L-1))
     gs = ForwardDiff.gradient(x->solve(SquareLattice(L, L), x, zeros(eltype(x), L^2); usecuda=true).n, Js)
     @test gs ≈ ones(Float32, 2L*(L-1))
-end
-
-@testset "c2l" begin
-    for i=1:100
-        shape = (4,rand(1:5),rand(1:7),5,19)
-        target = ([rand(1:s) for s in shape]...,)
-        @test c2l(shape, target) == LinearIndices(shape)[target...]
-    end
-    for i=1:100
-        shape = (4,rand(1:5),rand(1:12),15,19)
-        ci = CartesianIndices(shape)
-        i = rand(1:prod(shape))
-        @test l2c(shape, i) == ci[i].I
-    end
-end
-
-@testset "permutedims" begin
-    a = randn(rand(1:3, 20)...)
-    A = CuArray(a)
-    p = randperm(20)
-    @test Array(permutedims(A, p)) ≈ permutedims(a, p)
 end
 
 @testset "counting tropical matmul" begin

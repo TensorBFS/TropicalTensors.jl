@@ -4,16 +4,17 @@ using Viznet
 using Requires
 
 using TropicalNumbers
+using SimpleTensorNetworks
 
 export Tropical, CountingTropical
 export Reversible
+export TensorNetwork, LabeledTensor, contract, tensorcontract
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 
 include("Core.jl")
 include("dumpload.jl")
 include("yao.jl")
-include("tensorcontract.jl")
 #export Reversible
 include("reversible/reversible.jl")
 include("potts.jl")
