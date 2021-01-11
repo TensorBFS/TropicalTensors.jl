@@ -7,7 +7,7 @@ using NiLang, NiLang.AD
 @testset "isolve" begin
     Lx, Ly = 3, 4
     lt = ChimeraLattice(Lx, Ly)
-    nJ = length(sgbonds(lt))
+    nJ = length(bonds(lt))
     sg = Spinglass(lt, ones(Int32, nJ), zeros(Int32, Lx*Ly*8))
     reg = ArrayReg(ones(Tropical{Int32}, 1<<(4*Ly)))
     A = stack4reg(reg, 4*Ly)
@@ -21,7 +21,7 @@ end
 
 function _solve(Lx, Ly; largemem)
     lt = ChimeraLattice(Lx, Ly)
-    nJ = length(sgbonds(lt))
+    nJ = length(bonds(lt))
     sg = Spinglass(lt, ones(Int32, nJ), zeros(Int32, Lx*Ly*8))
     reg = ArrayReg(ones(Tropical{Int32}, 1<<(4*Ly)))
     if largemem
@@ -37,7 +37,7 @@ end
 @testset "isolve largemem" begin
     lt = ChimeraLattice(3, 2)
     _, Lx, Ly = size(lt)
-    nJ = length(sgbonds(lt))
+    nJ = length(bonds(lt))
     sg = Spinglass(lt, ones(Int32, nJ), zeros(Int32, Lx*Ly*8))
     reg = ArrayReg(ones(Tropical{Int32}, 1<<(4*Ly)))
     A = stack4reg(reg, Ly*Lx + Ly*(Lx-1)*4 + Lx-1)

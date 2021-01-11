@@ -24,11 +24,9 @@ The last line is required only when you use GPU for computing.
 Then open the notebook in a Julia REPL with
 
 ```julia
-julia> using TropicalTensors, Pluto
+julia> using TropicalTensors
 
-julia> TropicalTensors.notebook("spinglass") # solving square lattice Ising spinglass with the quantum circuit simulator
-
-julia> TropicalTensors.notebook("ising_and_2sat")  # solving Ising spinglass and 2-SAT counting on a 3-regular graph by tensor network contraction
+julia> notebook("spinglass")
 ```
 
 ## Gists

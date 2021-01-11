@@ -9,16 +9,16 @@ end
     include("yao.jl")
 end
 
-@testset "potts" begin
-    include("potts.jl")
-end
-
 @testset "reversible" begin
     include("reversible/reversible.jl")
 end
 
+@testset "tensorcontract.jl" begin
+    include("tensorcontract.jl")
+end
+
 @testset "cuda" begin
-    if Base.find_package("CuYao") !== nothing
+    if Base.find_package("CuYao") != nothing
         include("cuda.jl")
     end
 end

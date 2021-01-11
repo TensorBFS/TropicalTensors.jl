@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.12.18
+# v0.12.7
 
 using Markdown
 using InteractiveUtils
@@ -20,53 +20,46 @@ begin
 	using TropicalTensors
 	using Random
 	using LightGraphs
-	using Compose, Viznet
-	using SimpleTensorNetworks
-	using HDF5
-	Compose.set_default_graphic_size(14cm, 14cm)
-end
-
-# ╔═╡ 73cff25e-5434-11eb-0147-21ac9dbcb8b5
-function rand_3regular_tn(::Type{T}, n; D=2) where T
-	g = LightGraphs.random_regular_graph(n, 3)
-	labels = 1:ne(g)
-	arrays = [rand(T, fill(2, 3)...) for i=1:n]
-	labels = [Int[] for i=1:n]
-	for (k, e) in enumerate(edges(g))
-		push!(labels[e.src], k)
-		push!(labels[e.dst], k)
+	using Compose
+	Compose.set_default_graphic_size(10cm, 10cm)
+	
+	function rand_3regular_tn(::Type{T}, n; D=2) where T
+		g = LightGraphs.random_regular_graph(n, 3)
+		labels = 1:ne(g)
+		arrays = [rand(T, fill(2, 3)...) for i=1:n]
+		labels = [Int[] for i=1:n]
+		for (k, e) in enumerate(edges(g))
+			push!(labels[e.src], k)
+			push!(labels[e.dst], k)
+		end
+		tensors = LabeledTensor.(arrays, labels)
+		metas = [TensorMeta((0.5+0.5*cos(i/n*2π), 0.5+0.5*sin(i/n*2π)), string('A'+(i-1))) for i=1:n]
+		TensorNetwork(tensors; metas=metas)
 	end
-	tensors = LabeledTensor.(arrays, labels)
-	TensorNetwork(tensors)
 end
 
 # ╔═╡ 6b01ff60-217a-11eb-2a5c-13eb2716c727
 md"number of nodes = $(@bind nnodes Slider(2:2:40, default=16))"
 
 # ╔═╡ 2d5dd844-2136-11eb-176f-e53e2ac97d82
-tnr = rand_3regular_tn(Float64, nnodes; D=2)
-
-# ╔═╡ 8d7cb70c-5441-11eb-35cb-e551b9166fd6
-md"contract the graph by a random order"
+tn = rand_3regular_tn(Float64, nnodes; D=2)
 
 # ╔═╡ 1aabc318-2137-11eb-33b7-cfcec36e631f
-@bind step Button(label="step")
+@bind step Button(label="contract")
 
 # ╔═╡ 72d7474c-2137-11eb-030b-eb894e4b22dc
 @regstate step
 
 # ╔═╡ 09ea2b64-2137-11eb-187a-fdf0f5b882ca
 @when step begin
-	length(tnr.tensors) > 1 && SimpleTensorNetworks.contract_label!(tnr, rand(vcat([t.labels for t in tnr.tensors]...)))
-	tnr
+	length(tn.tensors) > 1 && contract!(tn, rand(vcat([t.labels for t in tn.tensors]...)))
+	tn
 end
 
 # ╔═╡ Cell order:
 # ╠═c7118f3c-209e-11eb-1f79-bdc2dd17aea0
-# ╠═73cff25e-5434-11eb-0147-21ac9dbcb8b5
 # ╟─6b01ff60-217a-11eb-2a5c-13eb2716c727
 # ╠═2d5dd844-2136-11eb-176f-e53e2ac97d82
-# ╟─8d7cb70c-5441-11eb-35cb-e551b9166fd6
 # ╟─1aabc318-2137-11eb-33b7-cfcec36e631f
 # ╟─72d7474c-2137-11eb-030b-eb894e4b22dc
 # ╠═09ea2b64-2137-11eb-187a-fdf0f5b882ca

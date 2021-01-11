@@ -4,7 +4,7 @@ using Test
 
 @testset "bonds" begin
     lt = SquareLattice(3,2)
-    @test map(x->x[1]<x[2] ? x : (x[2], x[1]), sgbonds(lt)) == [(1, 4), (1, 2), (4, 5), (2, 5), (2, 3), (5, 6), (3, 6)]
+    @test sgbonds(lt) == [(1, 4), (1, 2), (4, 5), (2, 5), (2, 3), (5, 6), (3, 6)]
 end
 
 @testset "spinglass" begin

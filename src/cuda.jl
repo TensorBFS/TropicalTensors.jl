@@ -1,9 +1,6 @@
 using .CuYao
 using .CuYao: CUDA
-using .CUDA: CuArray, @linearidx, GPUArrays
-using LinearAlgebra
-
-export togpu
+using .CUDA: CuArray
 
 CUDA.ones(::Type{Tropical{T}}, dims...) where T = fill!(CuArray{Tropical{T}}(undef, dims...), one(Tropical{T}))
 CUDA.zeros(::Type{Tropical{T}}, dims...) where T = fill!(CuArray{Tropical{T}}(undef, dims...), zero(Tropical{T}))
@@ -19,29 +16,4 @@ function _init_reg(::Type{T}, lt::MaskedSquareLattice, ::Val{:true}) where T
     state = CUDA.zeros(T, 1<<nbit)
     fill!(view(state,1:1<<(nbit-2)), one(T))
     ArrayReg(state)
-end
-
-function togpu(tn::TensorNetwork)
-    TensorNetwork(togpu.(tn.tensors); metas=tn.metas)
-end
-
-function togpu(t::LabeledTensor)
-    LabeledTensor(CuArray(t.array), t.labels)
-end
-
-function GPUArrays.genperm(I::NTuple{N}, perm::NTuple{N}) where N
-    ntuple(d-> (@inbounds return I[perm[d]]), Val(N))
-end
-
-function LinearAlgebra.permutedims!(dest::GPUArrays.AbstractGPUArray, src::GPUArrays.AbstractGPUArray, perm)
-    perm isa Tuple || (perm = Tuple(perm))
-    size_dest = size(dest)
-    size_src = size(src)
-    CUDA.gpu_call(vec(dest), vec(src), perm; name="permutedims!") do ctx, dest, src, perm
-        i = @linearidx src
-        I = l2c(size_src, i)
-        @inbounds dest[c2l(size_dest, GPUArrays.genperm(I, perm))] = src[i]
-        return
-    end
-    return reshape(dest, size(dest))
 end
