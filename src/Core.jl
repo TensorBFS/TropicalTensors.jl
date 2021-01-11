@@ -17,18 +17,18 @@ _get_J(::Zero) = 0.0
 
 abstract type AbstractSpinglass{LT, T} end
 
-struct Spinglass{LT,T} <: AbstractSpinglass{LT,T}
+struct Spinglass{LT,T,JT<:Union{AbstractVector{T}, Dict{KT, T} where KT},HT<:Union{AbstractVector{T}, Dict{KT2, T} where KT2}} <: AbstractSpinglass{LT,T}
     lattice::LT
-    Js::Vector{T}
-    hs::Vector{T}
+    Js::JT
+    hs::HT
 end
 
-function bondtensor(::Type{TT}, sg::Spinglass, i::Int) where TT
+function bondtensor(::Type{TT}, sg::Spinglass, i) where TT
     J = sg.Js[i]
     TT.([J -J; -J J])
 end
 
-function vertextensor(::Type{TT}, sg::Spinglass, i::Int) where TT
+function vertextensor(::Type{TT}, sg::Spinglass, i) where TT
     h = sg.hs[i]
     TT.([h, -h])
 end

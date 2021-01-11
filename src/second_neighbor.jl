@@ -10,8 +10,10 @@ Base.size(lt::MaskedSquareLattice) = size(lt.mask)
 Base.size(lt::MaskedSquareLattice, i::Int) = size(lt.mask, i)
 Viznet.unit(lt::MaskedSquareLattice) = 1/(max(size(lt)...))
 Viznet.vertices(lt::MaskedSquareLattice) = [i for i in 1:length(lt.mask) if lt.mask[i]]
-function rand_maskedsquare(Nx::Int, Ny::Int, ρ::Real; seed=2)
-    Random.seed!(seed)
+function rand_maskedsquare(Nx::Int, Ny::Int, ρ::Real; seed=nothing)
+    if seed !== nothing
+        Random.seed!(seed)
+    end
     MaskedSquareLattice(rand(Nx, Ny) .< ρ)
 end
 function Base.getindex(lt::MaskedSquareLattice, i::Real, j::Real)
@@ -45,7 +47,7 @@ function solve(::Type{TT}, sg::AbstractSpinglass{LT}; usecuda=false) where {TT, 
             if lt.mask[i,j]
                 l += 1
                 reg |> put(nbit, j=>Gh(vertextensor(TT, sg, l)))
-            else
+            elseif i!=Lx && lt.mask[i+1,j] && any(lt.mask[1:i,j])
                 reg |> put(nbit, j=>Gcut(TT))
             end
         end
