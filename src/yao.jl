@@ -73,6 +73,7 @@ include("square.jl")
 include("chimera.jl")
 include("second_neighbor.jl")
 include("cylinder.jl")
+include("cubic.jl")
 
 function assign_Js(lt::Viznet.AbstractLattice, g::AbstractVector{T}) where T
     grid = zeros(length(lt))

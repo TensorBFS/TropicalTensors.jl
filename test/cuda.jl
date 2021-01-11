@@ -2,6 +2,8 @@ using Test
 using TropicalTensors
 using CUDA, CuYao
 using ForwardDiff
+using Random
+
 CUDA.allowscalar(false)
 
 @testset "cuda" begin
@@ -29,4 +31,10 @@ end
     Js = ones(Float32, 2L*(L-1))
     gs = ForwardDiff.gradient(x->solve(SquareLattice(L, L), x, zeros(eltype(x), L^2); usecuda=true).n, Js)
     @test gs ≈ ones(Float32, 2L*(L-1))
+end
+
+@testset "counting tropical matmul" begin
+    a = CountingTropical{Float64}.(randn(5, 7))
+    b = CountingTropical{Float64}.(randn(7, 5))
+    @test all(a * b .≈ Array(CuArray(a) * CuArray(b)))
 end
