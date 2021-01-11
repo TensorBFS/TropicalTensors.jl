@@ -26,7 +26,9 @@ Then open the notebook in a Julia REPL with
 ```julia
 julia> using TropicalTensors, Pluto
 
-julia> notebook("spinglass")
+julia> TropicalTensors.notebook("spinglass") # solving square lattice Ising spinglass with the quantum circuit simulator
+
+julia> TropicalTensors.notebook("ising_and_2sat")  # solving Ising spinglass and 2-SAT counting on a 3-regular graph by tensor network contraction
 ```
 
 ## Gists

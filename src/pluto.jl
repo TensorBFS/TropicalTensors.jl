@@ -1,6 +1,9 @@
 using .Pluto
 
-@info "You can use the notebooks now by typing, e.g. `TropicalTensors.notebook(\"spinglass\")`"
+@info "You can use the notebooks now by typing, e.g.
+  ∘ `TropicalTensors.notebook(\"spinglass\")`, solving square lattice spinglass using a quantum simulator.
+  ∘ `TropicalTensors.notebook(\"ising_and_2sat\")`, solving Ising spinglass and 2-SAT counting using tensor network contraction.
+"
 
 """
     notebook(which; dev=false, kwargs...)
