@@ -5,12 +5,12 @@
     end
     @invcheckoff for i=1:Ly-1
         for j = 1:4
-            apply_Gvb!(reg, (4*(i-1)+j,4*i+j), Js[k+1], REG_STACK)
+            apply_Gvb!(reg, (@const (4*(i-1)+j,4*i+j)), Js[k+1], REG_STACK)
             k += 1
         end
     end
     @invcheckoff for i=1:Ly
-        apply_G16!(reg, (4i-3,4i-2,4i-1,4i), Js[k+1:k+16], REG_STACK)
+        apply_G16!(reg, (@const (4i-3,4i-2,4i-1,4i)), Js[k+1:k+16], REG_STACK)
         k += 16
     end
     k → length(Js)

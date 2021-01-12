@@ -11,7 +11,7 @@
     end
     for j=1:Ly-1
         k += 1
-        apply_Gvb!(reg, (j, j+1), Js[k], A_STACK)
+        apply_Gvb!(reg, (@const (j, j+1)), Js[k], A_STACK)
     end
     for i=2:Lx
         @safe println("Layer $i/$Lx, stack size: $(A_STACK.top) & $(B_STACK.top)")
@@ -38,7 +38,7 @@
         end
         for j=1:Ly-1
             k += 1
-            apply_Gvb!(reg, (j, j+1), Js[k], A_STACK)
+            apply_Gvb!(reg, (@const (j, j+1)), Js[k], A_STACK)
         end
     end
     summed ← one(TT)
@@ -74,7 +74,7 @@ end
     end
     for j=1:Ly-1
         k += 1
-        apply_Gvb!(reg, (j, j+1), Js[k], REG_STACK)
+        apply_Gvb!(reg, (@const (j, j+1)), Js[k], REG_STACK)
     end
     for i=2:Lx
         @safe println("Layer $i/$Lx")
@@ -87,7 +87,7 @@ end
         end
         for j=1:Ly-1
             k += 1
-            apply_Gvb!(reg, (j, j+1), Js[k], REG_STACK)
+            apply_Gvb!(reg, (@const (j, j+1)), Js[k], REG_STACK)
         end
     end
     summed ← one(TT)
