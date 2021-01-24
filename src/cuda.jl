@@ -16,8 +16,7 @@ end
 
 function _init_reg(::Type{T}, lt::MaskedSquareLattice, ::Val{:true}) where T
     nbit = size(lt, 2) + 2
-    state = CUDA.zeros(T, 1<<nbit)
-    fill!(view(state,1:1<<(nbit-2)), one(T))
+    state = CUDA.ones(T, 1<<nbit)
     ArrayReg(state)
 end
 

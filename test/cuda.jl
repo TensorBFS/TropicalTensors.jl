@@ -13,17 +13,33 @@ CUDA.allowscalar(false)
 end
 
 @testset "spinglass" begin
-    lt = SquareLattice(10, 10)
-    sg = Spinglass(lt, ones(Float32, 180), zeros(Float32, 100))
-    res = solve(sg; usecuda=true)
-    @test res.n == 180
+    for i=1:10
+        lt = SquareLattice(10, 10)
+        sg = Spinglass(lt, randn(Float32, 180), zeros(Float32, 100))
+        res = solve(sg; usecuda=true)
+        res0 = solve(sg; usecuda=false)
+        @test res.n == res0.n
+    end
+end
+
+@testset "masked square" begin
+    for i=1:10
+        lt = rand_maskedsquare(5, 5, 0.7)
+        sg = Spinglass(lt, randn(Float32, length(sgbonds(lt))), zeros(Float32, length(lt)))
+        res = solve(sg; usecuda=true)
+        res0 = solve(sg; usecuda=false)
+        @test res.n == res0.n
+    end
 end
 
 @testset "test Chimera" begin
-    lt = ChimeraLattice(3, 3)
-    sg = Spinglass(lt, ones(Float32, 12*4 + 9*16), zeros(Float32, 9*8))
-    res = solve(sg; usecuda=true)
-    @test res.n == 12*4 + 9*16
+    for i=1:10
+        lt = ChimeraLattice(3, 3)
+        sg = Spinglass(lt, randn(Float32, 12*4 + 9*16), zeros(Float32, 9*8))
+        res = solve(sg; usecuda=true)
+        res0 = solve(sg; usecuda=false)
+        @test res.n == res0.n
+    end
 end
 
 @testset "forwarddiff-gpu" begin
