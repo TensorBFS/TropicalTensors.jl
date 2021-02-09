@@ -61,3 +61,21 @@ end
     sg = Spinglass(lt, [-1,1], [0,0,0])
     @test solve(sg).n == 2
 end
+
+@testset "forwarddiff" begin
+    L = 6
+    lt = rand_maskedsquare(L, L, 0.8)
+    hs = zeros(length(lt))
+    Js = rand([-1,1.0], length(sgbonds(lt)))
+    res = solve(lt, Js, hs; usecuda=false).n
+    gs = ForwardDiff.gradient(x->(dn = solve(lt, eltype(x).(Js), x; usecuda=false).n; (@test ForwardDiff.value(dn)==res); dn), hs)
+    function compute_loss(lt, Js, config)
+        res = 0.0
+        vs = vertices(lt)
+        for (i, (src, dst)) in enumerate(sgbonds(lt))
+            res += Js[i] * config[findfirst(==(src), vs)] * config[findfirst(==(dst), vs)]
+        end
+        return res
+    end
+    @test compute_loss(lt, Js, gs) == res
+end
