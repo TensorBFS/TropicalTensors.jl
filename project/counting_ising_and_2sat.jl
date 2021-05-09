@@ -21,8 +21,7 @@ function load_and_contract(::Type{T}, n::Int; seed::Int, usecuda=false, datafile
 		LabeledTensor(CountingTropical{T}.(arr, degen), labels[:,i]) 
 	end
 	# circle layout
-	metas = [TensorMeta((0.5+0.5*cos(i/n*2π), 0.5+0.5*sin(i/n*2π)), string(i)) for i=1:n]
-    tn = TensorNetwork(tensors, metas=metas)
+    tn = TensorNetwork(tensors)
     if usecuda
         tn = TropicalTensors.togpu(tn)
     end
@@ -36,7 +35,7 @@ function run(::Type{T}, n::Int; dataset) where T
     datafile = dataset*".hdf5"
 	loadeddata = HDF5.h5open(TropicalTensors.project_relative_path("data", datafile), "r")
     println("number of seeds = $(length(read(loadeddata["n$n"])))")
-    t = @elapsed res = load_and_contract(T, n; seed=10, usecuda=true, datafile=dataset*".hdf5")
+    t = @elapsed res = load_and_contract(T, n; seed=1, usecuda=true, datafile=dataset*".hdf5")
     for seed = 1:100
         try
             t = @elapsed res = load_and_contract(T, n; seed=seed, usecuda=true, datafile=datafile)

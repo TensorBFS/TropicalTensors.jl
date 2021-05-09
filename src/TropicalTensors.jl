@@ -8,7 +8,7 @@ using SimpleTensorNetworks
 
 export Tropical, CountingTropical
 export Reversible
-export TensorNetwork, LabeledTensor, contract, tensorcontract
+export TensorNetwork, LabeledTensor, contract, tensorcontract, ContractionTree
 
 project_relative_path(xs...) = normpath(joinpath(dirname(dirname(pathof(@__MODULE__))), xs...))
 

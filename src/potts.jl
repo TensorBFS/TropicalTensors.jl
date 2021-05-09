@@ -1,4 +1,5 @@
 # Solving the Potts model on a SquareLattice
+using SimpleTensorNetworks: ContractionTree
 
 export potts_bondtensor, δ, solve_potts
 
