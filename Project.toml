@@ -32,6 +32,7 @@ TropicalNumbers = "0.2.1"
 TropicalYao = "0.1"
 Viznet = "0.3"
 Yao = "0.6"
+PlutoUI = "0.7"
 julia = "1"
 
 [extras]
