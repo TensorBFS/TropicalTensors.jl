@@ -5,12 +5,14 @@ end
 
 @i function isolve_largemem(out!::T, sg::AbstractSpinglass{MaskedSquareLattice}, reg::ArrayReg{1,TT}, REG_STACK; usecuda=false) where {T,TT<:Tropical{T}}
     @invcheckoff begin
-    lt ← sg.lattice
-    Lx ← size(lt, 1)
-    Ly ← size(lt, 2)
-    nbit ← Ly + 2
-    Js ← sg.Js
-    hs ← sg.hs
+    @routine begin
+        lt ← sg.lattice
+        Lx ← size(lt, 1)
+        Ly ← size(lt, 2)
+        nbit ← Ly + 2
+        Js ← sg.Js
+        hs ← sg.hs
+    end
     k ← 0
     l ← 0
     for i=1:Lx
@@ -61,6 +63,7 @@ end
     l → length(hs)
     k → length(Js)
     summed → one(TT)
+    ~@routine
     end
 end
 
@@ -83,12 +86,14 @@ function cachesize_largemem(lt::MaskedSquareLattice)
 end
 
 @i function isolve(out!::T, sg::Spinglass{MaskedSquareLattice,T}, reg::ArrayReg{1,TT}, A_STACK, B_STACK; usecuda=false) where {T,TT<:Tropical{T}}
-    lt ← sg.lattice
-    Lx ← size(lt, 1)
-    Ly ← size(lt, 2)
-    nbit ← Ly + 2
-    Js ← sg.Js
-    hs ← sg.hs
+    @routine begin
+        lt ← sg.lattice
+        Lx ← size(lt, 1)
+        Ly ← size(lt, 2)
+        nbit ← Ly + 2
+        Js ← sg.Js
+        hs ← sg.hs
+    end
     k ← 0
     l ← 0
     for i=1:Lx
@@ -159,6 +164,7 @@ end
     l → length(hs)
     k → length(Js)
     summed → one(TT)
+    ~@routine
 end
 
 cachesize_A(lt::MaskedSquareLattice) = size(lt,2)*3-1

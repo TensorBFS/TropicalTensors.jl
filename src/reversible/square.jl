@@ -1,9 +1,11 @@
 @i function isolve(out!::T, sg::AbstractSpinglass{SquareLattice, T}, reg::ArrayReg{B,TT}, A_STACK, B_STACK) where {B,T,TT<:Tropical{T}}
     @invcheckoff begin
-    Lx ← sg.lattice.Nx
-    Ly ← sg.lattice.Ny
-    Js ← sg.Js
-    hs ← sg.hs
+    @routine begin
+        Lx ← sg.lattice.Nx
+        Ly ← sg.lattice.Ny
+        Js ← sg.Js
+        hs ← sg.hs
+    end
     @safe println("Layer 1/$Lx, stack size: $(A_STACK.top) & $(B_STACK.top)")
     k ← 0
     for j=1:Ly
@@ -46,6 +48,7 @@
     NiLang.SWAP(summed.n, out!)
     k → length(Js)
     summed → one(TT)
+    ~@routine
     end
 end
 
@@ -63,10 +66,12 @@ end
 
 @i function isolve_largemem(out!, sg::Spinglass{SquareLattice, T}, reg::ArrayReg{B,TT}, REG_STACK) where {B,T,TT<:Tropical{T}}
     @invcheckoff begin
-    Lx ← sg.lattice.Nx
-    Ly ← sg.lattice.Ny
-    Js ← sg.Js
-    hs ← sg.hs
+    @routine begin
+        Lx ← sg.lattice.Nx
+        Ly ← sg.lattice.Ny
+        Js ← sg.Js
+        hs ← sg.hs
+    end
     @safe println("Layer 1/$Lx")
     k ← 0
     for j=1:Ly
@@ -95,6 +100,7 @@ end
     NiLang.SWAP(summed.n, out!)
     k → length(Js)
     summed → one(TT)
+    ~@routine
     end
 end
 

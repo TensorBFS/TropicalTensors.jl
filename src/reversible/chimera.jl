@@ -18,11 +18,13 @@ end
 
 @i function isolve_largemem(out!::T, sg::Spinglass{ChimeraLattice, T}, reg::ArrayReg{B,TT}, REG_STACK) where {B,T,TT<:Tropical{T}}
     @invcheckoff begin
-    Lx ← sg.lattice.Nx
-    Ly ← sg.lattice.Ny
-    Js ← sg.Js
-    hs ← sg.hs
-    nj_red ← (Ly-1)*4 + 16 * Ly
+    @routine begin
+        Lx ← sg.lattice.Nx
+        Ly ← sg.lattice.Ny
+        Js ← sg.Js
+        hs ← sg.hs
+        nj_red ← (Ly-1)*4 + 16 * Ly
+    end
     k ← 0
     @safe println("Running Chimera, Lx = $Lx, Ly = $Ly, eltype = $T.")
     @safe println("Layer 1/$Lx")
@@ -33,7 +35,7 @@ end
     end
 
     for i=2:Lx
-        hk ← (i-1)*Ly*8
+        @routine hk ← (i-1)*Ly*8
         @safe println("Layer $i/$Lx")
         # BLACK
         for j=1:Ly*4
@@ -45,28 +47,33 @@ end
         end
 
         # Contract with RED
-        rr ← _init_reg(Tropical{T}, Ly*4, Val(false))
+        @routine rr ← _init_reg(Tropical{T}, Ly*4, Val(false))
         red_reg(rr, Ly, Js[k+1:k+nj_red], hs[hk+1:hk+4Ly], REG_STACK)
         reg.state .*= rr.state
         incstack!(REG_STACK)
         swap_state!(REG_STACK, rr.state)
         k += nj_red
+        ~@routine
+        ~@routine
     end
     summed ← one(TT)
     i_sum(summed, reg.state)
     NiLang.SWAP(summed.n, out!)
     k → length(Js)
     summed → one(TT)
+    ~@routine
     end
 end
 
 @i function isolve(out!::T, sg::AbstractSpinglass{ChimeraLattice, T}, reg::ArrayReg{B,TT}, A_STACK, B_STACK) where {B,T,TT<:Tropical{T}}
     @invcheckoff begin
-    Lx ← sg.lattice.Nx
-    Ly ← sg.lattice.Ny
-    Js ← sg.Js
-    hs ← sg.hs
-    nj_red ← (Ly-1)*4 + 16 * Ly
+    @routine begin
+        Lx ← sg.lattice.Nx
+        Ly ← sg.lattice.Ny
+        Js ← sg.Js
+        hs ← sg.hs
+        nj_red ← (Ly-1)*4 + 16 * Ly
+    end
     k ← 0
     @safe println("Running Chimera, Lx = $Lx, Ly = $Ly, eltype = $T.")
     @safe println("Layer 1/$Lx")
@@ -112,12 +119,14 @@ end
         reg.state .*= rr.state
         ~@routine
         k += nj_red
+        hk → (i-1)*Ly*8
     end
     summed ← one(TT)
     i_sum(summed, reg.state)
     NiLang.SWAP(summed.n, out!)
     k → length(Js)
     summed → one(TT)
+    ~@routine
     end
 end
 
