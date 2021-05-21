@@ -96,7 +96,7 @@ Tropical(106)
 
 #### Case 2: Computing the energy degeneracy
 ```julia repl
-julia> solve(CountingTropical{Int}, sg; usecuda=false)
+julia> solve(CountingTropical{Int,Int}, sg; usecuda=false)
 Layer 1/10
 Layer 2/10
 Layer 3/10
@@ -107,7 +107,7 @@ Layer 7/10
 Layer 8/10
 Layer 9/10
 Layer 10/10
-CountingTropical{Int64}(106, 1504)
+CountingTropical{Int64,Int64}(106, 1504)
 ```
 
 #### Case 3: Computing the optimal spin configuration with [ForwardDiff](https://github.com/JuliaDiff/ForwardDiff.jl) and [CUDA](https://github.com/JuliaGPU/CUDA.jl)

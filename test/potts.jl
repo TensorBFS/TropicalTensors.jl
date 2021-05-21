@@ -43,8 +43,8 @@ end
         for b in sgbonds(lt)
             push!(sj, dj[CI[b[1]].I => CI[b[2]].I])
         end
-        res1 = solve_potts(CountingTropical{Float64}, Val(2), lt, dj; usecuda=false)
-        res2 = solve(CountingTropical{Float64}, Spinglass(lt, sj, zeros(L*L)); usecuda=false)
+        res1 = solve_potts(CountingTropicalF64, Val(2), lt, dj; usecuda=false)
+        res2 = solve(CountingTropicalF64, Spinglass(lt, sj, zeros(L*L)); usecuda=false)
         @test res1.n ≈ res2.n
         @test res1.c ≈ res2.c
     end
@@ -54,7 +54,7 @@ end
     L = 3
     lt = SquareLattice(L, L)
     jd = potts_randpm_J(lt)
-    res1 = solve_potts(CountingTropical{Float64}, Val(3), lt, jd; usecuda=false)
+    res1 = solve_potts(CountingTropicalF64, Val(3), lt, jd; usecuda=false)
     eng, deg = exact_solve_potts3(lt, jd)
     @test res1.n == eng
     @test res1.c == deg

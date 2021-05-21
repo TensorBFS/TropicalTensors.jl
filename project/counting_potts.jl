@@ -11,7 +11,7 @@ function run(::Type{T}, n::Int; nrepeat, usecuda) where T
     println("The number of repetition is $nrepeat.")
     for i=1:nrepeat
         lt = SquareLattice(n, n)
-        t = @elapsed res = solve_potts(CountingTropical{T}, Val(3), lt, TropicalTensors.potts_randpm_J(lt); usecuda=usecuda)
+        t = @elapsed res = solve_potts(CountingTropical{T,T}, Val(3), lt, TropicalTensors.potts_randpm_J(lt); usecuda=usecuda)
         println("Δt = $t, maximum energy = $(res.n), degeneracy = $(res.c)")
         elsl[1,i] = res.n/n
         elsl[2,i] = log(res.c)/n

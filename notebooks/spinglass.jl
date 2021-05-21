@@ -90,7 +90,7 @@ DownloadButton(svgstring(viz(sg)), "spinglass_$(lattice_type)_Lx$(Lx)_Ly$Ly.svg"
 md"## Find the optimal configuration"
 
 # ╔═╡ 246f7f8c-2170-11eb-2659-a9ae4bc4022f
-res = solve(CountingTropical{Float64}, sg; usecuda=false)
+res = solve(CountingTropicalF64, sg; usecuda=false)
 
 # ╔═╡ 6ff289d6-2166-11eb-3a5c-4f1e686b2810
 md"The minimum energy is $(res.n), degenercy is $(res.c)"

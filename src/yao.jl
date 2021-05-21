@@ -19,7 +19,7 @@ function solve(sg::AbstractSpinglass{LT,T}; usecuda=false) where {LT,T}
 end
 
 function solve_and_count(sg::Spinglass{LT,T}; usecuda=false) where {LT,T}
-    solve(CountingTropical{T}, sg; usecuda=usecuda)
+    solve(CountingTropical{T,T}, sg; usecuda=usecuda)
 end
 
 struct SpinglassOptConfig{LT,T}

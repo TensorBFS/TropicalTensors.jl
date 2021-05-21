@@ -18,7 +18,7 @@ function load_and_contract(::Type{T}, n::Int; seed::Int, usecuda=false, datafile
 	tensors = map(1:n) do i
 		arr = T.(permutedims(arrays[:,:,:,i], (3,2,1)))
 		degen = T.(round.(exp.(permutedims(entros[:,:,:,i], (3,2,1)))))
-		LabeledTensor(CountingTropical{T}.(arr, degen), labels[:,i]) 
+		LabeledTensor(CountingTropical{T,T}.(arr, degen), labels[:,i]) 
 	end
 	# circle layout
     tn = TensorNetwork(tensors)

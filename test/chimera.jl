@@ -28,7 +28,7 @@ end
 @testset "counting tropical" begin
     lt = ChimeraLattice(3, 3)
     sg = Spinglass(lt, ones(Float32, 12*4 + 9*16), zeros(Float32, 72))
-    res = solve(CountingTropical{Float32}, sg; usecuda=false)
+    res = solve(CountingTropicalF32, sg; usecuda=false)
     @test res.n == 12*4 + 9*16
     @test res.c == 2
 end

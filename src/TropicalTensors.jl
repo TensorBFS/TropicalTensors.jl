@@ -7,6 +7,7 @@ using TropicalNumbers
 using SimpleTensorNetworks
 
 export Tropical, CountingTropical
+export TropicalF64, TropicalF32, CountingTropicalF64, CountingTropicalF32
 export Reversible
 export TensorNetwork, LabeledTensor, contract, tensorcontract, ContractionTree
 

@@ -6,7 +6,7 @@ CUDA.device!(parse(Int, ARGS[1]))
 
 function random_degeneracy(::Type{T}, lt; usecuda) where T
     sg = Spinglass(lt, rand(T[-1,1],length(sgbonds(lt))), zeros(T, length(lt)))
-    res = solve(CountingTropical{T}, sg; usecuda=usecuda)
+    res = solve(CountingTropical{T,T}, sg; usecuda=usecuda)
     return res.n, res.c
 end
 

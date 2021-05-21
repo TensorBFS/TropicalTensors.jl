@@ -13,7 +13,7 @@ end
 @testset "counting tropical" begin
     lt = CubicLattice(4,4,4)
     sg = Spinglass(lt, rand_Js(Float32, Ferro(), lt), rand_hs(Float32, Zero(), lt))
-    res = solve(CountingTropical{Float32}, sg; usecuda=false)
+    res = solve(CountingTropicalF32, sg; usecuda=false)
     @test res.n == 144
     @test res.c == 2
 end
@@ -38,6 +38,6 @@ end
     Random.seed!(3)
     lt = CubicLattice(2, 3, 3)
     sg = Spinglass(lt, rand_Js(Float32, Randpm(), lt), rand_hs(Float32, Zero(), lt))
-    res = solve(CountingTropical{Int}, sg; usecuda=false)
+    res = solve(CountingTropical{Int,Int}, sg; usecuda=false)
     @test res.c == count_degeneracy_exact(sg)
 end

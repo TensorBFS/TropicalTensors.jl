@@ -109,7 +109,7 @@ tn = let
 		# from entropy to 
 		degen = round.(exp.(permutedims(entros[:,:,:,i], (3,2,1))))
 		# the first parameter is the tensor element type, where `CountingTropical{Float64}` is a tropical number type that do the counting while computing. The storage is 64 bit floating point numbers. One can also use `Tropical{Float64}` for computing ground state. The reason for not using `Int` is because the degeneracy can be very huge.
-		LabeledTensor(CountingTropical{Float64}.(arr, degen), labels[:,i]) 
+		LabeledTensor(CountingTropicalF64.(arr, degen), labels[:,i]) 
 	end
 	TensorNetwork(tensors)
 end

@@ -7,8 +7,8 @@ export togpu
 
 CUDA.ones(::Type{Tropical{T}}, dims...) where T = fill!(CuArray{Tropical{T}}(undef, dims...), one(Tropical{T}))
 CUDA.zeros(::Type{Tropical{T}}, dims...) where T = fill!(CuArray{Tropical{T}}(undef, dims...), zero(Tropical{T}))
-CUDA.ones(::Type{CountingTropical{T}}, dims...) where T = fill!(CuArray{CountingTropical{T}}(undef, dims...), one(CountingTropical{T}))
-CUDA.zeros(::Type{CountingTropical{T}}, dims...) where T = fill!(CuArray{CountingTropical{T}}(undef, dims...), zero(CountingTropical{T}))
+CUDA.ones(::Type{CountingTropical{T,CT}}, dims...) where {T,CT} = fill!(CuArray{CountingTropical{T,CT}}(undef, dims...), one(CountingTropical{T,CT}))
+CUDA.zeros(::Type{CountingTropical{T,CT}}, dims...) where {T,CT} = fill!(CuArray{CountingTropical{T,CT}}(undef, dims...), zero(CountingTropical{T,CT}))
 
 function _init_reg(::Type{T}, L::Int, usecuda::Val{:true}) where T
     ArrayReg(CUDA.ones(T, 1<<L))
