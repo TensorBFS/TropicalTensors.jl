@@ -1,3 +1,5 @@
+> NOTE: Archived. The continuation of tropical tensor network is in [GenericTensorNetworks](https://github.com/QuEraComputing/GenericTensorNetworks.jl).
+
 # TropicalTensors
 
 Solving spinglass ground state with [Yao](https://github.com/QuantumBFS/Yao.jl). It contains
